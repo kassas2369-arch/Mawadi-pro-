@@ -3,410 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mawadi-Pro ERP + Barcode</title>
-
-<link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+<title>Mawadi-Pro ERP - نظام إدارة المخزون المتكامل</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#007bff">
-
+<meta name="theme-color" content="#1a1f36">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
 :root {
-    --bg-color: #eef2f7;
-    --container-bg: #fff;
-    --text-color: #333;
-    --border-color: #ddd;
+  --bg: #f0f2f8; --surface: #ffffff; --surface2: #f7f8fc; --surface3: #eef0f8;
+  --primary: #3d5af1; --primary-dark: #2a40d4; --primary-light: #e8ecfd;
+  --accent: #22c55e; --danger: #ef4444; --warning: #f59e0b; --info: #0ea5e9; --purple: #8b5cf6;
+  --text: #1a1f36; --text2: #4a5568; --text3: #9aa3b5;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+  --shadow: 0 2px 12px rgba(61,90,241,0.08); --shadow2: 0 8px 32px rgba(61,90,241,0.14);
+  --radius: 14px; --radius-sm: 8px; --radius-lg: 20px;
 }
-
-body.dark-mode {
-    --bg-color: #1a1a1a;
-    --container-bg: #2d2d2d;
-    --text-color: #f5f5f5;
-    --border-color: #444;
+body.dark {
+  --bg: #0f1117; --surface: #1a1d2e; --surface2: #1f2235; --surface3: #252840;
+  --primary: #4f6ef7; --primary-dark: #3d5af1; --primary-light: #1e2445;
+  --text: #e8eaf6; --text2: #9aa3c8; --text3: #5c6380;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow2: 0 8px 32px rgba(0,0,0,0.5);
 }
-
-body{font-family:Arial, sans-serif; background: var(--bg-color); color: var(--text-color); padding:15px; transition: 0.3s;}
-.container{background: var(--container-bg); padding:10px; border-radius:10px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-table{width:100%; border-collapse:collapse; margin-top:10px}
-th,td{border:1px solid var(--border-color); padding:8px; text-align:center}
-th{background:#007bff; color:#fff}
-button{margin:3px; padding:6px 10px; border:none; border-radius:5px; background:#007bff; color:#fff; cursor:pointer}
-input,select{padding:6px; margin:3px; background: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color);}
-
-.logo{width:100px; height:100px; object-fit: cover; border-radius:50%; border: 2px solid #007bff; margin-bottom: 10px;}
-
-.theme-switch { position: fixed; top: 10px; left: 10px; z-index: 1000; background: #444; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-#loginBox{max-width:300px; margin:auto; margin-top:80px; text-align:center}
-
-#missingPage { display: none; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; background: #f4f4f4; z-index: 9999; padding: 20px;}
-#printableArea { background: white; width: 210mm; min-height: 290mm; margin: auto; padding: 20mm; box-sizing: border-box; border: 1px solid #eee; color: black !important;}
-.pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #007bff; padding-bottom: 15px; margin-bottom: 20px;}
-.pdf-table { width: 100%; border: 1px solid #000; border-collapse: collapse; }
-.pdf-table th { background: #f2f2f2 !important; color: black !important; border: 1px solid #000; }
-.pdf-table td { border: 1px solid #000; padding: 10px; color: black !important;}
-
-#reader { width: 100%; max-width: 400px; min-height: 250px; margin: auto; display: none; border: 2px solid #007bff; border-radius: 10px; overflow: hidden; background: #000000; }
-.qty-controls { display: flex; align-items: center; justify-content: center; gap: 5px; }
-.btn-qty { background: #28a745; width: 25px; height: 25px; padding: 0; }
-.btn-minus { background: #dc3545; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+#loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1f36 0%, #3d5af1 50%, #22c55e 100%); padding: 20px; position: relative; overflow: hidden; }
+#loginPage::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 50px 50px; animation: float 20s linear infinite; }
+@keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+.login-card { background: var(--surface); border-radius: var(--radius-lg); padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: 0 32px 80px rgba(0,0,0,0.3); text-align: center; position: relative; z-index: 1; }
+.login-logo { width: 80px; height: 80px; border-radius: 24px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; box-shadow: 0 8px 24px rgba(61,90,241,0.3); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.login-title { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+.login-sub { font-size: 14px; color: var(--text3); margin-bottom: 32px; }
+.field-group { margin-bottom: 18px; text-align: right; }
+.field-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+.field-group input { width: 100%; padding: 14px 18px; border: 2px solid var(--border2); border-radius: var(--radius-sm); font-family: 'Cairo', sans-serif; font-size: 15px; background: var(--surface2); color: var(--text); transition: all 0.2s; outline: none; }
+.field-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(61,90,241,0.12); }
+.btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 8px; box-shadow: 0 4px 16px rgba(61,90,241,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(61,90,241,0.4); }
+.btn-primary:active { transform: scale(0.98); }
+#appPage { display: none; min-height: 100vh; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.topbar-brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 2px solid var(--border2); transition: transform 0.2s; }
+.brand-logo:hover { transform: scale(1.1); }
+.brand-name { font-size: 18px; font-weight: 800; color: var(--text); }
+.brand-name span { color: var(--primary); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border2); background: var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; color: var(--text2); }
+.icon-btn:hover { background: var(--primary-light); color: var(--primary); transform: translateY(-2px); }
+.nav-tabs { display: flex; gap: 8px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 64px; z-index: 99; }
+.nav-tab { padding: 8px 16px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text2); font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.nav-tab:hover { background: var(--surface2); }
+.nav-tab.active { background: var(--primary-light); color: var(--primary); }
+.content { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border-radius: var(--radius); padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform 0.2s; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card:nth-child(1)::before { background: var(--primary); }
+.stat-card:nth-child(2)::before { background: var(--accent); }
+.stat-card:nth-child(3)::before { background: var(--warning); }
+.stat-card:nth-child(4)::before { background: var(--danger); }
+.stat-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 900; color: var(--primary); line-height: 1; }
+.stat-value.green { color: var(--accent); }
+.stat-value.orange { color: var(--warning); }
+.stat-value.red { color: var(--danger); }
+.stat-trend { font-size: 11px; margin-top: 6px; font-weight: 600; }
+.stat-trend.up { color: var(--accent); }
+.stat-trend.down { color: var(--danger); }
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+.card:hover { box-shadow: var(--shadow2); }
+.card-header { padding: 18px 20px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.card-title { font-size: 15px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.card-body { padding: 16px 20px 20px; }
+.charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+.chart-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 20px; }
+.chart-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 16px; text-align: center; }
+.chart-container { position: relative; height: 250px; }
+.ai-insights { background: linear-gradient(135deg, var(--primary-light), var(--surface)); border: 1px solid var(--primary); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+.ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ai-icon { font-size: 24px; animation: sparkle 2s ease-in-out infinite; }
+@keyframes sparkle { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.2) rotate(10deg); } }
+.ai-title { font-size: 16px; font-weight: 800; color: var(--primary); }
+.ai-content { font-size: 13px; color: var(--text2); line-height: 1.8; }
+.ai-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.ai-item:last-child { border-bottom: none; }
+#reader { display: none; border-radius: var(--radius); overflow: hidden; border: 2px solid var(--primary); margin-bottom: 16px; background: #000; }
+.input-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.inp { flex: 1; min-width: 120px; padding: 11px 16px; border: 1.5px solid var(--border2); border-radius: var(--radius-sm); font-family: 'Cairo', sans-serif; font-size: 13px; background: var(--surface2); color: var(--text); outline: none; transition: all 0.2s; }
+.inp:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(61,90,241,0.1); }
+select.inp { cursor: pointer; }
+.btn { padding: 10px 18px; border: none; border-radius: var(--radius-sm); font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn-blue { background: var(--primary); color: #fff; }
+.btn-blue:hover { background: var(--primary-dark); }
+.btn-green { background: var(--accent); color: #fff; }
+.btn-green:hover { opacity: 0.9; }
+.btn-red { background: var(--danger); color: #fff; }
+.btn-red:hover { opacity: 0.9; }
+.btn-yellow { background: var(--warning); color: #fff; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-info { background: var(--info); color: #fff; }
+.btn-gray { background: var(--surface3); color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { background: var(--surface3); }
+.btn-lg { width: 100%; justify-content: center; padding: 14px; font-size: 14px; border-radius: var(--radius-sm); margin-top: 4px; }
+.search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.search-bar .inp { flex: 1; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: var(--primary); color: #fff; padding: 12px 14px; font-weight: 700; font-size: 12px; text-align: center; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 11px 14px; text-align: center; color: var(--text); font-size: 13px; }
+.code-badge { display: inline-block; background: var(--primary-light); color: var(--primary); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 700; font-family: monospace; }
+.sup-badge { display: inline-block; background: var(--surface3); color: var(--text2); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+.qty-wrap { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 2px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 6px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1; }
+.qty-minus { background: #fee2e2; color: var(--danger); }
+.qty-plus { background: #dcfce7; color: var(--accent); }
+.qty-minus:hover { background: #fecaca; }
+.qty-plus:hover { background: #bbf7d0; }
+.qty-num { min-width: 32px; text-align: center; font-weight: 800; font-size: 14px; color: var(--text); }
+.tbl-actions { display: flex; gap: 4px; justify-content: center; }
+.tbl-btn { width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; }
+.tbl-btn:hover { transform: scale(1.1); }
+.tbl-edit { background: #fef3c7; }
+.tbl-del { background: #fee2e2; }
+#supplierPdfPage { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; overflow-y: auto; }
+.page-topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; }
+.page-title { font-size: 16px; font-weight: 800; flex: 1; }
+.page-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 20px; }
+.printable-area { background: white; width: 210mm; min-height: 290mm; margin: 0 auto 20px; padding: 18mm; box-sizing: border-box; color: black !important; }
+.pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3d5af1; padding-bottom: 16px; margin-bottom: 24px; }
+.pdf-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
+.pdf-shop { font-size: 22px; font-weight: 800; color: #3d5af1; margin-bottom: 4px; }
+.pdf-date { font-size: 12px; color: #666; }
+.pdf-banner { text-align: center; background: #3d5af1; color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 16px; font-weight: 700; }
+.pdf-sup { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 12px; padding: 8px 12px; background: #f0f2f8; border-radius: 6px; border-right: 4px solid #3d5af1; }
+.pdf-table { width: 100%; border-collapse: collapse; }
+.pdf-table th { background: #f0f2f8 !important; color: #1a1f36 !important; border: 1px solid #ddd; padding: 10px; font-size: 13px; }
+.pdf-table td { border: 1px solid #ddd; padding: 10px; font-size: 13px; color: #333 !important; }
+.pdf-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.pdf-stat-box { background: #f0f2f8; border-radius: 8px; padding: 12px; text-align: center; }
+.pdf-stat-value { font-size: 20px; font-weight: 800; color: #3d5af1; }
+.pdf-stat-label { font-size: 11px; color: #666; margin-top: 4px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 13px; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #fff; padding: 14px 24px; border-radius: 12px; font-size: 13px; font-weight: 700; box-shadow: var(--shadow2); z-index: 9999; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; display: flex; align-items: center; gap: 8px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.green { background: var(--accent); }
+.toast.red { background: var(--danger); }
+.toast.warning { background: var(--warning); }
+.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.report-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.report-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; cursor: pointer; transition: all 0.2s; }
+.report-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-color: var(--primary); }
+.report-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; }
+.report-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.report-desc { font-size: 12px; color: var(--text3); }
+.shop-edit-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.invoice-items { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; }
+.invoice-item-row { display: flex; align-items: center; gap: 8px; padding: 10px; border-bottom: 1px solid var(--border); }
+.invoice-item-row:last-child { border-bottom: none; }
+.invoice-total { background: var(--primary-light); padding: 16px; border-radius: var(--radius-sm); text-align: center; font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 12px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow2); }
+.modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 16px; font-weight: 800; }
+.modal-close { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--surface2); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.category-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--surface3); color: var(--text2); }
+@media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .charts-grid { grid-template-columns: 1fr; } .topbar { padding: 0 12px; } .content { padding: 16px 10px; } .printable-area { width: 100%; padding: 12px; } .nav-tabs { padding: 8px 10px; } }
+@media (max-width: 540px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .stat-card:nth-child(3), .stat-card:nth-child(4) { grid-column: span 2; } }
+@media print { body { background: white; } #supplierPdfPage { position: static; } .page-topbar, .page-actions { display: none; } .printable-area { box-shadow: none; border: none; } }
 </style>
 </head>
-
 <body>
 
-<div class="theme-switch" onclick="toggleTheme()">☀️</div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-<div id="loginBox" class="container">
-<h3>🔒 تسجيل الدخول</h3>
-<img src="https://cdn-icons-png.flaticon.com/512/6073/6073873.png" style="width: 60px;"><br><br>
-<input id="user" placeholder="المستخدم">
-<input id="pass" type="password" placeholder="كلمة المرور">
-<button onclick="login()">دخول</button>
-<p style="font-size: 12px; color: #666;">يمكنك تغيير كلمة السر من الداخل</p>
-</div>
-
-<div id="app" style="display:none">
-
-<div style="text-align:center;margin-bottom:10px">
-<div onclick="document.getElementById('logoInput').click()" style="cursor: pointer;">
-    <img id="logoPreview" class="logo" src="https://cdn-icons-png.flaticon.com/512/1162/1162456.png">
-    <input type="file" id="logoInput" style="display:none" accept="image/*" onchange="uploadLogo()">
-    <p style="font-size: 10px;">اضغط لتغيير الشعار</p>
-</div>
-<h2 id="shopName"></h2>
-<input id="shopInput" placeholder="اسم المحل">
-<button onclick="saveShopName()">💾 حفظ الاسم</button>
-<br>
-<button onclick="changePasswordPrompt()" style="background:#6c757d; font-size: 11px;">🔑 تغيير كلمة السر</button>
-</div>
-
-<div class="container">
-<div id="reader"></div> 
-<div style="text-align:center; margin: 10px 0;">
-    <button id="startBtn" onclick="startScanner()" style="background:#28a745">📸 فتح ماسح الباركود</button>
-    <button id="stopBtn" onclick="stopScanner()" style="display:none; background:#dc3545">❌ إغلاق الكاميرا</button>
-</div>
-<br>
-<input id="name" placeholder="اسم المادة">
-<input id="code" placeholder="الكود">
-<input id="four" placeholder="المزود">
-<select id="supplierDropdown" onchange="selectSupplier()"></select>
-<button onclick="addMaterial()">➕ إضافة</button>
-<br>
-<input id="searchInput" placeholder="🔍 بحث بالاسم أو الكود..." oninput="renderTable()">
-<button onclick="resetSearch()">🔄 Reset</button>
-<h4 id="counterBox"></h4>
-<br>
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-    <input type="file" id="excelFile" accept=".xlsx" style="display:none" onchange="importExcel(event)">
-    <button onclick="document.getElementById('excelFile').click()">📥 Import Excel</button>
-    <button onclick="exportExcelFile()">📤 Export Excel</button>
-    <button onclick="backupJSON()">💾 Backup</button>
-    <button onclick="restoreJSON()">🔄 Restore</button>
-</div>
-<br>
-<button onclick="showMissingPage()" style="background:#28a745; width: 100%; padding: 12px;">📑 صفحة النواقص (A4)</button>
-
-<table>
-<thead>
-<tr>
-<th>الكود</th>
-<th>الاسم</th>
-<th>المزود</th>
-<th>الكمية</th>
-<th>تعديل/حذف</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
-</div>
-</div>
-
-<div id="missingPage">
-    <div id="printableArea">
-        <div class="pdf-header">
-            <div style="text-align: right;"><h2 id="shopName2" style="margin:0; color:#007bff;"></h2><p id="dateTime"></p></div>
-            <img id="logoPreview2" class="logo">
-        </div>
-        <div style="text-align:center; background:#007bff; color:white; padding:10px; margin:20px 0;"><h3>قائمة طلبات المواد الناقصة</h3></div>
-        <div id="supplierTitle" style="font-weight:bold; margin-bottom:10px;"></div>
-        <table class="pdf-table">
-            <thead><tr><th>المادة</th><th>الكود</th><th>الكمية</th></tr></thead>
-            <tbody id="missingTable"></tbody>
-        </table>
+<!-- LOGIN PAGE -->
+<div id="loginPage" style="display:flex">
+  <div class="login-card">
+    <div class="login-logo">📦</div>
+    <div class="login-title">Mawadi-Pro ERP</div>
+    <div class="login-sub">نظام إدارة المخزون المتكامل بالذكاء الاصطناعي</div>
+    <div class="field-group">
+      <label>المستخدم</label>
+      <input id="user" placeholder="أدخل اسم المستخدم" autocomplete="username">
     </div>
-    <div style="text-align:center; margin-top:20px;">
-        <select id="filterSupplier" onchange="renderMissingTable()"></select><br><br>
-        <button onclick="exportMissingPDF()" style="background:#dc3545">📑 تحميل PDF</button>
-        <button onclick="shareMissingPageWhatsApp()" style="background:#25D366">📱 WhatsApp (نسخة A4)</button>
-        <button onclick="closeMissingPage()" style="background:#666">رجوع</button>
+    <div class="field-group">
+      <label>كلمة المرور</label>
+      <input id="pass" type="password" placeholder="أدخل كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
     </div>
-</div>
-
-<script>
-let materials = JSON.parse(localStorage.getItem("materials") || "[]");
-let html5QrCode;
-
-function login(){
-    const savedUser = localStorage.getItem("adminUser") || "admin";
-    const savedPass = localStorage.getItem("adminPass") || "1234";
-    if(document.getElementById("user").value === savedUser && document.getElementById("pass").value === savedPass){
-        document.getElementById("loginBox").style.display="none";
-        document.getElementById("app").style.display="block";
-        loadData();
-    } else alert("بيانات الدخول خاطئة");
-}
-
-function changePasswordPrompt() {
-    const newUser = prompt("أدخل اسم المستخدم الجديد:", localStorage.getItem("adminUser") || "admin");
-    const newPass = prompt("أدخل كلمة السر الجديدة:");
-    if(newUser && newPass) {
-        localStorage.setItem("adminUser", newUser);
-        localStorage.setItem("adminPass", newPass);
-        alert("تم تحديث بيانات الدخول بنجاح");
-    }
-}
-
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-}
-
-// تعديل برمجي متقدم جداً متوافق مع WebView لمنع الشاشة البيضاء
-function startScanner() {
-    const readerDiv = document.getElementById("reader");
-    readerDiv.style.display = "block";
-    document.getElementById("stopBtn").style.display = "inline-block";
-    document.getElementById("startBtn").style.display = "none";
-
-    // إجبار المتصفح الداخلي على تهيئة المساحة لعرض الكاميرا
-    readerDiv.innerHTML = ""; 
-
-    setTimeout(() => {
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("reader", { useBarCodeDetectorIfSupported: true });
-        }
-
-        const config = { 
-            fps: 15, 
-            qrbox: { width: 280, height: 160 },
-            aspectRatio: 1.0
-        };
-
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            config,
-            (decodedText) => {
-                document.getElementById("code").value = decodedText;
-                document.getElementById("searchInput").value = decodedText;
-                renderTable();
-                stopScanner();
-            },
-            (errorMessage) => {
-                // تجاوز الأخطاء المتكررة أثناء البحث عن الكود لمنع توقف الشاشة
-            }
-        ).catch(err => {
-            alert("خطأ WebView الداخلي: " + err);
-            stopScanner();
-        });
-    }, 300); // تأخير بسيط بالملي ثانية ليتم تجهيز شاشة الأندرويد
-}
-
-function stopScanner() {
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            document.getElementById("reader").style.display = "none";
-            document.getElementById("stopBtn").style.display = "none";
-            document.getElementById("startBtn").style.display = "inline-block";
-        }).catch(err => {
-            document.getElementById("reader").style.display = "none";
-            document.getElementById("stopBtn").style.display = "none";
-            document.getElementById("startBtn").style.display = "inline-block";
-        });
-    }
-}
-
-function addMaterial() {
-    const n = document.getElementById("name").value;
-    if(!n) return;
-    materials.push({ 
-        id: Date.now(), 
-        name: n, 
-        code: document.getElementById("code").value, 
-        four: document.getElementById("four").value,
-        qty: 1 
-    });
-    saveAndRefresh();
-    clearInputs();
-}
-
-function changeQty(id, val) {
-    const m = materials.find(x => x.id === id);
-    m.qty = Math.max(0, (m.qty || 0) + val);
-    saveAndRefresh();
-}
-
-function saveAndRefresh() {
-    localStorage.setItem("materials", JSON.stringify(materials));
-    renderTable();
-    updateSuppliersList();
-}
-
-function renderTable() {
-    const search = document.getElementById("searchInput").value.toLowerCase();
-    const tbody = document.getElementById("table");
-    tbody.innerHTML = "";
-    materials.filter(m => m.name.toLowerCase().includes(search) || (m.code && m.code.toLowerCase().includes(search))).forEach(m => {
-        tbody.innerHTML += `<tr>
-            <td>${m.code || '-'}</td>
-            <td>${m.name}</td>
-            <td>${m.four || '-'}</td>
-            <td>
-                <div class="qty-controls">
-                    <button class="btn-qty btn-minus" onclick="changeQty(${m.id}, -1)">-</button>
-                    <span style="font-weight:bold">${m.qty || 0}</span>
-                    <button class="btn-qty" onclick="changeQty(${m.id}, 1)">+</button>
-                </div>
-            </td>
-            <td>
-                <button style="background:#ffc107;color:black" onclick="editMaterial(${m.id})">📝</button>
-                <button style="background:#dc3545" onclick="deleteMaterial(${m.id})">🗑️</button>
-            </td>
-        </tr>`;
-    });
-    document.getElementById("counterBox").innerText = "عدد المواد: " + materials.length;
-}
-
-function editMaterial(id) {
-    const m = materials.find(x => x.id === id);
-    const n = prompt("تعديل اسم المادة:", m.name);
-    if(n) {
-        m.name = n; m.code = prompt("تعديل الكود:", m.code); m.four = prompt("تعديل المزود:", m.four);
-        saveAndRefresh();
-    }
-}
-
-function deleteMaterial(id) {
-    if(confirm("حذف؟")) { materials = materials.filter(m => m.id !== id); saveAndRefresh(); }
-}
-
-function selectSupplier() { document.getElementById("four").value = document.getElementById("supplierDropdown").value; }
-
-function updateSuppliersList() {
-    const sups = [...new Set(materials.map(m => m.four))].filter(s => s);
-    ["supplierDropdown", "filterSupplier"].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-            el.innerHTML = '<option value="all">كل المزودين</option>';
-            sups.forEach(s => el.innerHTML += `<option value="${s}">${s}</option>`);
-        }
-    });
-}
-
-function showMissingPage() {
-    document.getElementById("app").style.display="none";
-    document.getElementById("missingPage").style.display="block";
-    document.getElementById("dateTime").innerText = "التاريخ: " + new Date().toLocaleString('ar-TN');
-    renderMissingTable();
-}
-
-function renderMissingTable() {
-    const sup = document.getElementById("filterSupplier").value;
-    document.getElementById("supplierTitle").innerText = "المزود: " + (sup === "all" ? "الكل" : sup);
-    const tbody = document.getElementById("missingTable");
-    tbody.innerHTML = "";
-    materials.filter(m => (sup === "all" || m.four === sup) && m.qty > 0).forEach(m => {
-        tbody.innerHTML += `<tr><td>${m.name}</td><td>${m.code || '-'}</td><td>${m.qty}</td></tr>`;
-    });
-}
-
-function exportMissingPDF() {
-    const { jsPDF } = window.jspdf;
-    html2canvas(document.getElementById("printableArea"), { scale: 2 }).then(canvas => {
-        const img = canvas.toDataURL('image/png');
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const w = doc.internal.pageSize.getWidth();
-        const h = (canvas.height * w) / canvas.width;
-        doc.addImage(img, 'PNG', 0, 0, w, h);
-        doc.save("Nawakis.pdf");
-    });
-}
-
-function shareMissingPageWhatsApp() {
-    const sup = document.getElementById("filterSupplier").value;
-    const shop = localStorage.getItem("shopName") || "المحل";
-    let msg = `*📑 قائمة نواقص: ${shop}*\n`;
-    msg += `*📅 التاريخ:* ${new Date().toLocaleDateString('ar-TN')}\n`;
-    msg += `*👤 المزود:* ${sup === "all" ? "الكل" : sup}\n`;
-    msg += `----------------------------\n`;
-    msg += `*المادة* | *الكود* | *الكمية*\n`;
-    materials.filter(m => (sup === "all" || m.four === sup) && m.qty > 0).forEach(m => {
-        msg += `▪️ ${m.name} | ${m.code || '---'} | [ ${m.qty} ]\n`;
-    });
-    msg += `----------------------------\n`;
-    msg += `_تم التوليد بواسطة Mawadi-Pro_`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
-}
-
-function saveShopName() { localStorage.setItem("shopName", document.getElementById("shopInput").value); loadData(); }
-
-function uploadLogo() {
-    const file = document.getElementById("logoInput").files[0];
-    const r = new FileReader();
-    r.onloadend = () => { localStorage.setItem("shopLogo", r.result); loadData(); };
-    if(file) r.readAsDataURL(file);
-}
-
-function loadData() {
-    const n = localStorage.getItem("shopName") || "المحل";
-    document.getElementById("shopName").innerText = n; document.getElementById("shopName2").innerText = n;
-    const l = localStorage.getItem("shopLogo");
-    if(l) { document.getElementById("logoPreview").src = l; document.getElementById("logoPreview2").src = l; }
-    if(localStorage.getItem("theme") === "dark") document.body.classList.add('dark-mode');
-    renderTable(); updateSuppliersList();
-}
-
-function exportExcelFile() {
-    XLSX.writeFile(XLSX.utils.book_append_sheet(XLSX.utils.book_new(), XLSX.utils.json_to_sheet(materials), "Data"), "data.xlsx");
-}
-
-function importExcel(e) {
-    const r = new FileReader();
-    r.onload = (ev) => {
-        const data = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result), {type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result), {type:'array'}).SheetNames[0]]);
-        materials = data;
-        saveAndRefresh();
-    };
-    r.readAsArrayBuffer(e.target.files[0]);
-}
-
-function backupJSON() {
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(materials)], {type: "application/json"})); a.download = "backup.json"; a.click();
-}
-
-function restoreJSON() {
-    const i = document.createElement('input'); i.type = 'file';
-    i.onchange = e => {
-        const r = new FileReader();
-        r.onload = ev => { materials = JSON.parse(ev.target.result); saveAndRefresh(); };
-        r.readAsText(e.target.files[0]);
-    };
-    i.click();
-}
-
-function clearInputs() { document.getElementById("name").value=""; document.getElementById("code").value=""; document.getElementById("four").value=""; }
-function closeMissingPage() { document.getElementById("missingPage").style.display="none"; document.getElementById("app").style.display="block"; }
-function resetSearch() { document.getElementById("searchInput").value = ""; renderTable(); }
-</script>
-
-</body>
-</html>
+    <button class="btn-primary" onclick="login()">تسجيل الدخول</button>
+    <div style="margin-top:12px;font-size:12px;color:var(--text3);cursor:pointer" onc
