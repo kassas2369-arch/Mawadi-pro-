@@ -1,1 +1,600 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mawadi-Pro</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:#eef0f5;direction:rtl;color:#333}.page{max-width:600px;margin:0 auto;padding:15px}.login-box{max-width:360px;margin:60px auto;padding:30px;background:#fff;border-radius:20px;text-align:center}.login-box h1{color:#3d5af1;margin-bottom:8px}.login-box input{width:100%;padding:14px;margin-bottom:12px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px}.login-box button{width:100%;padding:14px;background:#3d5af1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px}#msg{color:#ef4444;margin-top:10px;font-size:13px;min-height:20px}.top-bar{background:#fff;padding:12px 15px;border-radius:0 0 20px 20px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}.top-bar h2{color:#3d5af1;margin:0;font-size:20px}.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:15px}.nav-tabs button{flex-shrink:0;padding:10px 16px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-weight:bold;font-size:13px;color:#888}.nav-tabs button.active{background:#3d5af1;color:#fff}.section-card{background:#fff;padding:18px;border-radius:16px;margin-bottom:12px}.section-card h3{margin:0 0 15px 0;font-size:16px}.input-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}.input-row input,.input-row select{flex:1;min-width:100px;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;font-size:14px}.btn-blue{background:#3d5af1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}.btn-green{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}.btn-red{background:#ef4444;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer}.btn-gray{background:#e5e7eb;color:#555;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}.btn-orange{background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}table{width:100%;border-collapse:collapse;font-size:13px}th{background:#f8fafc;color:#666;padding:10px;text-align:center;font-weight:600}td{padding:10px;border-bottom:1px solid #eee;text-align:center}.empty{text-align:center;padding:30px;color:#aaa}.low-stock{color:#ef4444;font-weight:900}.print-area{display:none}@media print{body *{visibility:hidden}.print-area,.print-area *{visibility:visible}.print-area{position:fixed;left:0;top:0;width:100%;height:100%;display:block;padding:20px;background:#fff;z-index:9999}}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:flex-end;z-index:1000}.modal-content{background:#fff;padding:25px;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-close{background:#ef4444;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:bold;font-size:18px}.scanner-overlay{display:none}body.dark{background:#0f172a;color:#e2e8f0}body.dark .login-box{background:#1e293b}body.dark .login-box input{background:#0f172a;border-color:#334155;color:#e2e8f0}body.dark .top-bar{background:#1e293b}body.dark .section-card{background:#1e293b}body.dark .section-card h3{color:#e2e8f0}body.dark .input-row input{background:#0f172a;border-color:#334155;color:#e2e8f0}body.dark .btn-gray{background:#334155;color:#e2e8f0}body.dark th{background:#0f172a;color:#94a3b8}body.dark td{border-color:#334155;color:#e2e8f0}body.dark .low-stock{color:#f87171}body.dark .modal-content{background:#1e293b}body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}</style></head><body><div id="login" class="login-box"><h1>📦 Mawadi-Pro</h1><p>نظام إدارة المخزون</p><input type="text" id="u" value="admin" placeholder="المستخدم"><input type="password" id="p" value="admin" placeholder="كلمة المرور"><button onclick="doLogin()">تسجيل الدخول</button><button onclick="doLoginFast()" style="background:#22c55e">دخول سريع</button><button onclick="resetData()" class="btn-orange" style="margin-top:8px">🗑️ مسح البيانات (إذا تجمد)</button><div id="msg"></div></div><div id="app" style="display:none"><div class="top-bar"><h2>📦 Mawadi-Pro</h2><div style="display:flex;gap:8px"><button onclick="toggleTheme()" id="theme-btn">🌙</button><button onclick="showSettings()">⚙️</button><button onclick="doLogout()">🚪</button></div></div><div class="page"><div class="nav-tabs"><button onclick="show('inv')" id="nav-inv" class="active">📦 المخزون</button><button onclick="show('miss')" id="nav-miss">📑 النواقص</button></div><div id="inv" class="section"><div class="section-card"><h3>📦 إضافة مادة</h3><button class="btn-green" onclick="openScanner()" style="margin-bottom:15px">📷 مسح باركود</button><div class="input-row"><input id="ic" placeholder="الكود" style="min-width:120px"><input id="in" placeholder="اسم المادة *" style="min-width:150px"></div><div class="input-row"><input id="ib" placeholder="سعر الشراء" type="number" step="0.01"><input id="is" placeholder="سعر البيع" type="number" step="0.01"></div><div class="input-row"><input id="im" placeholder="حد أدنى" type="number"><input id="iq" placeholder="الكمية" type="number"><input id="iu" placeholder="الوحدة"></div><div style="display:flex;gap:10px;margin-top:10px"><button class="btn-blue" onclick="addItem()">➕ إضافة</button><button class="btn-gray" onclick="clearItemForm()">مسح</button></div></div><div class="section-card"><h3>📋 قائمة المواد</h3><input type="text" id="search-items" placeholder="🔍 بحث..." oninput="renderItems()" style="width:100%;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;margin-bottom:10px;font-size:14px"><table><thead><tr><th>الكود</th><th>الاسم</th><th>السعر</th><th>الكمية</th><th>حذف</th></tr></thead><tbody id="itb"></tbody></table></div></div><div id="miss" class="section" style="display:none"><div class="section-card"><h3>📑 المواد الناقصة</h3><div class="input-row" style="margin-bottom:15px"><input id="wa-phone" placeholder="📱 رقم الواتساب (مثال: 21655123456)" type="tel" style="flex:2"><button class="btn-green" onclick="shareWA()">📤 واتساب</button><button class="btn-blue" onclick="printMiss()">📄 PDF</button></div><div id="miss-print" class="print-area"><div style="text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px;margin-bottom:15px"><h2 style="color:#ef4444;margin:0;font-size:22px">📑 تقرير النواقص</h2><p style="color:#888;font-size:12px;margin:5px 0 0 0">Mawadi-Pro | <span id="mp-date"></span></p></div><table style="width:100%;border:1px solid #ddd"><thead><tr style="background:#fee2e2"><th style="border:1px solid #ddd;padding:8px">الكود</th><th style="border:1px solid #ddd;padding:8px">اسم المادة</th><th style="border:1px solid #ddd;padding:8px">الكمية</th></tr></thead><tbody id="mtb"></tbody></table></div></div></div></div></div><script>var items=[],nid=1,lsOK=false,currentPass="admin",scanStream=null;try{localStorage.setItem("t","1");if(localStorage.getItem("t")==="1")lsOK=true;localStorage.removeItem("t");}catch(e){}function isArray(v){return Array.isArray(v);}function isString(v){return typeof v==="string";}function isNumber(v){return typeof v==="number"&&!isNaN(v);}function saveData(){if(!lsOK)return;try{localStorage.setItem("mp_data",JSON.stringify({items:items,nid:nid,pass:currentPass}));}catch(e){alert("فشل الحفظ: "+e.message);}}function loadData(){if(!lsOK)return;try{var s=localStorage.getItem("mp_data");if(s){var d=JSON.parse(s);if(d.items&&isArray(d.items)){items=d.items;}else{items=[];console.warn("mp_data.items ليست مصفوفة");}if(isNumber(d.nid)&&d.nid>0){nid=d.nid;}else{nid=1;}if(isString(d.pass)&&d.pass.length>=1){currentPass=d.pass;}else{currentPass="admin";}}}catch(e){console.error("خطأ في تحميل البيانات:",e);items=[];nid=1;currentPass="admin";}}function resetData(){if(!confirm("هل أنت متأكد من مسح جميع البيانات؟"))return;try{localStorage.removeItem("mp_data");localStorage.removeItem("mp_theme");}catch(e){}items=[];nid=1;currentPass="admin";alert("✅ تم مسح البيانات. أعد تحميل الصفحة.");location.reload();}function initTheme(){try{var s=localStorage.getItem("mp_theme");if(s==="dark"){document.body.classList.add("dark");var b=document.getElementById("theme-btn");if(b)b.innerHTML="☀️";}}catch(e){}}function toggleTheme(){try{var d=document.body.classList.contains("dark");if(d){document.body.classList.remove("dark");localStorage.setItem("mp_theme","light");document.getElementById("theme-btn").innerHTML="🌙";}else{document.body.classList.add("dark");localStorage.setItem("mp_theme","dark");document.getElementById("theme-btn").innerHTML="☀️";}}catch(e){console.error(e);}}initTheme();function doLogin(){var u=document.getElementById("u").value.trim();var p=document.getElementById("p").value.trim();loadData();if(u==="admin"&&p===currentPass){document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";document.getElementById("msg").innerHTML="";renderItems();}else{document.getElementById("msg").innerHTML="❌ بيانات الدخول غير صحيحة";}}function doLoginFast(){loadData();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";document.getElementById("msg").innerHTML="";renderItems();}function doLogout(){document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";document.getElementById("u").value="admin";document.getElementById("p").value="";}function showSettings(){document.getElementById("settings-modal").style.display="flex";document.getElementById("pass-msg").innerHTML="";}function closeSettings(){document.getElementById("settings-modal").style.display="none";}function changePassword(){var o=document.getElementById("old-pass").value;var n=document.getElementById("new-pass").value;var c=document.getElementById("confirm-pass").value;var m=document.getElementById("pass-msg");if(o!==currentPass){m.innerHTML="❌ كلمة المرور الحالية غير صحيحة";return;}if(n.length<4){m.innerHTML="❌ كلمة المرور الجديدة قصيرة جداً (4 أحرف على الأقل)";return;}if(n!==c){m.innerHTML="❌ كلمتا المرور الجديدتان غير متطابقتين";return;}currentPass=n;saveData();m.style.color="#22c55e";m.innerHTML="✅ تم تغيير كلمة المرور بنجاح";document.getElementById("old-pass").value="";document.getElementById("new-pass").value="";document.getElementById("confirm-pass").value="";}function openScanner(){document.getElementById("scanner-overlay").style.display="flex";document.getElementById("manual-scan").focus();startCamera();}function closeScanner(){document.getElementById("scanner-overlay").style.display="none";stopCamera();}function stopCamera(){if(scanStream){scanStream.getTracks().forEach(function(t){t.stop();});scanStream=null;}var v=document.getElementById("scan-video");if(v)v.srcObject=null;}function startCamera(){var v=document.getElementById("scan-video");if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert("⚠️ الكاميرا غير مدعومة على هذا المتصفح. استخدم الإدخال اليدوي.");return;}navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(s){scanStream=s;v.srcObject=s;v.play();}).catch(function(e){console.log("Camera error:",e);alert("⚠️ لا يمكن فتح الكاميرا. تأكد من:\n1. السماح بالوصول للكاميرا\n2. استخدام HTTPS أو localhost\n3. استخدم الإدخال اليدوي بدلاً من ذلك");});}function manualScan(v){if(v){document.getElementById("ic").value=v.trim();closeScanner();document.getElementById("in").focus();}}function show(id){var s=["inv","miss"];for(var i=0;i<s.length;i++){var e=document.getElementById(s[i]);var n=document.getElementById("nav-"+s[i]);if(e)e.style.display=(s[i]===id)?"block":"none";if(n)n.className=(s[i]===id)?"active":"";}if(id==="inv")renderItems();if(id==="miss")renderMissing();}function clearItemForm(){document.getElementById("ic").value="";document.getElementById("in").value="";document.getElementById("ib").value="";document.getElementById("is").value="";document.getElementById("im").value="";document.getElementById("iq").value="";document.getElementById("iu").value="";}function addItem(){var c=document.getElementById("ic").value.trim()||"ITM"+Date.now();var n=document.getElementById("in").value.trim();if(!n){alert("اسم المادة مطلوب");return;}var b=parseFloat(document.getElementById("ib").value)||0;var e=parseFloat(document.getElementById("is").value)||0;var m=parseFloat(document.getElementById("im").value)||0;var q=parseFloat(document.getElementById("iq").value)||0;var u=document.getElementById("iu").value.trim()||"قطعة";items.push({code:c,name:n,buy:b,sell:e,min:m,qty:q,unit:u});saveData();clearItemForm();renderItems();}function renderItems(){if(!isArray(items)){console.error("items ليست مصفوفة!",items);items=[];}var q=document.getElementById("search-items").value.toLowerCase();var t=document.getElementById("itb");t.innerHTML="";for(var i=0;i<items.length;i++){var it=items[i];if(!it)continue;if(q&&it.name&&it.name.toLowerCase().indexOf(q)===-1&&it.code&&it.code.toLowerCase().indexOf(q)===-1)continue;var c=parseFloat(it.qty||0)<=parseFloat(it.min||0)?'low-stock':'';t.innerHTML+='<tr><td>'+(it.code||'')+'</td><td>'+(it.name||'')+'</td><td>'+(it.sell||0)+' د.ت</td><td class="'+c+'">'+(it.qty||0)+' '+(it.unit||'قطعة')+'</td><td><button class="btn-red" onclick="delItem('+i+')">حذف</button></td></tr>';}}function delItem(i){if(!confirm("حذف المادة؟"))return;items.splice(i,1);saveData();renderItems();}function renderMissing(){if(!isArray(items)){items=[];}var t=document.getElementById("mtb");t.innerHTML="";var c=0;for(var i=0;i<items.length;i++){var it=items[i];if(!it)continue;var q=parseFloat(it.qty||0),m=parseFloat(it.min||0);if(q<=m&&m>0){c++;t.innerHTML+='<tr><td style="border:1px solid #ddd;padding:8px">'+(it.code||'')+'</td><td style="border:1px solid #ddd;padding:8px;font-weight:bold">'+(it.name||'')+'</td><td style="border:1px solid #ddd;padding:8px;color:#ef4444;font-weight:bold">'+q+' '+(it.unit||'قطعة')+'</td></tr>';}}if(c===0)t.innerHTML='<tr><td colspan="3" class="empty" style="border:1px solid #ddd;padding:20px">لا توجد نواقص 🎉</td></tr>';document.getElementById("mp-date").innerText=new Date().toLocaleString("ar-TN");}function printMiss(){renderMissing();var mp=document.getElementById("miss-print");var pa=document.getElementById("print-area");var pc=document.getElementById("print-content");if(mp&&pa&&pc){pc.innerHTML=mp.innerHTML;pa.style.display="block";window.print();pa.style.display="none";}}function shareWA(){var p=document.getElementById("wa-phone").value.trim().replace(/[^0-9]/g,"");if(!p){alert("أدخل رقم الواتساب");return;}var t="*📑 تقرير النواقص - Mawadi-Pro*\n═══════════════════\n*التاريخ:* "+new Date().toLocaleString("ar-TN")+"\n\n";var c=0;if(!isArray(items)){items=[];}for(var i=0;i<items.length;i++){var it=items[i];if(!it)continue;var q=parseFloat(it.qty||0),m=parseFloat(it.min||0);if(q<=m&&m>0){c++;t+="*"+c+".* "+(it.name||'')+"\n   الكود: "+(it.code||'')+" | الكمية: *"+q+"* "+(it.unit||'قطعة')+"\n\n";}}if(c===0)t+="✅ لا توجد نواقص";else t+="⚠️ يُنصح بإعادة الطلب فوراً";window.open("https://wa.me/"+p+"?text="+encodeURIComponent(t),"_blank");}</script><div class="modal-overlay" id="settings-modal" onclick="if(event.target===this)closeSettings()"><div class="modal-content"><div class="modal-header"><h3 style="color:#3d5af1;margin:0">⚙️ الإعدادات</h3><button class="modal-close" onclick="closeSettings()">×</button></div><div><h4 style="margin-bottom:10px">🔐 تغيير كلمة المرور</h4><div class="input-row"><input id="old-pass" type="password" placeholder="كلمة المرور الحالية"></div><div class="input-row"><input id="new-pass" type="password" placeholder="كلمة المرور الجديدة"></div><div class="input-row"><input id="confirm-pass" type="password" placeholder="تأكيد كلمة المرور"></div><button class="btn-blue" onclick="changePassword()" style="width:100%">💾 حفظ التغييرات</button><div id="pass-msg" style="margin-top:10px;color:#ef4444;font-size:13px"></div></div></div></div><div class="scanner-overlay" id="scanner-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;flex-direction:column;z-index:2000"><div style="background:#1a1a2e;padding:15px;display:flex;justify-content:space-between;align-items:center"><h3 style="color:#3d5af1;margin:0;font-size:18px">📷 ماسح الباركود</h3><button style="background:#ef4444;color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:20px" onclick="closeScanner()">×</button></div><div id="reader" style="flex:1;display:flex;justify-content:center;align-items:center;background:#000"><video id="scan-video" style="max-width:100%;max-height:100%" autoplay playsinline></video></div><div style="background:#1a1a2e;padding:20px;border-top:1px solid #333"><input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." style="width:100%;padding:15px;font-size:20px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#0f172a;color:#fff;letter-spacing:3px" onkeydown="if(event.key==='Enter'){manualScan(this.value)}"></div></div><div id="print-area" class="print-area" style="display:none"><div id="print-content"></div></div></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mawadi-Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#eef0f5;direction:rtl;color:#333}
+.page{max-width:600px;margin:0 auto;padding:15px}
+.login-box{max-width:360px;margin:60px auto;padding:30px;background:#fff;border-radius:20px;text-align:center}
+.login-box h1{color:#3d5af1;margin-bottom:8px}
+.login-box input{width:100%;padding:14px;margin-bottom:12px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px}
+.login-box button{width:100%;padding:14px;background:#3d5af1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;cursor:pointer}
+#msg{color:#ef4444;margin-top:10px;font-size:13px;min-height:20px}
+.top-bar{background:#fff;padding:12px 15px;border-radius:0 0 20px 20px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.top-bar h2{color:#3d5af1;margin:0;font-size:20px}
+.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:15px}
+.nav-tabs button{flex-shrink:0;padding:10px 16px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-weight:bold;font-size:13px;color:#888}
+.nav-tabs button.active{background:#3d5af1;color:#fff}
+.section-card{background:#fff;padding:18px;border-radius:16px;margin-bottom:12px}
+.section-card h3{margin:0 0 15px 0;font-size:16px}
+.input-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.input-row input,.input-row select{flex:1;min-width:100px;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;font-size:14px}
+.btn-blue{background:#3d5af1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-green{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-red{background:#ef4444;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer}
+.btn-gray{background:#e5e7eb;color:#555;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-orange{background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;color:#666;padding:10px;text-align:center;font-weight:600}
+td{padding:10px;border-bottom:1px solid #eee;text-align:center}
+.empty{text-align:center;padding:30px;color:#aaa}
+.low-stock{color:#ef4444;font-weight:900}
+.print-area{display:none}
+@media print{body *{visibility:hidden}.print-area,.print-area *{visibility:visible}.print-area{position:fixed;left:0;top:0;width:100%;height:100%;display:block;padding:20px;background:#fff;z-index:9999}}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:flex-end;z-index:1000}
+.modal-content{background:#fff;padding:25px;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-close{background:#ef4444;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:bold;font-size:18px}
+body.dark{background:#0f172a;color:#e2e8f0}
+body.dark .login-box{background:#1e293b}
+body.dark .login-box input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .top-bar{background:#1e293b}
+body.dark .section-card{background:#1e293b}
+body.dark .section-card h3{color:#e2e8f0}
+body.dark .input-row input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .btn-gray{background:#334155;color:#e2e8f0}
+body.dark th{background:#0f172a;color:#94a3b8}
+body.dark td{border-color:#334155;color:#e2e8f0}
+body.dark .low-stock{color:#f87171}
+body.dark .modal-content{background:#1e293b}
+body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}
+</style>
+</head>
+<body>
+
+<div id="login" class="login-box">
+<h1>📦 Mawadi-Pro</h1>
+<p>نظام إدارة المخزون</p>
+<input type="text" id="u" value="admin" placeholder="المستخدم">
+<input type="password" id="p" value="admin" placeholder="كلمة المرور">
+<button id="btn-login">تسجيل الدخول</button>
+<button id="btn-fast" style="background:#22c55e">دخول سريع</button>
+<button id="btn-reset" class="btn-orange" style="margin-top:8px">🗑️ مسح البيانات</button>
+<div id="msg"></div>
+</div>
+
+<div id="app" style="display:none">
+<div class="top-bar">
+<h2>📦 Mawadi-Pro</h2>
+<div style="display:flex;gap:8px">
+<button class="btn-gray" id="btn-theme">🌙</button>
+<button class="btn-gray" id="btn-settings">⚙️</button>
+<button class="btn-red" id="btn-logout">🚪</button>
+</div>
+</div>
+
+<div class="page">
+<div class="nav-tabs">
+<button id="nav-inv" class="active">📦 المخزون</button>
+<button id="nav-miss">📑 النواقص</button>
+</div>
+
+<div id="inv" class="section">
+<div class="section-card">
+<h3>📦 إضافة مادة</h3>
+<button class="btn-green" id="btn-scanner" style="margin-bottom:15px">📷 مسح باركود</button>
+<div class="input-row">
+<input id="ic" placeholder="الكود" style="min-width:120px">
+<input id="in" placeholder="اسم المادة *" style="min-width:150px">
+</div>
+<div class="input-row">
+<input id="ib" placeholder="سعر الشراء" type="number" step="0.01">
+<input id="is" placeholder="سعر البيع" type="number" step="0.01">
+</div>
+<div class="input-row">
+<input id="im" placeholder="حد أدنى" type="number">
+<input id="iq" placeholder="الكمية" type="number">
+<input id="iu" placeholder="الوحدة">
+</div>
+<div style="display:flex;gap:10px;margin-top:10px">
+<button class="btn-blue" id="btn-add">➕ إضافة</button>
+<button class="btn-gray" id="btn-clear">مسح</button>
+</div>
+</div>
+<div class="section-card">
+<h3>📋 قائمة المواد</h3>
+<input type="text" id="search-items" placeholder="🔍 بحث..." style="width:100%;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;margin-bottom:10px;font-size:14px">
+<table>
+<thead><tr><th>الكود</th><th>الاسم</th><th>السعر</th><th>الكمية</th><th>حذف</th></tr></thead>
+<tbody id="itb"></tbody>
+</table>
+</div>
+</div>
+
+<div id="miss" class="section" style="display:none">
+<div class="section-card">
+<h3>📑 المواد الناقصة</h3>
+<div class="input-row" style="margin-bottom:15px">
+<input id="wa-phone" placeholder="📱 رقم الواتساب (مثال: 21655123456)" type="tel" style="flex:2">
+<button class="btn-green" id="btn-wa">📤 واتساب</button>
+<button class="btn-blue" id="btn-print">📄 PDF</button>
+</div>
+<div id="miss-print" class="print-area">
+<div style="text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px;margin-bottom:15px">
+<h2 style="color:#ef4444;margin:0;font-size:22px">📑 تقرير النواقص</h2>
+<p style="color:#888;font-size:12px;margin:5px 0 0 0">Mawadi-Pro | <span id="mp-date"></span></p>
+</div>
+<table style="width:100%;border:1px solid #ddd">
+<thead><tr style="background:#fee2e2"><th style="border:1px solid #ddd;padding:8px">الكود</th><th style="border:1px solid #ddd;padding:8px">اسم المادة</th><th style="border:1px solid #ddd;padding:8px">الكمية</th></tr></thead>
+<tbody id="mtb"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3 style="color:#3d5af1;margin:0">⚙️ الإعدادات</h3>
+<button class="modal-close" id="btn-close-settings">×</button>
+</div>
+<div>
+<h4 style="margin-bottom:10px">🔐 تغيير كلمة المرور</h4>
+<div class="input-row">
+<input id="old-pass" type="password" placeholder="كلمة المرور الحالية">
+</div>
+<div class="input-row">
+<input id="new-pass" type="password" placeholder="كلمة المرور الجديدة">
+</div>
+<div class="input-row">
+<input id="confirm-pass" type="password" placeholder="تأكيد كلمة المرور">
+</div>
+<button class="btn-blue" id="btn-change-pass" style="width:100%">💾 حفظ التغييرات</button>
+<div id="pass-msg" style="margin-top:10px;color:#ef4444;font-size:13px"></div>
+</div>
+</div>
+</div>
+
+<!-- SCANNER OVERLAY -->
+<div class="modal-overlay" id="scanner-overlay" style="background:#000;align-items:flex-start">
+<div style="background:#1a1a2e;padding:15px;display:flex;justify-content:space-between;align-items:center;width:100%">
+<h3 style="color:#3d5af1;margin:0;font-size:18px">📷 ماسح الباركود</h3>
+<button class="modal-close" id="btn-close-scanner">×</button>
+</div>
+<div style="flex:1;display:flex;justify-content:center;align-items:center;background:#000;width:100%;height:50vh">
+<video id="scan-video" style="max-width:100%;max-height:100%" autoplay playsinline></video>
+</div>
+<div style="background:#1a1a2e;padding:20px;border-top:1px solid #333;width:100%">
+<input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." style="width:100%;padding:15px;font-size:20px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#0f172a;color:#fff;letter-spacing:3px">
+</div>
+</div>
+
+<!-- PRINT AREA -->
+<div id="print-area" class="print-area" style="display:none">
+<div id="print-content"></div>
+</div>
+
+<script>
+    var items = [];
+var nid = 1;
+var lsOK = false;
+var currentPass = "admin";
+var scanStream = null;
+
+try {
+    localStorage.setItem("t", "1");
+    if (localStorage.getItem("t") === "1") lsOK = true;
+    localStorage.removeItem("t");
+} catch (e) {
+    console.warn("LocalStorage not available");
+    lsOK = false;
+}
+
+function get(id) {
+    return document.getElementById(id);
+}
+
+function saveData() {
+    if (!lsOK) return;
+    try {
+        localStorage.setItem("mp_data", JSON.stringify({items: items, nid: nid, pass: currentPass}));
+    } catch (e) {
+        console.error("Save failed", e);
+    }
+}
+
+function loadData() {
+    if (!lsOK) return;
+    try {
+        var s = localStorage.getItem("mp_data");
+        if (s) {
+            var d = JSON.parse(s);
+            if (d.items && Array.isArray(d.items)) items = d.items; else items = [];
+            if (typeof d.nid === "number" && d.nid > 0) nid = d.nid; else nid = 1;
+            if (typeof d.pass === "string" && d.pass.length >= 1) currentPass = d.pass; else currentPass = "admin";
+        }
+    } catch (e) {
+        console.error("Load failed", e);
+        items = [];
+        nid = 1;
+        currentPass = "admin";
+    }
+}
+
+function resetData() {
+    if (!confirm("هل أنت متأكد من مسح جميع البيانات؟")) return;
+    try {
+        localStorage.removeItem("mp_data");
+        localStorage.removeItem("mp_theme");
+    } catch (e) {}
+    items = [];
+    nid = 1;
+    currentPass = "admin";
+    alert("✅ تم مسح البيانات. أعد تحميل الصفحة.");
+    location.reload();
+}
+
+function initTheme() {
+    try {
+        var s = localStorage.getItem("mp_theme");
+        if (s === "dark") {
+            document.body.classList.add("dark");
+            var b = get("btn-theme");
+            if (b) b.innerHTML = "☀️";
+        }
+    } catch (e) {}
+}
+
+function toggleTheme() {
+    try {
+        var d = document.body.classList.contains("dark");
+        var btn = get("btn-theme");
+        if (d) {
+            document.body.classList.remove("dark");
+            try { localStorage.setItem("mp_theme", "light"); } catch (e) {}
+            if (btn) btn.innerHTML = "🌙";
+        } else {
+            document.body.classList.add("dark");
+            try { localStorage.setItem("mp_theme", "dark"); } catch (e) {}
+            if (btn) btn.innerHTML = "☀️";
+        }
+    } catch (e) {
+        console.error("Theme error", e);
+    }
+}
+
+function doLogin() {
+    try {
+        var u = get("u").value.trim();
+        var p = get("p").value.trim();
+        loadData();
+        if (u === "admin" && p === currentPass) {
+            get("login").style.display = "none";
+            get("app").style.display = "block";
+            get("msg").innerHTML = "";
+            renderItems();
+        } else {
+            get("msg").innerHTML = "❌ بيانات الدخول غير صحيحة";
+        }
+    } catch (e) {
+        console.error("Login error", e);
+        alert("خطأ في تسجيل الدخول: " + e.message);
+    }
+}
+
+function doLoginFast() {
+    try {
+        loadData();
+        get("login").style.display = "none";
+        get("app").style.display = "block";
+        get("msg").innerHTML = "";
+        renderItems();
+    } catch (e) {
+        console.error("Fast login error", e);
+        alert("خطأ في الدخول السريع: " + e.message);
+    }
+}
+
+function doLogout() {
+    try {
+        get("app").style.display = "none";
+        get("login").style.display = "block";
+        get("u").value = "admin";
+        get("p").value = "";
+    } catch (e) {
+        console.error("Logout error", e);
+    }
+}
+
+function showSettings() {
+    try {
+        get("settings-modal").style.display = "flex";
+        get("pass-msg").innerHTML = "";
+    } catch (e) {
+        console.error("Show settings error", e);
+    }
+}
+
+function closeSettings() {
+    try {
+        get("settings-modal").style.display = "none";
+    } catch (e) {
+        console.error("Close settings error", e);
+    }
+}
+
+function changePassword() {
+    try {
+        var o = get("old-pass").value;
+        var n = get("new-pass").value;
+        var c = get("confirm-pass").value;
+        var m = get("pass-msg");
+        if (o !== currentPass) { m.innerHTML = "❌ كلمة المرور الحالية غير صحيحة"; return; }
+        if (n.length < 4) { m.innerHTML = "❌ كلمة المرور الجديدة قصيرة جداً"; return; }
+        if (n !== c) { m.innerHTML = "❌ كلمتا المرور غير متطابقتين"; return; }
+        currentPass = n;
+        saveData();
+        m.style.color = "#22c55e";
+        m.innerHTML = "✅ تم تغيير كلمة المرور بنجاح";
+        get("old-pass").value = "";
+        get("new-pass").value = "";
+        get("confirm-pass").value = "";
+    } catch (e) {
+        console.error("Change password error", e);
+    }
+}
+
+function openScanner() {
+    try {
+        get("scanner-overlay").style.display = "flex";
+        get("manual-scan").focus();
+        startCamera();
+    } catch (e) {
+        console.error("Open scanner error", e);
+    }
+}
+
+function closeScanner() {
+    try {
+        get("scanner-overlay").style.display = "none";
+        stopCamera();
+    } catch (e) {
+        console.error("Close scanner error", e);
+    }
+}
+
+function stopCamera() {
+    try {
+        if (scanStream) {
+            scanStream.getTracks().forEach(function(t) { t.stop(); });
+            scanStream = null;
+        }
+        var v = get("scan-video");
+        if (v) v.srcObject = null;
+    } catch (e) {
+        console.error("Stop camera error", e);
+    }
+}
+
+function startCamera() {
+    try {
+        var v = get("scan-video");
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("⚠️ الكاميرا غير مدعومة. استخدم الإدخال اليدوي.");
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(s) {
+            scanStream = s;
+            if (v) v.srcObject = s;
+            if (v) v.play();
+        }).catch(function(e) {
+            console.log("Camera error", e);
+            alert("⚠️ لا يمكن فتح الكاميرا. استخدم الإدخال اليدوي.");
+        });
+    } catch (e) {
+        console.error("Start camera error", e);
+    }
+}
+
+function manualScan(val) {
+    try {
+        if (val) {
+            get("ic").value = val.trim();
+            closeScanner();
+            get("in").focus();
+        }
+    } catch (e) {
+        console.error("Manual scan error", e);
+    }
+}
+
+function showSection(id) {
+    try {
+        var sections = ["inv", "miss"];
+        for (var i = 0; i < sections.length; i++) {
+            var sec = get(sections[i]);
+            var nav = get("nav-" + sections[i]);
+            if (sec) sec.style.display = (sections[i] === id) ? "block" : "none";
+            if (nav) nav.className = (sections[i] === id) ? "active" : "";
+        }
+        if (id === "inv") renderItems();
+        if (id === "miss") renderMissing();
+    } catch (e) {
+        console.error("Show section error", e);
+    }
+}
+
+function clearItemForm() {
+    try {
+        var ids = ["ic", "in", "ib", "is", "im", "iq", "iu"];
+        for (var i = 0; i < ids.length; i++) {
+            var el = get(ids[i]);
+            if (el) el.value = "";
+        }
+    } catch (e) {
+        console.error("Clear form error", e);
+    }
+}
+
+function addItem() {
+    try {
+        var c = get("ic").value.trim() || ("ITM" + Date.now());
+        var n = get("in").value.trim();
+        if (!n) { alert("اسم المادة مطلوب"); return; }
+        var b = parseFloat(get("ib").value) || 0;
+        var e = parseFloat(get("is").value) || 0;
+        var m = parseFloat(get("im").value) || 0;
+        var q = parseFloat(get("iq").value) || 0;
+        var u = get("iu").value.trim() || "قطعة";
+        items.push({ code: c, name: n, buy: b, sell: e, min: m, qty: q, unit: u });
+        saveData();
+        clearItemForm();
+        renderItems();
+    } catch (err) {
+        console.error("Add item error", err);
+        alert("خطأ في إضافة المادة: " + err.message);
+    }
+}
+
+function renderItems() {
+    try {
+        if (!Array.isArray(items)) items = [];
+        var searchEl = get("search-items");
+        var q = searchEl ? searchEl.value.toLowerCase() : "";
+        var t = get("itb");
+        if (!t) return;
+        t.innerHTML = "";
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            if (q && it.name && it.name.toLowerCase().indexOf(q) === -1 && it.code && it.code.toLowerCase().indexOf(q) === -1) continue;
+            var cls = parseFloat(it.qty || 0) <= parseFloat(it.min || 0) ? "low-stock" : "";
+            t.innerHTML += "<tr><td>" + (it.code || "") + "</td><td>" + (it.name || "") + "</td><td>" + (it.sell || 0) + " د.ت</td><td class=\"" + cls + "\">" + (it.qty || 0) + " " + (it.unit || "قطعة") + "</td><td><button class=\"btn-red\" onclick=\"delItem(" + i + ")\">حذف</button></td></tr>";
+        }
+    } catch (e) {
+        console.error("Render items error", e);
+    }
+}
+
+function delItem(i) {
+    try {
+        if (!confirm("حذف المادة؟")) return;
+        items.splice(i, 1);
+        saveData();
+        renderItems();
+    } catch (e) {
+        console.error("Delete item error", e);
+    }
+}
+
+function renderMissing() {
+    try {
+        if (!Array.isArray(items)) items = [];
+        var t = get("mtb");
+        if (!t) return;
+        t.innerHTML = "";
+        var c = 0;
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) {
+                c++;
+                t.innerHTML += "<tr><td style=\"border:1px solid #ddd;padding:8px\">" + (it.code || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;font-weight:bold\">" + (it.name || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;color:#ef4444;font-weight:bold\">" + q + " " + (it.unit || "قطعة") + "</td></tr>";
+            }
+        }
+        if (c === 0) t.innerHTML = "<tr><td colspan=\"3\" class=\"empty\" style=\"border:1px solid #ddd;padding:20px\">لا توجد نواقص 🎉</td></tr>";
+        var mpDate = get("mp-date");
+        if (mpDate) mpDate.innerText = new Date().toLocaleString("ar-TN");
+    } catch (e) {
+        console.error("Render missing error", e);
+    }
+}
+
+function printMiss() {
+    try {
+        renderMissing();
+        var mp = get("miss-print");
+        var pa = get("print-area");
+        var pc = get("print-content");
+        if (mp && pa && pc) {
+            pc.innerHTML = mp.innerHTML;
+            pa.style.display = "block";
+            window.print();
+            pa.style.display = "none";
+        }
+    } catch (e) {
+        console.error("Print error", e);
+    }
+}
+
+function shareWA() {
+    try {
+        var p = get("wa-phone").value.trim().replace(/[^0-9]/g, "");
+        if (!p) { alert("أدخل رقم الواتساب"); return; }
+        var t = "*📑 تقرير النواقص - Mawadi-Pro*\n═══════════════════\n*التاريخ:* " + new Date().toLocaleString("ar-TN") + "\n\n";
+        var c = 0;
+        if (!Array.isArray(items)) items = [];
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) {
+                c++;
+                t += "*" + c + ".* " + (it.name || "") + "\n   الكود: " + (it.code || "") + " | الكمية: *" + q + "* " + (it.unit || "قطعة") + "\n\n";
+            }
+        }
+        if (c === 0) t += "✅ لا توجد نواقص";
+        else t += "⚠️ يُنصح بإعادة الطلب فوراً";
+        window.open("https://wa.me/" + p + "?text=" + encodeURIComponent(t), "_blank");
+    } catch (e) {
+        console.error("Share WA error", e);
+    }
+}
+
+// ====== EVENT LISTENERS (attached AFTER all functions are defined) ======
+function attachEvents() {
+    try {
+        get("btn-login").addEventListener("click", doLogin);
+        get("btn-fast").addEventListener("click", doLoginFast);
+        get("btn-reset").addEventListener("click", resetData);
+        get("btn-theme").addEventListener("click", toggleTheme);
+        get("btn-settings").addEventListener("click", showSettings);
+        get("btn-logout").addEventListener("click", doLogout);
+        get("nav-inv").addEventListener("click", function() { showSection("inv"); });
+        get("nav-miss").addEventListener("click", function() { showSection("miss"); });
+        get("btn-scanner").addEventListener("click", openScanner);
+        get("btn-add").addEventListener("click", addItem);
+        get("btn-clear").addEventListener("click", clearItemForm);
+        get("search-items").addEventListener("input", renderItems);
+        get("btn-wa").addEventListener("click", shareWA);
+        get("btn-print").addEventListener("click", printMiss);
+        get("btn-close-settings").addEventListener("click", closeSettings);
+        get("settings-modal").addEventListener("click", function(e) {
+            if (e.target === get("settings-modal")) closeSettings();
+        });
+        get("btn-change-pass").addEventListener("click", changePassword);
+        get("btn-close-scanner").addEventListener("click", closeScanner);
+        get("manual-scan").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") manualScan(this.value);
+        });
+        console.log("✅ All events attached");
+    } catch (e) {
+        console.error("Attach events error", e);
+        alert("خطأ في ربط الأزرار: " + e.message);
+    }
+}
+
+initTheme();
+attachEvents();
+</script>
+</body>
+</html>
