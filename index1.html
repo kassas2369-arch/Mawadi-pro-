@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مقهى بن يوسف - نظام المزامنة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        :root { --primary: #1e3c72; --secondary: #2a5298; --accent: #2ecc71; --danger: #e74c3c; --bg: #f4f7f6; --card: #ffffff; --text: #333; --table-border: #eee; }
+        body.dark-mode { --bg: #1a1a2e; --card: #16213e; --text: #e9ecef; --table-border: #2d3436; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; padding: 0; margin: 0; min-height: 100vh; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; display: none; padding: 10px; padding-bottom: 60px; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px 15px; border-radius: 0 0 25px 25px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 10px 20px 10px; }
+        .nav-tab { padding: 12px 5px; background: var(--card); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; color: var(--primary); font-size: 0.8rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .nav-tab.active { background: var(--primary); color: white; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; margin: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid var(--table-border); }
+        .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-family: 'Cairo'; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { color: #777; font-size: 0.85rem; padding-bottom: 10px; border-bottom: 2px solid var(--table-border); text-align: center; }
+        td { padding: 15px 5px; border-bottom: 1px solid var(--table-border); font-weight: 600; text-align: center; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--table-border); background: var(--card); color: var(--text); border-radius: 10px; margin-bottom: 10px; font-family: 'Cairo'; text-align: center; }
+        .kn-signature-login { position: absolute; bottom: 20px; right: 20px; color: red; font-weight: bold; font-size: 1.5rem; }
+        .cloud-indicator { position: fixed; top: 10px; left: 10px; background: white; border: 1px solid var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; color: var(--accent); z-index: 1000; font-weight: bold; display: none; }
+        #pdfReportTemplate { position: fixed; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; color: black; }
+    </style>
+</head>
+<body>
+
+<div id="cloudStatus" class="cloud-indicator">☁️ متصل ومحمي سحابياً</div>
+
+<div id="loginScreen" style="height:100vh; display:flex; justify-content:center; align-items:center; background:var(--primary); position:relative;">
+    <div class="card" style="width:340px; text-align:center;">
+        <h2 style="color:var(--primary); margin-bottom:25px; font-weight:800;">دخول بن يوسف ☕</h2>
+        <input type="password" id="passInput" class="input-field" placeholder="كلمة السر">
+        <button class="btn" style="background:var(--primary); width:100%; height:55px;" onclick="checkPass()">دخول</button>
+        <p id="errorMsg" style="color:red; font-size:0.8rem; margin-top:10px; display:none;">جاري تحميل النظام...</p>
+    </div>
+    <div class="kn-signature-login">k-N</div>
+</div>
+
+<div class="container" id="mainApp">
+    <div class="header">
+        <button onclick="toggleDarkMode()" style="position:absolute; left:15px; top:15px; background:none; border:none; color:white; font-size:1.5rem;">🌓</button>
+        <h1 style="margin:0">☕ مقهى بن يوسف</h1>
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:15px;">
+            <button onclick="exportData()" class="btn" style="background:#e67e22; padding:8px 20px;">📥 تصدير</button>
+            <button onclick="importData()" class="btn" style="background:#2ecc71; padding:8px 20px;">📤 استيراد</button>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('sales')">📊 المبيعات</button>
+        <button class="nav-tab" onclick="showTab('WATER')">💧 المياه</button>
+        <button class="nav-tab" onclick="showTab('HOT')">🫘 البن</button>
+        <button class="nav-tab" onclick="showTab('SODA')">🥤 الغازيات</button>
+        <button class="nav-tab" onclick="showTab('JUICE')">🍹 العصائر</button>
+        <button class="nav-tab" onclick="showTab('SHISHA')">🌬️ الشيشة</button>
+        <button class="nav-tab" onclick="showTab('expenses')">💸 المصاريف</button>
+        <button class="nav-tab" onclick="showTab('settings')">⚙️ الإعدادات</button>
+    </div>
+
+    <div id="sales" class="tab-content">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0">تسجيل مبيعات اليوم</h3>
+                <div style="background:#1e3c72; color:white; padding:8px 15px; border-radius:10px; font-size:0.8rem;">
+                    رصيد البن: <b id="globalCoffeeStock">0</b> كجم
+                    <button onclick="addCoffeeStock()" style="background:#2ecc71; border:none; color:white; border-radius:5px; margin-right:5px; cursor:pointer;">+</button>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="date" id="saleDate" class="input-field" style="flex:2;">
+                <button class="btn" style="background:#e67e22; flex:1; font-size: 0.8rem;" onclick="generateReport('يومي')">يومي PDF</button>
+                <button class="btn" style="background:#d35400; flex:1; font-size: 0.8rem;" onclick="generateReport('شهري')">شهري PDF</button>
+            </div>
+            <table>
+                <thead><tr><th>الصنف</th><th>المخزن</th><th>تزويد</th><th>السعر</th><th>الكمية</th></tr></thead>
+                <tbody id="salesBody"></tbody>
+            </table>
+            <div style="background:#fff8e1; color:#f57f17; padding:15px; border-radius:15px; font-size:1.2rem; font-weight:800; margin-top:15px;">
+                الإجمالي: <span id="dailyTotalDisplay">0.000</span> DT
+            </div>
+            <button class="btn" style="background:var(--primary); width:100%; height:55px; margin-top:20px;" onclick="processSale()">💾 حفظ المبيعات</button>
+        </div>
+    </div>
+
+    <div id="WATER" class="tab-content" style="display:none"><div class="card"><h3>💧 قسم المياه</h3><div id="btns_WATER"></div><div id="list_WATER"></div></div></div>
+    <div id="HOT" class="tab-content" style="display:none"><div class="card"><h3>🫘 قسم البن</h3><div id="btns_HOT"></div><div id="list_HOT"></div></div></div>
+    <div id="SODA" class="tab-content" style="display:none"><div class="card"><h3>🥤 قسم الغازيات</h3><div id="btns_SODA"></div><div id="list_SODA"></div></div></div>
+    <div id="JUICE" class="tab-content" style="display:none"><div class="card"><h3>🍹 قسم العصائر</h3><div id="btns_JUICE"></div><div id="list_JUICE"></div></div></div>
+    <div id="SHISHA" class="tab-content" style="display:none"><div class="card"><h3>🌬️ قسم الشيشة</h3><div id="btns_SHISHA"></div><div id="list_SHISHA"></div></div></div>
+
+    <div id="expenses" class="tab-content" style="display:none">
+        <div class="card"><h3>💸 المصاريف</h3><input type="text" id="expNote" class="input-field" placeholder="البيان"><input type="number" step="0.001" id="expAmount" class="input-field" placeholder="المبلغ"><button class="btn" style="background:var(--danger); width:100%" onclick="addExpense()">➕ حفظ</button></div>
+        <div class="card"><table><thead><tr><th>البيان</th><th>المبلغ</th><th>حذف</th></tr></thead><tbody id="expensesBody"></tbody></table></div>
+    </div>
+    
+    <div id="settings" class="tab-content" style="display:none">
+        <div class="card">
+            <h3>⚙️ إدارة الأصناف</h3>
+            <input type="text" id="itemName" class="input-field" placeholder="اسم الصنف">
+            <select id="itemCat" class="input-field"><option value="HOT">بن</option><option value="WATER">مياه</option><option value="SODA">غازيات</option><option value="JUICE">عصائر</option><option value="SHISHA">شيشة</option></select>
+            <input type="number" step="0.001" id="itemPrice" class="input-field" placeholder="السعر">
+            <input type="number" id="itemGrams" class="input-field" placeholder="جرام البن لكل كوب">
+            <input type="number" id="itemStock" class="input-field" placeholder="المخزن">
+            <button class="btn" style="background:var(--accent); width:100%" onclick="saveItem()">✅ إضافة/تحديث</button>
+        </div>
+        <div class="card"><table><thead><tr><th>الصنف</th><th>المخزن</th><th>تعديل</th><th>حذف</th></tr></thead><tbody id="itemsBody"></tbody></table></div>
+    </div>
+</div>
+
+<script>
+    // إعداداتك الأصلية
+    const firebaseConfig = {
+        apiKey: "AIzaSyAwtYqO6xeoHG-tTF81Gc24tQbN_6eUGX8",
+        authDomain: "bin-youssef-cafe.firebaseapp.com",
+        projectId: "bin-youssef-cafe",
+        appId: "1:369013953473:web:0d8e4f85dc662452ea5540"
+    };
+
+    // التهيئة
+    firebase.initializeApp(firebaseConfig);
+    const fs = firebase.firestore();
+    const DB_KEY = 'BIN_YOUSSEF_V6_STABLE';
+
+    // 1. نظام جلب البيانات الفوري من الذاكرة المحلية لضمان عمل زر الدخول
+    let db = JSON.parse(localStorage.getItem(DB_KEY)) || { items: [], history: [], expenses: [], coffeeStock: 0, appPass: "1234" };
+
+    function checkPass() {
+        const input = document.getElementById('passInput').value;
+        // التحقق محلياً لضمان عدم توقف الزر بسبب الإنترنت
+        if(input === db.appPass) {
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('mainApp').style.display='block';
+            initApp();
+        } else {
+            alert("كلمة المرور غير صحيحة");
+        }
+    }
+
+    async function initApp() {
+        document.getElementById('saleDate').valueAsDate = new Date();
+        renderAll();
+
+        // 2. محاولة الاتصال بالسحاب وتحديث البيانات في الخلفية
+        try {
+            const doc = await fs.collection("cafe_data").doc("main").get();
+            if (doc.exists) {
+                db = doc.data();
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+                document.getElementById('cloudStatus').style.display = 'block';
+                renderAll();
+            } else {
+                // إذا لم تكن الوثيقة موجودة، قم بإنشائها لأول مرة
+                saveDB();
+            }
+        } catch (e) {
+            console.warn("Offline Mode");
+        }
+    }
+
+    async function saveDB() {
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        try {
+            await fs.collection("cafe_data").doc("main").set(db);
+            document.getElementById('cloudStatus').style.display = 'block';
+        } catch (e) {
+            console.error("Cloud Sync Failed");
+        }
+    }
+
+    // --- المنطق البرمجي (دون المساس بالأصل) ---
+    function renderAll() {
+        document.getElementById('globalCoffeeStock').innerText = db.coffeeStock.toFixed(3);
+        renderSales(); renderSettings(); renderExpenses();
+        ['HOT', 'WATER','SODA','JUICE','SHISHA'].forEach(c => renderCategorySection(c));
+        saveDB();
+    }
+
+    function renderCategorySection(cat) {
+        const btns = document.getElementById('btns_' + cat);
+        const list = document.getElementById('list_' + cat);
+        if(btns) {
+            btns.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn" style="background:#e67e22; flex:1;" onclick="generateReport('يومي','${cat}')">يومي PDF</button>
+                <button class="btn" style="background:#d35400; flex:1;" onclick="generateReport('شهري','${cat}')">شهري PDF</button>
+            </div>`;
+        }
+        const filtered = db.items.filter(i => i.cat === cat);
+        list.innerHTML = `<table><thead><tr><th>الصنف</th><th>المخزن</th><th>تزويد</th></tr></thead><tbody>` + 
+        filtered.map(i => `<tr><td>${i.name}</td><td><b>${i.stock}</b></td><td><button style="background:var(--accent); color:white; border:none; border-radius:5px; padding:2px 8px;" onclick="quickAdd('${i.name}')">+</button></td></tr>`).join('') + `</tbody></table>`;
+    }
+
+    function processSale() {
+        const date = document.getElementById('saleDate').value;
+        let isChanged = false;
+        document.querySelectorAll('.qty-in').forEach(inp => {
+            const q = parseFloat(inp.value)||0; if(q > 0) {
+                const it = db.items[inp.dataset.idx];
+                let prevVal, currentVal;
+                if(it.cat === 'HOT') {
+                    prevVal = (db.coffeeStock * 1000).toFixed(0) + " غ";
+                    db.coffeeStock -= (q * it.grams / 1000);
+                    currentVal = (db.coffeeStock * 1000).toFixed(0) + " غ";
+                } else {
+                    prevVal = it.stock; it.stock -= q; currentVal = it.stock;
+                }
+                db.history.push({ date, name: it.name, cat: it.cat, qty: q, prev: prevVal, current: currentVal, total: (q * it.price) });
+                inp.value = 0; isChanged = true;
+            }
+        });
+        if(isChanged) { renderAll(); alert("تم حفظ المبيعات بنجاح"); }
+    }
+
+    function renderSales() {
+        document.getElementById('salesBody').innerHTML = db.items.map((it, i) => `<tr>
+            <td style="text-align:right">${it.name}</td>
+            <td>${it.cat==='HOT' ? '---' : it.stock}</td>
+            <td><button style="background:var(--accent); color:white; border:none; border-radius:5px; padding:2px 8px;" onclick="quickAdd('${it.name}')">+</button></td>
+            <td>${it.price.toFixed(3)}</td>
+            <td><input type="number" class="qty-in input-field" data-idx="${i}" value="0" oninput="calcTotal()" style="width:60px; margin:0;"></td>
+        </tr>`).join('');
+    }
+
+    function saveItem() {
+        const newItem = {
+            name: document.getElementById('itemName').value,
+            cat: document.getElementById('itemCat').value,
+            price: parseFloat(document.getElementById('itemPrice').value)||0,
+            grams: parseFloat(document.getElementById('itemGrams').value)||0,
+            stock: parseFloat(document.getElementById('itemStock').value)||0
+        };
+        const idx = db.items.findIndex(i => i.name === newItem.name);
+        if(idx > -1) db.items[idx] = newItem; else db.items.push(newItem);
+        renderAll();
+    }
+
+    function calcTotal() { let t = 0; document.querySelectorAll('.qty-in').forEach(inp => t += (parseFloat(inp.value)||0) * db.items[inp.dataset.idx].price); document.getElementById('dailyTotalDisplay').innerText = t.toFixed(3); }
+    function quickAdd(n) { const v = prompt("أدخل الكمية المضافة للمخزن:"); if(v) { db.items.find(i => i.name === n).stock += parseFloat(v); renderAll(); } }
+    function addCoffeeStock() { const v = prompt("أضف بن (كجم):"); if(v) { db.coffeeStock += parseFloat(v); renderAll(); } }
+    function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active')); document.getElementById(id).style.display='block'; if(event) event.target.classList.add('active'); }
+    function addExpense() { db.expenses.push({ date: document.getElementById('saleDate').value, note: document.getElementById('expNote').value, amount: parseFloat(document.getElementById('expAmount').value)||0 }); renderExpenses(); renderAll(); }
+    function renderExpenses() { const d = document.getElementById('saleDate').value; document.getElementById('expensesBody').innerHTML = db.expenses.filter(e => e.date === d).map((e, i) => `<tr><td>${e.note}</td><td>${e.amount.toFixed(3)}</td><td><button onclick="db.expenses.splice(${i},1);renderAll()">🗑️</button></td></tr>`).join(''); }
+    function renderSettings() { document.getElementById('itemsBody').innerHTML = db.items.map((it, i) => `<tr><td>${it.name}</td><td>${it.stock}</td><td><button onclick="db.items.splice(${i},1);renderAll()" style="background:var(--danger); border:none; color:white; padding:4px 8px; border-radius:5px;">حذف</button></td></tr>`).join(''); }
+    function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], {type:'application/json'})); a.download = `Backup.json`; a.click(); }
+    function importData() { const inp = document.createElement('input'); inp.type='file'; inp.onchange = e => { const r = new FileReader(); r.onload = ev => { db = JSON.parse(ev.target.result); renderAll(); }; r.readAsText(e.target.files[0]); }; inp.click(); }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+</script>
+</body>
+</html>
