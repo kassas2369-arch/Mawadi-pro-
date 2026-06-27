@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mawadi-Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#eef0f5;direction:rtl;color:#333}
+.page{max-width:600px;margin:0 auto;padding:15px}
+.login-box{max-width:360px;margin:60px auto;padding:30px;background:#fff;border-radius:20px;text-align:center}
+.login-box h1{color:#3d5af1;margin-bottom:8px}
+.login-box input{width:100%;padding:14px;margin-bottom:12px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px}
+.login-box button{width:100%;padding:14px;background:#3d5af1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;cursor:pointer}
+#msg{color:#ef4444;margin-top:10px;font-size:13px;min-height:20px}
+.top-bar{background:#fff;padding:12px 15px;border-radius:0 0 20px 20px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.top-bar h2{color:#3d5af1;margin:0;font-size:20px}
+.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:15px}
+.nav-tabs button{flex-shrink:0;padding:10px 16px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-weight:bold;font-size:13px;color:#888}
+.nav-tabs button.active{background:#3d5af1;color:#fff}
+.section-card{background:#fff;padding:18px;border-radius:16px;margin-bottom:12px}
+.section-card h3{margin:0 0 15px 0;font-size:16px}
+.input-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.input-row input,.input-row select{flex:1;min-width:100px;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;font-size:14px}
+.btn-blue{background:#3d5af1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-green{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-red{background:#ef4444;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer}
+.btn-gray{background:#e5e7eb;color:#555;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-orange{background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-purple{background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-cyan{background:#06b6d4;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.btn-pink{background:#ec4899;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;color:#666;padding:10px;text-align:center;font-weight:600}
+td{padding:10px;border-bottom:1px solid #eee;text-align:center}
+.empty{text-align:center;padding:30px;color:#aaa}
+.low-stock{color:#ef4444;font-weight:900}
+.print-area{display:none}
+@media print{body *{visibility:hidden}.print-area,.print-area *{visibility:visible}.print-area{position:fixed;left:0;top:0;width:100%;height:100%;display:block;padding:20px;background:#fff;z-index:9999}}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:flex-end;z-index:1000}
+.modal-content{background:#fff;padding:25px;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-close{background:#ef4444;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:bold;font-size:18px}
+body.dark{background:#0f172a;color:#e2e8f0}
+body.dark .login-box{background:#1e293b}
+body.dark .login-box input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .top-bar{background:#1e293b}
+body.dark .section-card{background:#1e293b}
+body.dark .section-card h3{color:#e2e8f0}
+body.dark .input-row input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .btn-gray{background:#334155;color:#e2e8f0}
+body.dark th{background:#0f172a;color:#94a3b8}
+body.dark td{border-color:#334155;color:#e2e8f0}
+body.dark .low-stock{color:#f87171}
+body.dark .modal-content{background:#1e293b}
+body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}
+#reader{width:100%;height:300px;background:#000}
+#scanner-file-input,#import-file-input{display:none}
+.search-highlight{background:#fef08a;padding:2px 4px;border-radius:4px;font-weight:bold}
+body.dark .search-highlight{background:#854d0e;color:#fff}
+.lib-loading{color:#888;font-size:12px;margin-top:5px}
+</style>
+</head>
+<body>
+
+<div id="login" class="login-box">
+<h1>📦 Mawadi-Pro</h1>
+<p>نظام إدارة المخزون</p>
+<input type="text" id="u" value="admin" placeholder="المستخدم">
+<input type="password" id="p" value="admin" placeholder="كلمة المرور">
+<button onclick="doLogin()">تسجيل الدخول</button>
+<button onclick="doLoginFast()" style="background:#22c55e">دخول سريع</button>
+<button onclick="resetData()" class="btn-orange" style="margin-top:8px">🗑️ مسح البيانات</button>
+<div id="msg"></div>
+<div id="lib-status" class="lib-loading"></div>
+</div>
+
+<div id="app" style="display:none">
+<div class="top-bar">
+<h2>📦 Mawadi-Pro</h2>
+<div style="display:flex;gap:8px">
+<button class="btn-gray" onclick="toggleTheme()">🌙</button>
+<button class="btn-gray" onclick="showSettings()">⚙️</button>
+<button class="btn-red" onclick="doLogout()">🚪</button>
+</div>
+</div>
+
+<div class="page">
+<div class="nav-tabs">
+<button id="nav-inv" class="active" onclick="showSection('inv')">📦 المخزون</button>
+<button id="nav-miss" onclick="showSection('miss')">📑 النواقص</button>
+</div>
+
+<div id="inv" class="section">
+<div class="section-card">
+<h3>📦 إضافة مادة</h3>
+<button class="btn-green" onclick="openScanner()" style="margin-bottom:15px">📷 مسح باركود</button>
+<button class="btn-purple" onclick="document.getElementById('scanner-file-input').click()" style="margin-bottom:15px;margin-right:10px">📁 مسح من صورة</button>
+<input type="file" id="scanner-file-input" accept="image/*" onchange="if(this.files[0]) scanFromFile(this.files[0])" style="display:none">
+<div class="input-row">
+<input id="ic" placeholder="الكود" style="min-width:120px">
+<input id="in" placeholder="اسم المادة *" style="min-width:150px">
+</div>
+<div class="input-row">
+<input id="ib" placeholder="سعر الشراء" type="number" step="0.01">
+<input id="is" placeholder="سعر البيع" type="number" step="0.01">
+</div>
+<div class="input-row">
+<input id="im" placeholder="حد أدنى" type="number">
+<input id="iq" placeholder="الكمية" type="number">
+<input id="iu" placeholder="الوحدة">
+</div>
+<div style="display:flex;gap:10px;margin-top:10px">
+<button class="btn-blue" onclick="addItem()">➕ إضافة</button>
+<button class="btn-gray" onclick="clearItemForm()">مسح</button>
+</div>
+</div>
+
+<div class="section-card">
+<h3>📋 قائمة المواد</h3>
+<div class="input-row" style="margin-bottom:10px">
+<input type="text" id="search-items" placeholder="🔍 بحث بالاسم أو الكود..." style="flex:2" oninput="renderItems()">
+<button class="btn-cyan" onclick="exportData()">📤 تصدير</button>
+<button class="btn-pink" onclick="document.getElementById('import-file-input').click()">📥 استيراد</button>
+<input type="file" id="import-file-input" accept=".json,.csv" style="display:none" onchange="if(this.files[0]) importData(this.files[0])">
+</div>
+<table>
+<thead><tr><th>الكود</th><th>الاسم</th><th>السعر</th><th>الكمية</th><th>حذف</th></tr></thead>
+<tbody id="itb"></tbody>
+</table>
+</div>
+</div>
+
+<div id="miss" class="section" style="display:none">
+<div class="section-card">
+<h3>📑 المواد الناقصة</h3>
+<div class="input-row" style="margin-bottom:15px">
+<input id="wa-phone" placeholder="📱 رقم الواتساب (مثال: 21655123456)" type="tel" style="flex:2">
+<button class="btn-green" onclick="shareWhatsApp()">📤 واتساب</button>
+<button class="btn-blue" onclick="printMissing()">📄 PDF</button>
+</div>
+<div id="miss-print" class="print-area">
+<div style="text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px;margin-bottom:15px">
+<h2 style="color:#ef4444;margin:0;font-size:22px">📑 تقرير النواقص</h2>
+<p style="color:#888;font-size:12px;margin:5px 0 0 0">Mawadi-Pro | <span id="mp-date"></span></p>
+</div>
+<table style="width:100%;border:1px solid #ddd">
+<thead><tr style="background:#fee2e2"><th style="border:1px solid #ddd;padding:8px">الكود</th><th style="border:1px solid #ddd;padding:8px">اسم المادة</th><th style="border:1px solid #ddd;padding:8px">الكمية</th></tr></thead>
+<tbody id="mtb"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="scanner-modal" onclick="if(event.target===this){closeScanner()}">
+<div class="modal-content" style="border-radius:20px;max-height:90vh">
+<div class="modal-header">
+<h3 style="color:#3d5af1;margin:0">📷 ماسح الباركود</h3>
+<button class="modal-close" onclick="closeScanner()">×</button>
+</div>
+<div id="reader"></div>
+<div style="margin-top:15px">
+<input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." style="width:100%;padding:15px;font-size:18px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#f9fafb;letter-spacing:3px" onkeydown="if(event.key==='Enter'){manualScan(this.value);this.value=''}">
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="settings-modal" onclick="if(event.target===this){closeSettings()}">
+<div class="modal-content">
+<div class="modal-header">
+<h3 style="color:#3d5af1;margin:0">⚙️ الإعدادات</h3>
+<button class="modal-close" onclick="closeSettings()">×</button>
+</div>
+<div>
+<h4 style="margin-bottom:10px">🔐 تغيير كلمة المرور</h4>
+<div class="input-row">
+<input id="old-pass" type="password" placeholder="كلمة المرور الحالية">
+</div>
+<div class="input-row">
+<input id="new-pass" type="password" placeholder="كلمة المرور الجديدة">
+</div>
+<div class="input-row">
+<input id="confirm-pass" type="password" placeholder="تأكيد كلمة المرور">
+</div>
+<button class="btn-blue" onclick="changePassword()" style="width:100%">💾 حفظ التغييرات</button>
+<div id="pass-msg" style="margin-top:10px;color:#ef4444;font-size:13px"></div>
+</div>
+</div>
+</div>
+
+<div id="print-area" class="print-area" style="display:none">
+<div id="print-content"></div>
+</div>
+
+<!-- Load libraries asynchronously (won't block the app) -->
+<script>
+(function(){
+    var s=document.createElement("script");
+    s.src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+    s.onload=function(){console.log("html5-qrcode loaded");};
+    s.onerror=function(){console.warn("html5-qrcode failed to load");};
+    document.head.appendChild(s);
+})();
+(function(){
+    var s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=function(){console.log("jsPDF loaded");};
+    s.onerror=function(){console.warn("jsPDF failed to load");};
+    document.head.appendChild(s);
+})();
+</script>
+
+<script>
+    // ====== CORE VARIABLES ======
+var items = [];
+var lsOK = false;
+var currentPass = "admin";
+var html5QrCode = null;
+
+// ====== CHECK LOCALSTORAGE ======
+try {
+    localStorage.setItem("t", "1");
+    if (localStorage.getItem("t") === "1") lsOK = true;
+    localStorage.removeItem("t");
+} catch (e) {
+    lsOK = false;
+}
+
+function get(id) {
+    return document.getElementById(id);
+}
+
+function setMsg(txt) {
+    var el = get("msg");
+    if (el) el.innerHTML = txt;
+}
+
+// ====== SAVE / LOAD ======
+function saveData() {
+    if (!lsOK) return;
+    try {
+        localStorage.setItem("mp_data", JSON.stringify({items: items, pass: currentPass}));
+    } catch (e) {}
+}
+
+function loadData() {
+    if (!lsOK) return;
+    try {
+        var s = localStorage.getItem("mp_data");
+        if (s) {
+            var d = JSON.parse(s);
+            if (d.items && Array.isArray(d.items)) items = d.items;
+            if (d.pass) currentPass = d.pass;
+        }
+    } catch (e) {
+        items = [];
+        currentPass = "admin";
+    }
+}
+
+function resetData() {
+    if (!confirm("هل أنت متأكد من مسح جميع البيانات؟")) return;
+    try {
+        localStorage.removeItem("mp_data");
+        localStorage.removeItem("mp_theme");
+    } catch (e) {}
+    items = [];
+    currentPass = "admin";
+    alert("✅ تم مسح البيانات. أعد تحميل الصفحة.");
+    location.reload();
+}
+
+// ====== THEME ======
+function initTheme() {
+    try {
+        var s = localStorage.getItem("mp_theme");
+        if (s === "dark") document.body.classList.add("dark");
+    } catch (e) {}
+}
+
+function toggleTheme() {
+    try {
+        var d = document.body.classList.contains("dark");
+        if (d) {
+            document.body.classList.remove("dark");
+            localStorage.setItem("mp_theme", "light");
+        } else {
+            document.body.classList.add("dark");
+            localStorage.setItem("mp_theme", "dark");
+        }
+    } catch (e) {}
+}
+
+// ====== LOGIN ======
+function doLogin() {
+    try {
+        var u = get("u").value.trim();
+        var p = get("p").value;
+        loadData();
+        if (u === "admin" && p === currentPass) {
+            get("login").style.display = "none";
+            get("app").style.display = "block";
+            setMsg("");
+            renderItems();
+        } else {
+            setMsg("❌ بيانات الدخول غير صحيحة");
+        }
+    } catch (e) {
+        setMsg("خطأ: " + e.message);
+    }
+}
+
+function doLoginFast() {
+    try {
+        loadData();
+        get("login").style.display = "none";
+        get("app").style.display = "block";
+        setMsg("");
+        renderItems();
+    } catch (e) {
+        setMsg("خطأ: " + e.message);
+    }
+}
+
+function doLogout() {
+    try {
+        get("app").style.display = "none";
+        get("login").style.display = "block";
+        get("u").value = "admin";
+        get("p").value = "";
+    } catch (e) {}
+}
+
+// ====== SETTINGS ======
+function showSettings() {
+    try {
+        get("settings-modal").style.display = "flex";
+        get("pass-msg").innerHTML = "";
+    } catch (e) {}
+}
+
+function closeSettings() {
+    try {
+        get("settings-modal").style.display = "none";
+    } catch (e) {}
+}
+
+function changePassword() {
+    try {
+        var o = get("old-pass").value;
+        var n = get("new-pass").value;
+        var c = get("confirm-pass").value;
+        var m = get("pass-msg");
+        if (o !== currentPass) { m.innerHTML = "❌ كلمة المرور الحالية غير صحيحة"; return; }
+        if (n.length < 4) { m.innerHTML = "❌ كلمة المرور الجديدة قصيرة جداً"; return; }
+        if (n !== c) { m.innerHTML = "❌ كلمتا المرور غير متطابقتين"; return; }
+        currentPass = n;
+        saveData();
+        m.style.color = "#22c55e";
+        m.innerHTML = "✅ تم تغيير كلمة المرور بنجاح";
+        get("old-pass").value = "";
+        get("new-pass").value = "";
+        get("confirm-pass").value = "";
+    } catch (e) {}
+}
+
+// ====== SCANNER (Camera + File) ======
+function openScanner() {
+    try {
+        get("scanner-modal").style.display = "flex";
+        get("manual-scan").focus();
+        // Check if library is loaded
+        if (typeof Html5Qrcode !== "undefined") {
+            startHtml5QrCode();
+        } else {
+            console.warn("html5-qrcode not loaded yet, waiting...");
+            // Wait for library to load
+            var checkInterval = setInterval(function() {
+                if (typeof Html5Qrcode !== "undefined") {
+                    clearInterval(checkInterval);
+                    startHtml5QrCode();
+                }
+            }, 500);
+            // Timeout after 10 seconds
+            setTimeout(function() {
+                clearInterval(checkInterval);
+                if (typeof Html5Qrcode === "undefined") {
+                    alert("⚠️ مكتبة الماسح غير متوفرة. تأكد من اتصال الإنترنت.");
+                }
+            }, 10000);
+        }
+    } catch (e) {
+        console.error("Open scanner error", e);
+    }
+}
+
+function closeScanner() {
+    try {
+        get("scanner-modal").style.display = "none";
+        stopHtml5QrCode();
+    } catch (e) {
+        console.error("Close scanner error", e);
+    }
+}
+
+function startHtml5QrCode() {
+    try {
+        if (typeof Html5Qrcode === "undefined") {
+            alert("⚠️ مكتبة الماسح غير متوفرة. تأكد من اتصال الإنترنت.");
+            return;
+        }
+        if (html5QrCode) {
+            html5QrCode.stop().catch(function(e) { console.log("Stop error", e); });
+            html5QrCode = null;
+        }
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            function(decodedText, decodedResult) {
+                console.log("Barcode detected:", decodedText);
+                get("ic").value = decodedText;
+                closeScanner();
+                get("in").focus();
+            },
+            function(errorMessage) {
+                // Ignore errors during scanning
+            }
+        ).catch(function(err) {
+            console.error("Start scanner error", err);
+            alert("⚠️ لا يمكن فتح الكاميرا. تأكد من إعطاء الإذن للكاميرا.");
+        });
+    } catch (e) {
+        console.error("Html5Qrcode init error", e);
+        alert("⚠️ خطأ في تشغيل الماسح.");
+    }
+}
+
+function stopHtml5QrCode() {
+    try {
+        if (html5QrCode) {
+            html5QrCode.stop().then(function() {
+                html5QrCode = null;
+            }).catch(function(e) {
+                html5QrCode = null;
+            });
+        }
+    } catch (e) {
+        console.error("Stop scanner error", e);
+    }
+}
+
+function scanFromFile(file) {
+    try {
+        if (typeof Html5Qrcode === "undefined") {
+            alert("⚠️ مكتبة الماسح غير متوفرة بعد. انتظر قليلاً أو تأكد من اتصال الإنترنت.");
+            return;
+        }
+        var tempScanner = new Html5Qrcode("reader");
+        tempScanner.scanFile(file, false).then(function(decodedText) {
+            get("ic").value = decodedText;
+            get("in").focus();
+            alert("✅ تم قراءة الباركود: " + decodedText);
+        }).catch(function(err) {
+            console.error("File scan error", err);
+            alert("❌ لم يتم العثور على باركود في الصورة.");
+        });
+    } catch (e) {
+        console.error("Scan from file error", e);
+        alert("❌ خطأ في مسح الصورة.");
+    }
+}
+
+function manualScan(val) {
+    try {
+        if (val) {
+            get("ic").value = val.trim();
+            closeScanner();
+            get("in").focus();
+        }
+    } catch (e) {
+        console.error("Manual scan error", e);
+    }
+}
+
+// ====== NAVIGATION ======
+function showSection(id) {
+    try {
+        var sections = ["inv", "miss"];
+        for (var i = 0; i < sections.length; i++) {
+            var sec = get(sections[i]);
+            var nav = get("nav-" + sections[i]);
+            if (sec) sec.style.display = (sections[i] === id) ? "block" : "none";
+            if (nav) nav.className = (sections[i] === id) ? "active" : "";
+        }
+        if (id === "inv") renderItems();
+        if (id === "miss") renderMissing();
+    } catch (e) {
+        console.error("Show section error", e);
+    }
+}
+
+function clearItemForm() {
+    try {
+        var ids = ["ic", "in", "ib", "is", "im", "iq", "iu"];
+        for (var i = 0; i < ids.length; i++) {
+            var el = get(ids[i]);
+            if (el) el.value = "";
+        }
+    } catch (e) {
+        console.error("Clear form error", e);
+    }
+}
+
+function addItem() {
+    try {
+        var c = get("ic").value.trim() || ("ITM" + Date.now());
+        var n = get("in").value.trim();
+        if (!n) { alert("اسم المادة مطلوب"); return; }
+        var b = parseFloat(get("ib").value) || 0;
+        var e = parseFloat(get("is").value) || 0;
+        var m = parseFloat(get("im").value) || 0;
+        var q = parseFloat(get("iq").value) || 0;
+        var u = get("iu").value.trim() || "قطعة";
+        items.push({ code: c, name: n, buy: b, sell: e, min: m, qty: q, unit: u });
+        saveData();
+        clearItemForm();
+        renderItems();
+    } catch (err) {
+        console.error("Add item error", err);
+        alert("خطأ في إضافة المادة: " + err.message);
+    }
+}
+
+// ====== SEARCH WITH HIGHLIGHT ======
+function highlightText(text, query) {
+    if (!query || !text) return text;
+    var lowerText = String(text).toLowerCase();
+    var lowerQuery = query.toLowerCase();
+    var idx = lowerText.indexOf(lowerQuery);
+    if (idx === -1) return text;
+    var before = String(text).substring(0, idx);
+    var match = String(text).substring(idx, idx + lowerQuery.length);
+    var after = String(text).substring(idx + lowerQuery.length);
+    return before + '<span class="search-highlight">' + match + '</span>' + after;
+}
+
+function renderItems() {
+    try {
+        if (!Array.isArray(items)) items = [];
+        var searchEl = get("search-items");
+        var q = searchEl ? searchEl.value.trim().toLowerCase() : "";
+        var t = get("itb");
+        if (!t) return;
+        t.innerHTML = "";
+        var shown = 0;
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var codeMatch = it.code && String(it.code).toLowerCase().indexOf(q) !== -1;
+            var nameMatch = it.name && String(it.name).toLowerCase().indexOf(q) !== -1;
+            if (q && !codeMatch && !nameMatch) continue;
+            shown++;
+            var cls = parseFloat(it.qty || 0) <= parseFloat(it.min || 0) ? "low-stock" : "";
+            var displayCode = q ? highlightText(it.code || "", q) : (it.code || "");
+            var displayName = q ? highlightText(it.name || "", q) : (it.name || "");
+            t.innerHTML += "<tr><td>" + displayCode + "</td><td>" + displayName + "</td><td>" + (it.sell || 0) + " د.ت</td><td class=\"" + cls + "\">" + (it.qty || 0) + " " + (it.unit || "قطعة") + "</td><td><button class=\"btn-red\" onclick=\"delItem(" + i + ")\">حذف</button></td></tr>";
+        }
+        if (shown === 0 && q) {
+            t.innerHTML = '<tr><td colspan="5" class="empty">لا توجد نتائج لـ "' + q + '"</td></tr>';
+        }
+    } catch (e) {
+        console.error("Render items error", e);
+    }
+}
+
+function delItem(i) {
+    try {
+        if (!confirm("حذف المادة؟")) return;
+        items.splice(i, 1);
+        saveData();
+        renderItems();
+    } catch (e) {
+        console.error("Delete item error", e);
+    }
+}
+
+function renderMissing() {
+    try {
+        if (!Array.isArray(items)) items = [];
+        var t = get("mtb");
+        if (!t) return;
+        t.innerHTML = "";
+        var c = 0;
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) {
+                c++;
+                t.innerHTML += "<tr><td style=\"border:1px solid #ddd;padding:8px\">" + (it.code || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;font-weight:bold\">" + (it.name || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;color:#ef4444;font-weight:bold\">" + q + " " + (it.unit || "قطعة") + "</td></tr>";
+            }
+        }
+        if (c === 0) t.innerHTML = "<tr><td colspan=\"3\" class=\"empty\" style=\"border:1px solid #ddd;padding:20px\">لا توجد نواقص 🎉</td></tr>";
+        var mpDate = get("mp-date");
+        if (mpDate) mpDate.innerText = new Date().toLocaleString("ar-TN");
+    } catch (e) {
+        console.error("Render missing error", e);
+    }
+}
+// ====== EXPORT / IMPORT ======
+function exportData() {
+    try {
+        if (!Array.isArray(items) || items.length === 0) {
+            alert("لا توجد بيانات للتصدير!");
+            return;
+        }
+        var data = {
+            app: "Mawadi-Pro",
+            version: "1.0",
+            date: new Date().toISOString(),
+            items: items,
+            totalItems: items.length
+        };
+        var json = JSON.stringify(data, null, 2);
+        var blob = new Blob([json], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "Mawadi-Pro-Backup-" + new Date().toISOString().slice(0, 10) + ".json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert("✅ تم تصدير " + items.length + " مادة بنجاح!");
+    } catch (e) {
+        alert("خطأ في التصدير: " + e.message);
+    }
+}
+
+function exportCSV() {
+    try {
+        if (!Array.isArray(items) || items.length === 0) {
+            alert("لا توجد بيانات للتصدير!");
+            return;
+        }
+        var csv = "الكود,الاسم,سعر الشراء,سعر البيع,حد أدنى,الكمية,الوحدة\n";
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            csv += '"' + (it.code || "") + '","' + (it.name || "") + '",' + (it.buy || 0) + "," + (it.sell || 0) + "," + (it.min || 0) + "," + (it.qty || 0) + ',"' + (it.unit || "قطعة") + '"\n';
+        }
+        var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "Mawadi-Pro-CSV-" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert("✅ تم تصدير CSV بنجاح!");
+    } catch (e) {
+        alert("خطأ في تصدير CSV: " + e.message);
+    }
+}
+
+function importData(file) {
+    try {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var content = e.target.result;
+                var ext = file.name.split(".").pop().toLowerCase();
+                if (ext === "json") {
+                    var data = JSON.parse(content);
+                    if (data.items && Array.isArray(data.items)) {
+                        if (confirm("سيتم استبدال " + items.length + " مادة بـ " + data.items.length + " مادة. متأكد؟")) {
+                            items = data.items;
+                            saveData();
+                            renderItems();
+                            alert("✅ تم استيراد " + data.items.length + " مادة بنجاح!");
+                        }
+                    } else {
+                        alert("❌ ملف JSON غير صالح!");
+                    }
+                } else if (ext === "csv") {
+                    importCSV(content);
+                } else {
+                    alert("❌ صيغة الملف غير مدعومة. استخدم JSON أو CSV.");
+                }
+            } catch (err) {
+                alert("❌ خطأ في قراءة الملف: " + err.message);
+            }
+        };
+        reader.readAsText(file);
+    } catch (e) {
+        alert("خطأ في الاستيراد: " + e.message);
+    }
+}
+
+function importCSV(csvText) {
+    try {
+        var lines = csvText.replace(/\uFEFF/g, "").split("\n");
+        var newItems = [];
+        for (var i = 1; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line) continue;
+            var parts = line.split(',');
+            if (parts.length < 2) continue;
+            newItems.push({
+                code: parts[0] ? parts[0].trim().replace(/^"|"$/g, '') : '',
+                name: parts[1] ? parts[1].trim().replace(/^"|"$/g, '') : '',
+                buy: parseFloat(parts[2]) || 0,
+                sell: parseFloat(parts[3]) || 0,
+                min: parseFloat(parts[4]) || 0,
+                qty: parseFloat(parts[5]) || 0,
+                unit: parts[6] ? parts[6].trim().replace(/^"|"$/g, '') : 'قطعة'
+            });
+        }
+        if (newItems.length === 0) { alert("❌ لا توجد بيانات صالحة في ملف CSV!"); return; }
+        if (confirm("سيتم استبدال " + items.length + " مادة بـ " + newItems.length + " مادة. متأكد؟")) {
+            items = newItems;
+            saveData();
+            renderItems();
+            alert("✅ تم استيراد " + newItems.length + " مادة من CSV بنجاح!");
+        }
+    } catch (e) {
+        alert("❌ خطأ في استيراد CSV: " + e.message);
+    }
+}
+
+// ====== WHATSAPP SHARE ======
+function shareWhatsApp() {
+    try {
+        var miss = [];
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) miss.push(it);
+        }
+        if (miss.length === 0) { alert("لا توجد مواد ناقصة!"); return; }
+        var txt = "*📑 تقرير النواقص — Mawadi-Pro*\n";
+        txt += new Date().toLocaleString("ar-TN") + "\n\n";
+        for (var j = 0; j < miss.length; j++) {
+            txt += (j + 1) + ". " + miss[j].name + " — الكمية: " + miss[j].qty + " " + (miss[j].unit || "قطعة") + "\n";
+        }
+        var phone = get("wa-phone").value.trim().replace(/^\+/, "");
+        var url = phone ? "https://wa.me/" + phone + "?text=" + encodeURIComponent(txt) : "https://wa.me/?text=" + encodeURIComponent(txt);
+        window.open(url, "_blank");
+    } catch (e) {
+        alert("خطأ في مشاركة واتساب: " + e.message);
+    }
+}
+
+// ====== PRINT / PDF ======
+function printMissing() {
+    try {
+        var miss = [];
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) miss.push(it);
+        }
+        if (miss.length === 0) { alert("لا توجد مواد ناقصة!"); return; }
+        var printWindow = window.open("", "_blank");
+        var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير النواقص</title>';
+        html += '<style>body{font-family:Arial,sans-serif;padding:20px;direction:rtl}h2{color:#ef4444;text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ddd;padding:10px;text-align:center}th{background:#fee2e2;color:#333;font-weight:bold}td{color:#ef4444;font-weight:bold}.info{text-align:center;color:#888;font-size:12px;margin-top:5px}</style></head><body>';
+        html += '<h2>📑 تقرير النواقص</h2>';
+        html += '<div class="info">Mawadi-Pro | ' + new Date().toLocaleString("ar-TN") + '</div>';
+        html += '<table><thead><tr><th>الكود</th><th>اسم المادة</th><th>الكمية</th></tr></thead><tbody>';
+        for (var k = 0; k < miss.length; k++) {
+            html += '<tr><td>' + (miss[k].code || "") + '</td><td style="text-align:right">' + (miss[k].name || "") + '</td><td>' + miss[k].qty + ' ' + (miss[k].unit || "قطعة") + '</td></tr>';
+        }
+        html += '</tbody></table></body></html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(function() { printWindow.print(); }, 500);
+    } catch (e) {
+        alert("خطأ في الطباعة: " + e.message);
+    }
+}
+
+// ====== INIT ======
+loadData();
+initTheme();
+</script>
+</body>
+</html>
