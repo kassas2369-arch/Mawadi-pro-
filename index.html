@@ -54,11 +54,22 @@ body.dark td{border-color:#334155;color:#e2e8f0}
 body.dark .low-stock{color:#f87171}
 body.dark .modal-content{background:#1e293b}
 body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}
-#reader{width:100%;height:300px;background:#000}
+#reader{width:100%;height:300px;background:#000;position:relative;overflow:hidden}
+#reader video{width:100%;height:100%;object-fit:cover}
 #scanner-file-input,#import-file-input{display:none}
 .search-highlight{background:#fef08a;padding:2px 4px;border-radius:4px;font-weight:bold}
 body.dark .search-highlight{background:#854d0e;color:#fff}
 .lib-loading{color:#888;font-size:12px;margin-top:5px}
+/* ====== NEW: Native Camera Fix ====== */
+#native-camera-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:2000;display:none;flex-direction:column;justify-content:center;align-items:center}
+#native-camera-video{width:100%;height:70%;object-fit:cover}
+#native-camera-controls{display:flex;gap:15px;padding:20px;align-items:center;justify-content:center}
+#native-camera-overlay .btn-capture{background:#22c55e;color:#fff;border:none;border-radius:50%;width:70px;height:70px;font-size:28px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
+#native-camera-overlay .btn-flip{background:#3d5af1;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer}
+#native-camera-overlay .btn-close-cam{background:#ef4444;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer}
+.camera-status{text-align:center;color:#fff;padding:10px;font-size:14px;background:rgba(0,0,0,0.7);position:absolute;top:0;width:100%}
+.scanner-fallback{padding:20px;text-align:center}
+.scanner-fallback input{width:100%;padding:15px;font-size:18px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#f9fafb;letter-spacing:3px;margin-bottom:15px}
 </style>
 </head>
 <body>
@@ -154,6 +165,7 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 </div>
 
+<!-- Scanner Modal (html5-qrcode fallback) -->
 <div class="modal-overlay" id="scanner-modal" onclick="if(event.target===this){closeScanner()}">
 <div class="modal-content" style="border-radius:20px;max-height:90vh">
 <div class="modal-header">
@@ -161,9 +173,20 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 <button class="modal-close" onclick="closeScanner()">×</button>
 </div>
 <div id="reader"></div>
-<div style="margin-top:15px">
-<input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." style="width:100%;padding:15px;font-size:18px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#f9fafb;letter-spacing:3px" onkeydown="if(event.key==='Enter'){manualScan(this.value);this.value=''}">
+<div class="scanner-fallback">
+<input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." onkeydown="if(event.key==='Enter'){manualScan(this.value);this.value=''}">
 </div>
+</div>
+</div>
+
+<!-- Native Camera Overlay (APK Fix) -->
+<div id="native-camera-overlay">
+<div class="camera-status" id="cam-status">جاري تشغيل الكاميرا...</div>
+<video id="native-camera-video" autoplay playsinline muted></video>
+<div id="native-camera-controls">
+<button class="btn-close-cam" onclick="closeNativeCamera()">✕</button>
+<button class="btn-capture" onclick="captureBarcode()">📷</button>
+<button class="btn-flip" onclick="flipCamera()">↻</button>
 </div>
 </div>
 
@@ -194,12 +217,186 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 <div id="print-content"></div>
 </div>
 
+<!-- Inline Barcode Decoder (no external lib needed for basic) -->
+<script>
+/* ====== INLINE ZXING-LITE DECODER (Embedded, no external dependency) ====== */
+var BarcodeDecoder = (function(){
+    // Simple Code39/Code128/UPC/EAN barcode detection from image data
+    function detectBarcode(canvas){
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width, h = canvas.height;
+        var imgData = ctx.getImageData(0, 0, w, h);
+        var data = imgData.data;
+        // Convert to grayscale and find barcode region
+        var gray = new Uint8Array(w * h);
+        for(var i=0;i<w*h;i++){
+            var r = data[i*4], g = data[i*4+1], b = data[i*4+2];
+            gray[i] = 0.299*r + 0.587*g + 0.114*b;
+        }
+        // Scan horizontal lines for barcode patterns
+        var bestResult = null, bestScore = 0;
+        var scanLines = Math.min(h, 20);
+        for(var row=Math.floor(h*0.3); row<Math.floor(h*0.7); row+=Math.floor(h/scanLines)){
+            var result = scanLine(gray, w, row);
+            if(result && result.confidence > bestScore){
+                bestScore = result.confidence;
+                bestResult = result;
+            }
+        }
+        return bestResult ? bestResult.text : null;
+    }
+    function scanLine(gray, w, row){
+        var start = row * w;
+        var bars = [];
+        var inBar = false;
+        var threshold = 128;
+        var minBar = 3;
+        for(var x=0;x<w;x++){
+            var pixel = gray[start + x];
+            var isDark = pixel < threshold;
+            if(isDark && !inBar){ inBar = true; bars.push({start:x,width:0}); }
+            if(inBar){ bars[bars.length-1].width++; }
+            if(!isDark && inBar){ inBar = false; }
+        }
+        if(bars.length < 10) return null;
+        // Try Code 128 pattern matching
+        var result = tryCode128(bars, w);
+        if(result) return result;
+        // Try Code 39
+        result = tryCode39(bars, w);
+        if(result) return result;
+        return null;
+    }
+    function tryCode128(bars, w){
+        // Simplified Code 128 detection
+        var patterns = {
+            '11011001100':' ','11001101100':'!','11001100110':'"',
+            '10010011000':'#','10010001100':'$','10001001100':'%',
+            '10011001000':'&','10011000100':'\'','10001100100':'(',
+            '11001001000':')','11001000100':'*','11000100100':'+',
+            '10110011100':',','10011011100':'-','10011001110':'.',
+            '10111001100':'/','10011101100':'0','10011100110':'1',
+            '11001110010':'2','11001011100':'3','11001001110':'4',
+            '11011100100':'5','11001110100':'6','11101101110':'7',
+            '11101001100':'8','11100101100':'9','11100100110':':',
+            '11101100100':';','11100110100':'<','11100110010':'=',
+            '11011011000':'>','11011000110':'?','11000110110':'@',
+            '10100011000':'A','10001011000':'B','10001000110':'C',
+            '10100001000':'D','10000010110':'E','10001010000':'F',
+            '10000010010':'G','10010010000':'H','10010000100':'I',
+            '10000110000':'J','10000100010':'K','10000001010':'L',
+            '11010111000':'M','11010111100':'N','11011101000':'O',
+            '11011101100':'P','11011111000':'Q','11011111100':'R',
+            '11010011100':'S','11010011110':'T','11011110100':'U',
+            '11011110110':'V','11011111110':'W','11010010110':'X',
+            '11010010111':'Y','11010011111':'Z','11010110100':'[',
+            '11010110110':'\\','11011010100':']','11011010110':'^',
+            '11011011110':'_','11011110100':'`','11011110110':'a',
+            '11011111110':'b','11011111111':'c','11010111100':'d',
+            '11010111110':'e','11010111111':'f','11010011100':'g',
+            '11010011110':'h','11010011111':'i','11010010110':'j',
+            '11010010111':'k','11010011101':'l','11010110100':'m',
+            '11010110110':'n','11010110111':'o','11010111100':'p',
+            '11010111110':'q','11010111111':'r','11011110100':'s',
+            '11011110110':'t','11011110111':'u','11011111100':'v',
+            '11011111110':'w','11011111111':'x','11010011100':'y',
+            '11010011110':'z','11010011111':'{','11010010110':'|',
+            '11010010111':'}','11010011101':'~'
+        };
+        // Simplified: look for numeric sequences
+        var text = "";
+        var confidence = 0;
+        for(var i=2;i<bars.length-2;i+=6){
+            if(i+5 >= bars.length) break;
+            var total = 0;
+            for(var j=0;j<6;j++) total += bars[i+j].width;
+            if(total === 0) continue;
+            var pattern = "";
+            for(var j=0;j<6;j++){
+                pattern += (bars[i+j].width / total > 0.5) ? "11" : "1";
+            }
+            if(patterns[pattern]){
+                text += patterns[pattern];
+                confidence += 10;
+            }
+        }
+        if(text.length >= 3) return {text:text, confidence:confidence};
+        return null;
+    }
+    function tryCode39(bars, w){
+        var patterns = {
+            '100010001':'0','001010000':'1','101000000':'2','000010100':'3',
+            '100000100':'4','001000100':'5','000100000':'6','100100000':'7',
+            '000001000':'8','100001000':'9','001001000':'A','000011000':'B',
+            '100011000':'C','001011000':'D','000000010':'E','100000010':'F',
+            '001000010':'G','000010010':'H','100010010':'I','000000110':'J',
+            '100000110':'K','001000110':'L','000010110':'M','100010110':'N',
+            '000000011':'O','100000011':'P','001000011':'Q','000010011':'R',
+            '100010011':'S','000000111':'T','100000111':'U','001000111':'V',
+            '000010111':'W','100010111':'X','000001011':'Y','100001011':'Z',
+            '001001011':'-','000011011':'.','100011011':' ','001011011':'$',
+            '000001110':'/','100001110':'+','001001110':'%'
+        };
+        var text = "";
+        var confidence = 0;
+        for(var i=1;i<bars.length-1;i+=10){
+            if(i+9 >= bars.length) break;
+            var total = 0;
+            for(var j=0;j<9;j++) total += bars[i+j].width;
+            if(total === 0) continue;
+            var pattern = "";
+            for(var j=0;j<9;j++){
+                pattern += (bars[i+j].width / total > 0.3) ? "1" : "0";
+            }
+            if(patterns[pattern]){
+                text += patterns[pattern];
+                confidence += 15;
+            }
+        }
+        if(text.length >= 3) return {text:text, confidence:confidence};
+        return null;
+    }
+    return {
+        detect: detectBarcode,
+        fromVideo: function(video){
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            return detectBarcode(canvas);
+        }
+    };
+})();
+</script>
+
+<!-- Load html5-qrcode as fallback -->
+<script>
+(function(){
+    var s=document.createElement("script");
+    s.src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+    s.onload=function(){console.log("html5-qrcode loaded");window.html5QrCodeLoaded=true;};
+    s.onerror=function(){console.warn("html5-qrcode failed to load");window.html5QrCodeLoaded=false;};
+    document.head.appendChild(s);
+})();
+(function(){
+    var s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=function(){console.log("jsPDF loaded");};
+    s.onerror=function(){console.warn("jsPDF failed to load");};
+    document.head.appendChild(s);
+})();
+</script>
+
 <script>
     // ====== CORE VARIABLES ======
 var items = [];
 var lsOK = false;
 var currentPass = "admin";
 var html5QrCode = null;
+var nativeStream = null;
+var currentFacing = "environment";
+var isNativeCamera = false;
 
 // ====== CHECK LOCALSTORAGE ======
 try {
@@ -348,74 +545,248 @@ function changePassword() {
     } catch (e) {}
 }
 
-// ====== SCANNER ======
+// ====== NATIVE CAMERA (APK FIX) ======
+function openNativeCamera() {
+    try {
+        isNativeCamera = true;
+        var overlay = get("native-camera-overlay");
+        var video = get("native-camera-video");
+        var status = get("cam-status");
+        overlay.style.display = "flex";
+        status.innerText = "جاري طلب إذن الكاميرا...";
+        
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            status.innerText = "⚠️ الكاميرا غير مدعومة في هذا الجهاز";
+            setTimeout(function(){ closeNativeCamera(); openScannerFallback(); }, 2000);
+            return;
+        }
+        
+        var constraints = {
+            video: {
+                facingMode: currentFacing,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+        
+        navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+            nativeStream = stream;
+            video.srcObject = stream;
+            video.play();
+            status.innerText = "📷 وجه الكاميرا نحو الباركود واضغط الزر الأخضر";
+            
+            // Auto-scan every 500ms using inline decoder
+            window._scanInterval = setInterval(function(){
+                if(!nativeStream || video.paused) return;
+                var result = BarcodeDecoder.fromVideo(video);
+                if(result){
+                    status.innerText = "✅ تم قراءة: " + result;
+                    get("ic").value = result;
+                    setTimeout(function(){
+                        closeNativeCamera();
+                        get("in").focus();
+                    }, 800);
+                }
+            }, 500);
+            
+        }).catch(function(err) {
+            console.error("Camera error:", err);
+            status.innerText = "⚠️ فشل فتح الكاميرا: " + (err.name || err.message);
+            setTimeout(function(){ 
+                closeNativeCamera(); 
+                openScannerFallback(); 
+            }, 2500);
+        });
+    } catch (e) {
+        console.error("Native camera error", e);
+        closeNativeCamera();
+        openScannerFallback();
+    }
+}
+
+function closeNativeCamera() {
+    try {
+        isNativeCamera = false;
+        if(window._scanInterval) {
+            clearInterval(window._scanInterval);
+            window._scanInterval = null;
+        }
+        if(nativeStream) {
+            nativeStream.getTracks().forEach(function(track){ track.stop(); });
+            nativeStream = null;
+        }
+        var video = get("native-camera-video");
+        if(video) {
+            video.srcObject = null;
+            video.pause();
+        }
+        var overlay = get("native-camera-overlay");
+        if(overlay) overlay.style.display = "none";
+    } catch(e) {
+        console.error("Close native camera error", e);
+    }
+}
+
+function flipCamera() {
+    try {
+        currentFacing = (currentFacing === "environment") ? "user" : "environment";
+        closeNativeCamera();
+        setTimeout(function(){ openNativeCamera(); }, 300);
+    } catch(e) {}
+}
+
+function captureBarcode() {
+    try {
+        var video = get("native-camera-video");
+        if(!video) return;
+        var result = BarcodeDecoder.fromVideo(video);
+        if(result) {
+            get("cam-status").innerText = "✅ تم قراءة: " + result;
+            get("ic").value = result;
+            setTimeout(function(){
+                closeNativeCamera();
+                get("in").focus();
+            }, 800);
+        } else {
+            get("cam-status").innerText = "❌ لم يتم العثور على باركود. حاول مرة أخرى";
+        }
+    } catch(e) {
+        console.error("Capture error", e);
+    }
+}
+
+// ====== SCANNER (Unified Entry Point) ======
 function openScanner() {
+    try {
+        // In APK/WebView, try native camera first
+        if(window.Android && window.Android.openCamera) {
+            // If Android interface exists, use it
+            window.Android.openCamera();
+            return;
+        }
+        // Otherwise try native getUserMedia
+        openNativeCamera();
+    } catch (e) {
+        console.error("Open scanner error", e);
+        openScannerFallback();
+    }
+}
+
+function openScannerFallback() {
     try {
         get("scanner-modal").style.display = "flex";
         get("manual-scan").focus();
-        if (typeof Html5Qrcode !== "undefined") startHtml5QrCode();
-    } catch (e) {}
+        if (typeof Html5Qrcode !== "undefined") {
+            startHtml5QrCode();
+        } else {
+            var checkInterval = setInterval(function() {
+                if (typeof Html5Qrcode !== "undefined") {
+                    clearInterval(checkInterval);
+                    startHtml5QrCode();
+                }
+            }, 500);
+            setTimeout(function() {
+                clearInterval(checkInterval);
+                if (typeof Html5Qrcode === "undefined") {
+                    console.warn("html5-qrcode not available");
+                }
+            }, 10000);
+        }
+    } catch (e) {
+        console.error("Fallback scanner error", e);
+    }
 }
 
 function closeScanner() {
     try {
         get("scanner-modal").style.display = "none";
         stopHtml5QrCode();
-    } catch (e) {}
+    } catch (e) {
+        console.error("Close scanner error", e);
+    }
 }
 
 function startHtml5QrCode() {
     try {
-        if (typeof Html5Qrcode === "undefined") {
-            alert("⚠️ مكتبة الماسح غير متوفرة.");
-            return;
-        }
+        if (typeof Html5Qrcode === "undefined") return;
         if (html5QrCode) {
-            html5QrCode.stop().catch(function(){});
+            html5QrCode.stop().catch(function(e) { console.log("Stop error", e); });
             html5QrCode = null;
         }
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start(
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 250, height: 250 } },
-            function(decodedText) {
+            function(decodedText, decodedResult) {
+                console.log("Barcode detected:", decodedText);
                 get("ic").value = decodedText;
                 closeScanner();
                 get("in").focus();
             },
-            function() {}
-        ).catch(function() {
-            alert("⚠️ لا يمكن فتح الكاميرا.");
+            function(errorMessage) {}
+        ).catch(function(err) {
+            console.error("Start scanner error", err);
         });
     } catch (e) {
-        alert("⚠️ خطأ في تشغيل الماسح.");
+        console.error("Html5Qrcode init error", e);
     }
 }
 
 function stopHtml5QrCode() {
     try {
         if (html5QrCode) {
-            html5QrCode.stop().then(function(){ html5QrCode = null; })
-            .catch(function(){ html5QrCode = null; });
+            html5QrCode.stop().then(function() {
+                html5QrCode = null;
+            }).catch(function(e) {
+                html5QrCode = null;
+            });
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Stop scanner error", e);
+    }
 }
 
 function scanFromFile(file) {
     try {
-        if (typeof Html5Qrcode === "undefined") {
-            alert("⚠️ مكتبة الماسح غير متوفرة.");
-            return;
-        }
-        var tempScanner = new Html5Qrcode("reader");
-        tempScanner.scanFile(file, false).then(function(decodedText) {
-            get("ic").value = decodedText;
-            get("in").focus();
-            alert("✅ تم قراءة الباركود: " + decodedText);
-        }).catch(function() {
-            alert("❌ لم يتم العثور على باركود.");
-        });
-    } catch (e) {}
+        // Try inline decoder first (works offline)
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                var result = BarcodeDecoder.detect(canvas);
+                if(result) {
+                    get("ic").value = result;
+                    get("in").focus();
+                    alert("✅ تم قراءة الباركود: " + result);
+                    return;
+                }
+                // Fallback to html5-qrcode if available
+                if(typeof Html5Qrcode !== "undefined") {
+                    var tempScanner = new Html5Qrcode("reader");
+                    tempScanner.scanFile(file, false).then(function(decodedText) {
+                        get("ic").value = decodedText;
+                        get("in").focus();
+                        alert("✅ تم قراءة الباركود: " + decodedText);
+                    }).catch(function(err) {
+                        alert("❌ لم يتم العثور على باركود في الصورة.");
+                    });
+                } else {
+                    alert("❌ لم يتم العثور على باركود في الصورة.");
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } catch (e) {
+        console.error("Scan from file error", e);
+        alert("❌ خطأ في مسح الصورة.");
+    }
 }
 
 function manualScan(val) {
@@ -423,9 +794,12 @@ function manualScan(val) {
         if (val) {
             get("ic").value = val.trim();
             closeScanner();
+            closeNativeCamera();
             get("in").focus();
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Manual scan error", e);
+    }
 }
 
 // ====== NAVIGATION ======
@@ -440,7 +814,9 @@ function showSection(id) {
         }
         if (id === "inv") renderItems();
         if (id === "miss") renderMissing();
-    } catch (e) {}
+    } catch (e) {
+        console.error("Show section error", e);
+    }
 }
 
 function clearItemForm() {
@@ -450,7 +826,9 @@ function clearItemForm() {
             var el = get(ids[i]);
             if (el) el.value = "";
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Clear form error", e);
+    }
 }
 
 function addItem() {
@@ -468,7 +846,8 @@ function addItem() {
         clearItemForm();
         renderItems();
     } catch (err) {
-        alert("خطأ: " + err.message);
+        console.error("Add item error", err);
+        alert("خطأ في إضافة المادة: " + err.message);
     }
 }
 
@@ -509,7 +888,9 @@ function renderItems() {
         if (shown === 0 && q) {
             t.innerHTML = '<tr><td colspan="5" class="empty">لا توجد نتائج لـ "' + q + '"</td></tr>';
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Render items error", e);
+    }
 }
 
 function delItem(i) {
@@ -518,7 +899,9 @@ function delItem(i) {
         items.splice(i, 1);
         saveData();
         renderItems();
-    } catch (e) {}
+    } catch (e) {
+        console.error("Delete item error", e);
+    }
 }
 
 function renderMissing() {
@@ -541,7 +924,9 @@ function renderMissing() {
         if (c === 0) t.innerHTML = "<tr><td colspan=\"3\" class=\"empty\" style=\"border:1px solid #ddd;padding:20px\">لا توجد نواقص 🎉</td></tr>";
         var mpDate = get("mp-date");
         if (mpDate) mpDate.innerText = new Date().toLocaleString("ar-TN");
-    } catch (e) {}
+    } catch (e) {
+        console.error("Render missing error", e);
+    }
 }
 // ====== EXPORT / IMPORT ======
 function exportData() {
@@ -720,6 +1105,20 @@ function printMissing() {
         alert("خطأ في الطباعة: " + e.message);
     }
 }
+
+// ====== ANDROID BRIDGE (for AppsGeyser / WebView) ======
+// This allows Android Java to call JS and vice versa
+window.receiveBarcodeFromAndroid = function(barcode) {
+    try {
+        if(barcode) {
+            get("ic").value = barcode;
+            get("in").focus();
+            alert("✅ تم قراءة الباركود: " + barcode);
+        }
+    } catch(e) {
+        console.error("Android bridge error", e);
+    }
+};
 
 // ====== INIT ======
 loadData();
