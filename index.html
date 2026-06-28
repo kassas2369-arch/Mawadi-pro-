@@ -3,33 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Mawadi-Pro</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#eef0f5;direction:rtl;color:#333}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#eef0f5;direction:rtl;color:#333;overflow-x:hidden}
 .page{max-width:600px;margin:0 auto;padding:15px}
-.login-box{max-width:360px;margin:60px auto;padding:30px;background:#fff;border-radius:20px;text-align:center}
-.login-box h1{color:#3d5af1;margin-bottom:8px}
-.login-box input{width:100%;padding:14px;margin-bottom:12px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px}
-.login-box button{width:100%;padding:14px;background:#3d5af1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;cursor:pointer}
+.login-box{max-width:360px;margin:60px auto;padding:30px;background:#fff;border-radius:20px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+.login-box h1{color:#3d5af1;margin-bottom:8px;font-size:28px}
+.login-box p{color:#888;margin-bottom:20px}
+.login-box input{width:100%;padding:14px;margin-bottom:12px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;outline:none;-webkit-appearance:none}
+.login-box input:focus{border-color:#3d5af1}
+.login-box button{width:100%;padding:14px;background:#3d5af1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;cursor:pointer;transition:0.2s;-webkit-appearance:none}
+.login-box button:active{transform:scale(0.98)}
 #msg{color:#ef4444;margin-top:10px;font-size:13px;min-height:20px}
-.top-bar{background:#fff;padding:12px 15px;border-radius:0 0 20px 20px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.top-bar{background:#fff;padding:12px 15px;border-radius:0 0 20px 20px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
 .top-bar h2{color:#3d5af1;margin:0;font-size:20px}
-.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:15px}
-.nav-tabs button{flex-shrink:0;padding:10px 16px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-weight:bold;font-size:13px;color:#888}
+.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:15px;-webkit-overflow-scrolling:touch}
+.nav-tabs button{flex-shrink:0;padding:10px 16px;border:none;background:transparent;border-radius:12px;cursor:pointer;font-weight:bold;font-size:13px;color:#888;transition:0.2s}
 .nav-tabs button.active{background:#3d5af1;color:#fff}
-.section-card{background:#fff;padding:18px;border-radius:16px;margin-bottom:12px}
-.section-card h3{margin:0 0 15px 0;font-size:16px}
+.section-card{background:#fff;padding:18px;border-radius:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.section-card h3{margin:0 0 15px 0;font-size:16px;color:#333}
 .input-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.input-row input,.input-row select{flex:1;min-width:100px;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;font-size:14px}
-.btn-blue{background:#3d5af1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-green{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-red{background:#ef4444;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer}
-.btn-gray{background:#e5e7eb;color:#555;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-orange{background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-purple{background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-cyan{background:#06b6d4;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
-.btn-pink{background:#ec4899;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer}
+.input-row input,.input-row select{flex:1;min-width:100px;padding:12px;border:none;border-bottom:2px solid #e5e7eb;border-radius:8px 8px 0 0;background:#f9fafb;font-size:14px;outline:none;-webkit-appearance:none}
+.btn-blue{background:#3d5af1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;transition:0.2s;-webkit-appearance:none}
+.btn-green{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;transition:0.2s;-webkit-appearance:none}
+.btn-red{background:#ef4444;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-gray{background:#e5e7eb;color:#555;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-orange{background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-purple{background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-cyan{background:#06b6d4;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-pink{background:#ec4899;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+button:active{transform:scale(0.96)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{background:#f8fafc;color:#666;padding:10px;text-align:center;font-weight:600}
 td{padding:10px;border-bottom:1px solid #eee;text-align:center}
@@ -38,9 +43,9 @@ td{padding:10px;border-bottom:1px solid #eee;text-align:center}
 .print-area{display:none}
 @media print{body *{visibility:hidden}.print-area,.print-area *{visibility:visible}.print-area{position:fixed;left:0;top:0;width:100%;height:100%;display:block;padding:20px;background:#fff;z-index:9999}}
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:flex-end;z-index:1000}
-.modal-content{background:#fff;padding:25px;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal-content{background:#fff;padding:25px;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.modal-close{background:#ef4444;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:bold;font-size:18px}
+.modal-close{background:#ef4444;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-weight:bold;font-size:18px;display:flex;align-items:center;justify-content:center}
 body.dark{background:#0f172a;color:#e2e8f0}
 body.dark .login-box{background:#1e293b}
 body.dark .login-box input{background:#0f172a;border-color:#334155;color:#e2e8f0}
@@ -60,32 +65,77 @@ body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}
 .search-highlight{background:#fef08a;padding:2px 4px;border-radius:4px;font-weight:bold}
 body.dark .search-highlight{background:#854d0e;color:#fff}
 .lib-loading{color:#888;font-size:12px;margin-top:5px}
-/* ====== NEW: Native Camera Fix ====== */
 #native-camera-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:2000;display:none;flex-direction:column;justify-content:center;align-items:center}
-#native-camera-video{width:100%;height:70%;object-fit:cover}
+#native-camera-video{width:100%;height:70%;object-fit:cover;background:#111}
 #native-camera-controls{display:flex;gap:15px;padding:20px;align-items:center;justify-content:center}
-#native-camera-overlay .btn-capture{background:#22c55e;color:#fff;border:none;border-radius:50%;width:70px;height:70px;font-size:28px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
-#native-camera-overlay .btn-flip{background:#3d5af1;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer}
-#native-camera-overlay .btn-close-cam{background:#ef4444;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer}
-.camera-status{text-align:center;color:#fff;padding:10px;font-size:14px;background:rgba(0,0,0,0.7);position:absolute;top:0;width:100%}
+#native-camera-overlay .btn-capture{background:#22c55e;color:#fff;border:none;border-radius:50%;width:70px;height:70px;font-size:28px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center}
+#native-camera-overlay .btn-flip{background:#3d5af1;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#native-camera-overlay .btn-close-cam{background:#ef4444;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.camera-status{text-align:center;color:#fff;padding:10px;font-size:14px;background:rgba(0,0,0,0.7);position:absolute;top:0;width:100%;z-index:20}
+.scan-line{position:absolute;width:100%;height:3px;background:#22c55e;box-shadow:0 0 10px #22c55e;top:0;animation:scanMove 2s linear infinite;z-index:10;pointer-events:none}
+@keyframes scanMove{0%{top:0}50%{top:100%}100%{top:0}}
+.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:250px;height:150px;border:3px solid #22c55e;border-radius:10px;z-index:10;pointer-events:none}
+.scan-frame::before,.scan-frame::after{content:'';position:absolute;width:20px;height:20px;border-color:#22c55e;border-style:solid}
+.scan-frame::before{top:-3px;left:-3px;border-width:3px 0 0 3px}
+.scan-frame::after{bottom:-3px;right:-3px;border-width:0 3px 3px 0}
+.last-scan-result{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#22c55e;padding:10px 20px;border-radius:20px;font-size:16px;font-weight:bold;z-index:11;display:none;white-space:nowrap}
 .scanner-fallback{padding:20px;text-align:center}
-.scanner-fallback input{width:100%;padding:15px;font-size:18px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#f9fafb;letter-spacing:3px;margin-bottom:15px}
+.scanner-fallback input{width:100%;padding:15px;font-size:18px;text-align:center;border:2px solid #3d5af1;border-radius:12px;background:#f9fafb;letter-spacing:3px;margin-bottom:15px;outline:none}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #f3f3f3;border-top:3px solid #3d5af1;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#333;color:#fff;padding:12px 24px;border-radius:25px;font-size:14px;z-index:3000;opacity:0;transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#22c55e}
+.toast.error{background:#ef4444}
+/* ====== NEW: Login freeze fix styles ====== */
+.login-box .spinner{margin:10px auto;display:none}
+.login-box.loading .spinner{display:inline-block}
+.login-box.loading button{opacity:0.6;pointer-events:none}
+/* ====== NEW: Item edit modal ====== */
+.edit-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.edit-row input{flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none}
+.edit-row button{padding:6px 12px;font-size:12px}
+/* ====== NEW: Stats bar ====== */
+.stats-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.stat-box{flex:1;min-width:100px;background:linear-gradient(135deg,#3d5af1,#22c55e);color:#fff;padding:12px;border-radius:12px;text-align:center}
+.stat-box h4{font-size:20px;margin:0}
+.stat-box span{font-size:11px;opacity:0.9}
+body.dark .stat-box{background:linear-gradient(135deg,#1e3a8a,#166534)}
+/* ====== NEW: Sort controls ====== */
+.sort-bar{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.sort-bar label{font-size:12px;color:#888}
+.sort-bar select{padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;background:#fff;outline:none}
+body.dark .sort-bar select{background:#0f172a;border-color:#334155;color:#e2e8f0}
+/* ====== NEW: Quantity input inline ====== */
+.qty-input{width:60px;padding:4px;border:1px solid #e5e7eb;border-radius:6px;text-align:center;font-size:13px;outline:none}
+body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
+/* ====== NEW: Responsive table scroll ====== */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* ====== NEW: Animations ====== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-card{animation:fadeIn 0.3s ease}
 </style>
 </head>
 <body>
 
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Login -->
 <div id="login" class="login-box">
 <h1>📦 Mawadi-Pro</h1>
-<p>نظام إدارة المخزون</p>
-<input type="text" id="u" value="admin" placeholder="المستخدم">
-<input type="password" id="p" value="admin" placeholder="كلمة المرور">
-<button onclick="doLogin()">تسجيل الدخول</button>
-<button onclick="doLoginFast()" style="background:#22c55e">دخول سريع</button>
+<p>نظام إدارة المخزون الاحترافي</p>
+<input type="text" id="u" value="admin" placeholder="المستخدم" autocomplete="off" onkeydown="if(event.key==='Enter'){get('p').focus()}">
+<input type="password" id="p" value="admin" placeholder="كلمة المرور" autocomplete="off" onkeydown="if(event.key==='Enter'){doLogin()}">
+<button id="btn-login" onclick="doLogin()">🔐 تسجيل الدخول</button>
+<button id="btn-fast" onclick="doLoginFast()" style="background:#22c55e">⚡ دخول سريع</button>
 <button onclick="resetData()" class="btn-orange" style="margin-top:8px">🗑️ مسح البيانات</button>
+<div class="spinner"></div>
 <div id="msg"></div>
 <div id="lib-status" class="lib-loading"></div>
 </div>
 
+<!-- App -->
 <div id="app" style="display:none">
 <div class="top-bar">
 <h2>📦 Mawadi-Pro</h2>
@@ -103,42 +153,63 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 
 <div id="inv" class="section">
+<!-- Stats Bar -->
+<div class="stats-bar" id="stats-bar" style="display:none"></div>
+
 <div class="section-card">
-<h3>📦 إضافة مادة</h3>
-<button class="btn-green" onclick="openScanner()" style="margin-bottom:15px">📷 مسح باركود</button>
-<button class="btn-purple" onclick="document.getElementById('scanner-file-input').click()" style="margin-bottom:15px;margin-right:10px">📁 مسح من صورة</button>
-<input type="file" id="scanner-file-input" accept="image/*" onchange="if(this.files[0]) scanFromFile(this.files[0])" style="display:none">
+<h3>📦 إضافة مادة جديدة</h3>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+<button class="btn-green" onclick="openScanner()">📷 مسح باركود</button>
+<button class="btn-purple" onclick="document.getElementById('scanner-file-input').click()">📁 مسح من صورة</button>
+</div>
+<input type="file" id="scanner-file-input" accept="image/*" style="display:none">
 <div class="input-row">
-<input id="ic" placeholder="الكود" style="min-width:120px">
-<input id="in" placeholder="اسم المادة *" style="min-width:150px">
+<input id="ic" placeholder="الكود (باركود)" style="min-width:120px" autocomplete="off" onkeydown="if(event.key==='Enter'){get('in').focus()}">
+<input id="in" placeholder="اسم المادة *" style="min-width:150px" autocomplete="off" onkeydown="if(event.key==='Enter'){get('ib').focus()}">
 </div>
 <div class="input-row">
-<input id="ib" placeholder="سعر الشراء" type="number" step="0.01">
-<input id="is" placeholder="سعر البيع" type="number" step="0.01">
+<input id="ib" placeholder="سعر الشراء" type="number" step="0.01" autocomplete="off" onkeydown="if(event.key==='Enter'){get('is').focus()}">
+<input id="is" placeholder="سعر البيع" type="number" step="0.01" autocomplete="off" onkeydown="if(event.key==='Enter'){get('im').focus()}">
 </div>
 <div class="input-row">
-<input id="im" placeholder="حد أدنى" type="number">
-<input id="iq" placeholder="الكمية" type="number">
-<input id="iu" placeholder="الوحدة">
+<input id="im" placeholder="حد أدنى للتنبيه" type="number" autocomplete="off" onkeydown="if(event.key==='Enter'){get('iq').focus()}">
+<input id="iq" placeholder="الكمية الحالية" type="number" autocomplete="off" onkeydown="if(event.key==='Enter'){get('iu').focus()}">
+<input id="iu" placeholder="الوحدة (قطعة/علبة/كيلو)" autocomplete="off" onkeydown="if(event.key==='Enter'){addItem()}">
 </div>
 <div style="display:flex;gap:10px;margin-top:10px">
-<button class="btn-blue" onclick="addItem()">➕ إضافة</button>
-<button class="btn-gray" onclick="clearItemForm()">مسح</button>
+<button class="btn-blue" onclick="addItem()">➕ إضافة المادة</button>
+<button class="btn-gray" onclick="clearItemForm()">🧹 مسح الحقول</button>
 </div>
 </div>
 
 <div class="section-card">
 <h3>📋 قائمة المواد</h3>
 <div class="input-row" style="margin-bottom:10px">
-<input type="text" id="search-items" placeholder="🔍 بحث بالاسم أو الكود..." style="flex:2" oninput="renderItems()">
-<button class="btn-cyan" onclick="exportData()">📤 تصدير</button>
-<button class="btn-pink" onclick="document.getElementById('import-file-input').click()">📥 استيراد</button>
-<input type="file" id="import-file-input" accept=".json,.csv" style="display:none" onchange="if(this.files[0]) importData(this.files[0])">
+<input type="text" id="search-items" placeholder="🔍 بحث بالاسم أو الكود..." style="flex:2" oninput="renderItems()" autocomplete="off">
 </div>
+<div class="sort-bar">
+<label>ترتيب:</label>
+<select id="sort-by" onchange="renderItems()">
+<option value="name">الاسم</option>
+<option value="code">الكود</option>
+<option value="qty">الكمية</option>
+<option value="sell">سعر البيع</option>
+</select>
+<select id="sort-dir" onchange="renderItems()">
+<option value="asc">تصاعدي</option>
+<option value="desc">تنازلي</option>
+</select>
+<button class="btn-cyan" onclick="exportData()">📤 JSON</button>
+<button class="btn-pink" onclick="exportCSV()">📄 CSV</button>
+<button class="btn-orange" onclick="document.getElementById('import-file-input').click()">📥 استيراد</button>
+<input type="file" id="import-file-input" accept=".json,.csv" style="display:none">
+</div>
+<div class="table-wrap">
 <table>
-<thead><tr><th>الكود</th><th>الاسم</th><th>السعر</th><th>الكمية</th><th>حذف</th></tr></thead>
+<thead><tr><th>الكود</th><th>الاسم</th><th>شراء</th><th>بيع</th><th>كمية</th><th>تعديل</th><th>حذف</th></tr></thead>
 <tbody id="itb"></tbody>
 </table>
+</div>
 </div>
 </div>
 
@@ -146,7 +217,7 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 <div class="section-card">
 <h3>📑 المواد الناقصة</h3>
 <div class="input-row" style="margin-bottom:15px">
-<input id="wa-phone" placeholder="📱 رقم الواتساب (مثال: 21655123456)" type="tel" style="flex:2">
+<input id="wa-phone" placeholder="📱 رقم الواتساب (مثال: 21655123456)" type="tel" style="flex:2" autocomplete="off">
 <button class="btn-green" onclick="shareWhatsApp()">📤 واتساب</button>
 <button class="btn-blue" onclick="printMissing()">📄 PDF</button>
 </div>
@@ -165,7 +236,7 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 </div>
 
-<!-- Scanner Modal (html5-qrcode fallback) -->
+<!-- Scanner Modal -->
 <div class="modal-overlay" id="scanner-modal" onclick="if(event.target===this){closeScanner()}">
 <div class="modal-content" style="border-radius:20px;max-height:90vh">
 <div class="modal-header">
@@ -174,15 +245,21 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 <div id="reader"></div>
 <div class="scanner-fallback">
-<input type="text" id="manual-scan" placeholder="أو اكتب الكود يدوياً..." onkeydown="if(event.key==='Enter'){manualScan(this.value);this.value=''}">
+<p style="color:#888;margin-bottom:10px;font-size:13px">أو اكتب الكود يدوياً:</p>
+<input type="text" id="manual-scan" placeholder="اكتب الكود واضغط Enter..." onkeydown="if(event.key==='Enter'){manualScan(this.value);this.value=''}" autocomplete="off">
 </div>
 </div>
 </div>
 
-<!-- Native Camera Overlay (APK Fix) -->
+<!-- Native Camera Overlay -->
 <div id="native-camera-overlay">
 <div class="camera-status" id="cam-status">جاري تشغيل الكاميرا...</div>
+<div style="position:relative;width:100%;height:70%">
 <video id="native-camera-video" autoplay playsinline muted></video>
+<div class="scan-line"></div>
+<div class="scan-frame"></div>
+<div class="last-scan-result" id="last-scan-result"></div>
+</div>
 <div id="native-camera-controls">
 <button class="btn-close-cam" onclick="closeNativeCamera()">✕</button>
 <button class="btn-capture" onclick="captureBarcode()">📷</button>
@@ -190,6 +267,7 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 </div>
 
+<!-- Settings Modal -->
 <div class="modal-overlay" id="settings-modal" onclick="if(event.target===this){closeSettings()}">
 <div class="modal-content">
 <div class="modal-header">
@@ -199,13 +277,13 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 <div>
 <h4 style="margin-bottom:10px">🔐 تغيير كلمة المرور</h4>
 <div class="input-row">
-<input id="old-pass" type="password" placeholder="كلمة المرور الحالية">
+<input id="old-pass" type="password" placeholder="كلمة المرور الحالية" autocomplete="off">
 </div>
 <div class="input-row">
-<input id="new-pass" type="password" placeholder="كلمة المرور الجديدة">
+<input id="new-pass" type="password" placeholder="كلمة المرور الجديدة" autocomplete="off">
 </div>
 <div class="input-row">
-<input id="confirm-pass" type="password" placeholder="تأكيد كلمة المرور">
+<input id="confirm-pass" type="password" placeholder="تأكيد كلمة المرور" autocomplete="off">
 </div>
 <button class="btn-blue" onclick="changePassword()" style="width:100%">💾 حفظ التغييرات</button>
 <div id="pass-msg" style="margin-top:10px;color:#ef4444;font-size:13px"></div>
@@ -213,202 +291,127 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 </div>
 </div>
 
+<!-- Edit Item Modal -->
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this){closeEditModal()}">
+<div class="modal-content">
+<div class="modal-header">
+<h3 style="color:#3d5af1;margin:0">✏️ تعديل مادة</h3>
+<button class="modal-close" onclick="closeEditModal()">×</button>
+</div>
+<div id="edit-form"></div>
+</div>
+</div>
+
 <div id="print-area" class="print-area" style="display:none">
 <div id="print-content"></div>
 </div>
-
-<!-- Inline Barcode Decoder (no external lib needed for basic) -->
 <script>
-/* ====== INLINE ZXING-LITE DECODER (Embedded, no external dependency) ====== */
-var BarcodeDecoder = (function(){
-    // Simple Code39/Code128/UPC/EAN barcode detection from image data
-    function detectBarcode(canvas){
+
+// ====== SIMPLE BARCODE SCANNER (No external libs) ======
+var BarcodeScanner = {
+    scan: function(canvas) {
         var ctx = canvas.getContext('2d');
         var w = canvas.width, h = canvas.height;
         var imgData = ctx.getImageData(0, 0, w, h);
         var data = imgData.data;
-        // Convert to grayscale and find barcode region
         var gray = new Uint8Array(w * h);
-        for(var i=0;i<w*h;i++){
-            var r = data[i*4], g = data[i*4+1], b = data[i*4+2];
-            gray[i] = 0.299*r + 0.587*g + 0.114*b;
+        for (var i = 0; i < w * h; i++) {
+            gray[i] = (data[i*4] * 0.299 + data[i*4+1] * 0.587 + data[i*4+2] * 0.114);
         }
-        // Scan horizontal lines for barcode patterns
-        var bestResult = null, bestScore = 0;
-        var scanLines = Math.min(h, 20);
-        for(var row=Math.floor(h*0.3); row<Math.floor(h*0.7); row+=Math.floor(h/scanLines)){
-            var result = scanLine(gray, w, row);
-            if(result && result.confidence > bestScore){
-                bestScore = result.confidence;
-                bestResult = result;
-            }
+        for (var row = Math.floor(h * 0.2); row < Math.floor(h * 0.8); row += 10) {
+            var result = this.scanLine(gray, w, row);
+            if (result) return result;
         }
-        return bestResult ? bestResult.text : null;
-    }
-    function scanLine(gray, w, row){
+        return null;
+    },
+    scanLine: function(gray, w, row) {
         var start = row * w;
         var bars = [];
         var inBar = false;
         var threshold = 128;
-        var minBar = 3;
-        for(var x=0;x<w;x++){
-            var pixel = gray[start + x];
-            var isDark = pixel < threshold;
-            if(isDark && !inBar){ inBar = true; bars.push({start:x,width:0}); }
-            if(inBar){ bars[bars.length-1].width++; }
-            if(!isDark && inBar){ inBar = false; }
+        for (var x = 0; x < w; x++) {
+            var isDark = gray[start + x] < threshold;
+            if (isDark && !inBar) { inBar = true; bars.push({start: x, width: 0}); }
+            if (inBar) { bars[bars.length - 1].width++; }
+            if (!isDark && inBar) { inBar = false; }
         }
-        if(bars.length < 10) return null;
-        // Try Code 128 pattern matching
-        var result = tryCode128(bars, w);
-        if(result) return result;
-        // Try Code 39
-        result = tryCode39(bars, w);
-        if(result) return result;
-        return null;
+        if (bars.length < 20) return null;
+        return this.decodeEAN13(bars, w);
+    },
+    decodeEAN13: function(bars, w) {
+        var pattern = [];
+        var totalWidth = 0;
+        for (var i = 0; i < bars.length; i++) totalWidth += bars[i].width;
+        var unit = totalWidth / 95;
+        for (var i = 0; i < bars.length; i++) {
+            var modules = Math.round(bars[i].width / unit);
+            for (var j = 0; j < modules; j++) pattern.push(i % 2 === 0 ? 1 : 0);
+        }
+        if (pattern.length < 95) return null;
+        var result = "";
+        var pos = 3;
+        for (var group = 0; group < 6; group++) {
+            var best = this.matchDigit(pattern, pos, "L");
+            if (best < 0) return null;
+            result += best;
+            pos += 7;
+        }
+        pos += 5;
+        for (var group = 0; group < 6; group++) {
+            var best = this.matchDigit(pattern, pos, "R");
+            if (best < 0) return null;
+            result += best;
+            pos += 7;
+        }
+        return result.length === 12 ? result : null;
+    },
+    matchDigit: function(pattern, pos, type) {
+        var L_PATTERNS = [
+            [0,0,0,1,1,0,1], [0,0,1,1,0,0,1], [0,0,1,0,0,1,1], [0,1,1,1,1,0,1],
+            [0,1,0,0,0,1,1], [0,1,1,0,0,0,1], [0,1,0,1,1,1,1], [0,1,1,1,0,1,1],
+            [0,1,1,0,1,1,1], [0,0,0,1,0,1,1]
+        ];
+        var R_PATTERNS = [
+            [1,1,1,0,0,1,0], [1,1,0,0,1,1,0], [1,1,0,1,1,0,0], [1,0,0,0,0,1,0],
+            [1,0,1,1,1,0,0], [1,0,0,1,1,1,0], [1,0,1,0,0,0,0], [1,0,0,0,1,0,0],
+            [1,0,0,1,0,0,0], [1,1,1,0,1,0,0]
+        ];
+        var patterns = type === "L" ? L_PATTERNS : R_PATTERNS;
+        var bestMatch = -1;
+        var bestScore = 999;
+        for (var d = 0; d < 10; d++) {
+            var score = 0;
+            for (var i = 0; i < 7; i++) {
+                if (pattern[pos + i] !== patterns[d][i]) score++;
+            }
+            if (score < bestScore) {
+                bestScore = score;
+                bestMatch = d;
+            }
+        }
+        return bestScore <= 2 ? bestMatch : -1;
     }
-    function tryCode128(bars, w){
-        // Simplified Code 128 detection
-        var patterns = {
-            '11011001100':' ','11001101100':'!','11001100110':'"',
-            '10010011000':'#','10010001100':'$','10001001100':'%',
-            '10011001000':'&','10011000100':'\'','10001100100':'(',
-            '11001001000':')','11001000100':'*','11000100100':'+',
-            '10110011100':',','10011011100':'-','10011001110':'.',
-            '10111001100':'/','10011101100':'0','10011100110':'1',
-            '11001110010':'2','11001011100':'3','11001001110':'4',
-            '11011100100':'5','11001110100':'6','11101101110':'7',
-            '11101001100':'8','11100101100':'9','11100100110':':',
-            '11101100100':';','11100110100':'<','11100110010':'=',
-            '11011011000':'>','11011000110':'?','11000110110':'@',
-            '10100011000':'A','10001011000':'B','10001000110':'C',
-            '10100001000':'D','10000010110':'E','10001010000':'F',
-            '10000010010':'G','10010010000':'H','10010000100':'I',
-            '10000110000':'J','10000100010':'K','10000001010':'L',
-            '11010111000':'M','11010111100':'N','11011101000':'O',
-            '11011101100':'P','11011111000':'Q','11011111100':'R',
-            '11010011100':'S','11010011110':'T','11011110100':'U',
-            '11011110110':'V','11011111110':'W','11010010110':'X',
-            '11010010111':'Y','11010011111':'Z','11010110100':'[',
-            '11010110110':'\\','11011010100':']','11011010110':'^',
-            '11011011110':'_','11011110100':'`','11011110110':'a',
-            '11011111110':'b','11011111111':'c','11010111100':'d',
-            '11010111110':'e','11010111111':'f','11010011100':'g',
-            '11010011110':'h','11010011111':'i','11010010110':'j',
-            '11010010111':'k','11010011101':'l','11010110100':'m',
-            '11010110110':'n','11010110111':'o','11010111100':'p',
-            '11010111110':'q','11010111111':'r','11011110100':'s',
-            '11011110110':'t','11011110111':'u','11011111100':'v',
-            '11011111110':'w','11011111111':'x','11010011100':'y',
-            '11010011110':'z','11010011111':'{','11010010110':'|',
-            '11010010111':'}','11010011101':'~'
-        };
-        // Simplified: look for numeric sequences
-        var text = "";
-        var confidence = 0;
-        for(var i=2;i<bars.length-2;i+=6){
-            if(i+5 >= bars.length) break;
-            var total = 0;
-            for(var j=0;j<6;j++) total += bars[i+j].width;
-            if(total === 0) continue;
-            var pattern = "";
-            for(var j=0;j<6;j++){
-                pattern += (bars[i+j].width / total > 0.5) ? "11" : "1";
-            }
-            if(patterns[pattern]){
-                text += patterns[pattern];
-                confidence += 10;
-            }
-        }
-        if(text.length >= 3) return {text:text, confidence:confidence};
-        return null;
-    }
-    function tryCode39(bars, w){
-        var patterns = {
-            '100010001':'0','001010000':'1','101000000':'2','000010100':'3',
-            '100000100':'4','001000100':'5','000100000':'6','100100000':'7',
-            '000001000':'8','100001000':'9','001001000':'A','000011000':'B',
-            '100011000':'C','001011000':'D','000000010':'E','100000010':'F',
-            '001000010':'G','000010010':'H','100010010':'I','000000110':'J',
-            '100000110':'K','001000110':'L','000010110':'M','100010110':'N',
-            '000000011':'O','100000011':'P','001000011':'Q','000010011':'R',
-            '100010011':'S','000000111':'T','100000111':'U','001000111':'V',
-            '000010111':'W','100010111':'X','000001011':'Y','100001011':'Z',
-            '001001011':'-','000011011':'.','100011011':' ','001011011':'$',
-            '000001110':'/','100001110':'+','001001110':'%'
-        };
-        var text = "";
-        var confidence = 0;
-        for(var i=1;i<bars.length-1;i+=10){
-            if(i+9 >= bars.length) break;
-            var total = 0;
-            for(var j=0;j<9;j++) total += bars[i+j].width;
-            if(total === 0) continue;
-            var pattern = "";
-            for(var j=0;j<9;j++){
-                pattern += (bars[i+j].width / total > 0.3) ? "1" : "0";
-            }
-            if(patterns[pattern]){
-                text += patterns[pattern];
-                confidence += 15;
-            }
-        }
-        if(text.length >= 3) return {text:text, confidence:confidence};
-        return null;
-    }
-    return {
-        detect: detectBarcode,
-        fromVideo: function(video){
-            var canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            return detectBarcode(canvas);
-        }
-    };
-})();
-</script>
+};
 
-<!-- Load html5-qrcode as fallback -->
-<script>
-(function(){
-    var s=document.createElement("script");
-    s.src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
-    s.onload=function(){console.log("html5-qrcode loaded");window.html5QrCodeLoaded=true;};
-    s.onerror=function(){console.warn("html5-qrcode failed to load");window.html5QrCodeLoaded=false;};
-    document.head.appendChild(s);
-})();
-(function(){
-    var s=document.createElement("script");
-    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    s.onload=function(){console.log("jsPDF loaded");};
-    s.onerror=function(){console.warn("jsPDF failed to load");};
-    document.head.appendChild(s);
-})();
-</script>
-
-<script>
-    // ====== CORE VARIABLES ======
+// ====== CORE VARIABLES ======
 var items = [];
 var lsOK = false;
 var currentPass = "admin";
-var html5QrCode = null;
 var nativeStream = null;
 var currentFacing = "environment";
-var isNativeCamera = false;
+var scanTimer = null;
+var currentEditIndex = -1;
 
-// ====== CHECK LOCALSTORAGE ======
-try {
-    localStorage.setItem("t", "1");
-    if (localStorage.getItem("t") === "1") lsOK = true;
-    localStorage.removeItem("t");
-} catch (e) {
-    lsOK = false;
-}
+// ====== UTILITIES ======
+function get(id) { return document.getElementById(id); }
 
-function get(id) {
-    return document.getElementById(id);
+function showToast(msg, type) {
+    var t = get("toast");
+    if (!t) return;
+    t.innerText = msg;
+    t.className = "toast " + (type || "");
+    setTimeout(function() { t.classList.add("show"); }, 10);
+    setTimeout(function() { t.classList.remove("show"); }, 2500);
 }
 
 function setMsg(txt) {
@@ -416,7 +419,17 @@ function setMsg(txt) {
     if (el) el.innerHTML = txt;
 }
 
-// ====== SAVE / LOAD ======
+// ====== LOCALSTORAGE ======
+function checkLS() {
+    try {
+        localStorage.setItem("mp_test", "1");
+        if (localStorage.getItem("mp_test") === "1") {
+            lsOK = true;
+            localStorage.removeItem("mp_test");
+        }
+    } catch (e) { lsOK = false; }
+}
+
 function saveData() {
     if (!lsOK) return;
     try {
@@ -440,29 +453,29 @@ function loadData() {
 }
 
 function resetData() {
-    if (!confirm("هل أنت متأكد من مسح جميع البيانات؟")) return;
+    if (!confirm("هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع!")) return;
     try {
         localStorage.removeItem("mp_data");
         localStorage.removeItem("mp_theme");
     } catch (e) {}
     items = [];
     currentPass = "admin";
-    alert("✅ تم مسح البيانات. أعد تحميل الصفحة.");
-    location.reload();
+    showToast("✅ تم مسح البيانات", "success");
+    setTimeout(function() { location.reload(); }, 1000);
 }
 
 // ====== THEME ======
 function initTheme() {
     try {
-        var s = localStorage.getItem("mp_theme");
-        if (s === "dark") document.body.classList.add("dark");
+        if (localStorage.getItem("mp_theme") === "dark") 
+            document.body.classList.add("dark");
     } catch (e) {}
 }
 
 function toggleTheme() {
     try {
-        var d = document.body.classList.contains("dark");
-        if (d) {
+        var isDark = document.body.classList.contains("dark");
+        if (isDark) {
             document.body.classList.remove("dark");
             localStorage.setItem("mp_theme", "light");
         } else {
@@ -472,9 +485,11 @@ function toggleTheme() {
     } catch (e) {}
 }
 
-// ====== LOGIN ======
+// ====== LOGIN (FIXED - NO MORE FREEZE) ======
 function doLogin() {
     try {
+        var loginBox = get("login");
+        loginBox.classList.add("loading");
         var u = get("u").value.trim();
         var p = get("p").value;
         loadData();
@@ -483,23 +498,33 @@ function doLogin() {
             get("app").style.display = "block";
             setMsg("");
             renderItems();
+            showToast("✅ تم تسجيل الدخول بنجاح", "success");
         } else {
             setMsg("❌ بيانات الدخول غير صحيحة");
+            showToast("❌ بيانات الدخول غير صحيحة", "error");
+            loginBox.classList.remove("loading");
         }
     } catch (e) {
         setMsg("خطأ: " + e.message);
+        showToast("خطأ في الدخول", "error");
+        get("login").classList.remove("loading");
     }
 }
 
 function doLoginFast() {
     try {
+        var loginBox = get("login");
+        loginBox.classList.add("loading");
         loadData();
         get("login").style.display = "none";
         get("app").style.display = "block";
         setMsg("");
         renderItems();
+        showToast("✅ دخول سريع", "success");
     } catch (e) {
         setMsg("خطأ: " + e.message);
+        showToast("خطأ في الدخول", "error");
+        loginBox.classList.remove("loading");
     }
 }
 
@@ -509,21 +534,285 @@ function doLogout() {
         get("login").style.display = "block";
         get("u").value = "admin";
         get("p").value = "";
+        get("login").classList.remove("loading");
+        showToast("👋 تم تسجيل الخروج", "success");
+    } catch (e) {}
+}
+
+// ====== SECTION NAVIGATION ======
+function showSection(id) {
+    try {
+        var sections = ["inv", "miss"];
+        var tabs = ["nav-inv", "nav-miss"];
+        for (var i = 0; i < sections.length; i++) {
+            var sec = get(sections[i]);
+            var tab = get(tabs[i]);
+            if (sec) sec.style.display = (sections[i] === id) ? "block" : "none";
+            if (tab) tab.className = (sections[i] === id) ? "active" : "";
+        }
+        if (id === "miss") renderMissing();
+    } catch (e) {}
+}
+
+// ====== ITEMS MANAGEMENT (CRITICAL FIX - WAS MISSING) ======
+function renderItems() {
+    try {
+        var tbody = get("itb");
+        if (!tbody) return;
+        var search = get("search-items").value.trim().toLowerCase();
+        var sortBy = get("sort-by").value;
+        var sortDir = get("sort-dir").value;
+
+        var filtered = [];
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            if (search) {
+                var name = (it.name || "").toLowerCase();
+                var code = (it.code || "").toLowerCase();
+                if (name.indexOf(search) === -1 && code.indexOf(search) === -1) continue;
+            }
+            filtered.push({item: it, index: i});
+        }
+
+        // Sort
+        filtered.sort(function(a, b) {
+            var va = a.item[sortBy] || "";
+            var vb = b.item[sortBy] || "";
+            if (typeof va === "string") va = va.toLowerCase();
+            if (typeof vb === "string") vb = vb.toLowerCase();
+            if (va < vb) return sortDir === "asc" ? -1 : 1;
+            if (va > vb) return sortDir === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        // Update stats
+        updateStats(filtered.length);
+
+        // Render table
+        var html = "";
+        if (filtered.length === 0) {
+            html = '<tr><td colspan="7" class="empty">لا توجد مواد</td></tr>';
+        } else {
+            for (var j = 0; j < filtered.length; j++) {
+                var it = filtered[j].item;
+                var idx = filtered[j].index;
+                var q = parseFloat(it.qty || 0);
+                var m = parseFloat(it.min || 0);
+                var isLow = (q <= m && m > 0);
+                var qtyClass = isLow ? 'class="low-stock"' : '';
+                var buyPrice = parseFloat(it.buy || 0).toFixed(2);
+                var sellPrice = parseFloat(it.sell || 0).toFixed(2);
+                html += '<tr>';
+                html += '<td>' + escapeHtml(it.code || "—") + '</td>';
+                html += '<td style="text-align:right">' + escapeHtml(it.name || "—") + '</td>';
+                html += '<td>' + buyPrice + '</td>';
+                html += '<td>' + sellPrice + '</td>';
+                html += '<td ' + qtyClass + '>' + q + ' ' + escapeHtml(it.unit || "قطعة") + '</td>';
+                html += '<td><button class="btn-blue" style="padding:4px 10px;font-size:12px" onclick="editItem(' + idx + ')">✏️</button></td>';
+                html += '<td><button class="btn-red" onclick="deleteItem(' + idx + ')">🗑️</button></td>';
+                html += '</tr>';
+            }
+        }
+        tbody.innerHTML = html;
+    } catch (e) {
+        console.error("renderItems error:", e);
+    }
+}
+
+function updateStats(count) {
+    try {
+        var bar = get("stats-bar");
+        if (!bar) return;
+        var total = items.length;
+        var low = 0;
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) low++;
+        }
+        bar.style.display = "flex";
+        bar.innerHTML = 
+            '<div class="stat-box"><h4>' + total + '</h4><span>إجمالي المواد</span></div>' +
+            '<div class="stat-box" style="background:linear-gradient(135deg,#ef4444,#f97316)"><h4>' + low + '</h4><span>مواد ناقصة</span></div>' +
+            '<div class="stat-box" style="background:linear-gradient(135deg,#22c55e,#06b6d4)"><h4>' + count + '</h4><span>معروضة</span></div>';
+    } catch (e) {}
+}
+
+function escapeHtml(text) {
+    var div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function addItem() {
+    try {
+        var code = get("ic").value.trim();
+        var name = get("in").value.trim();
+        var buy = parseFloat(get("ib").value) || 0;
+        var sell = parseFloat(get("is").value) || 0;
+        var min = parseFloat(get("im").value) || 0;
+        var qty = parseFloat(get("iq").value) || 0;
+        var unit = get("iu").value.trim() || "قطعة";
+
+        if (!name) {
+            showToast("❌ اسم المادة مطلوب", "error");
+            get("in").focus();
+            return;
+        }
+
+        // Check if code exists
+        if (code) {
+            for (var i = 0; i < items.length; i++) {
+                if (items[i] && items[i].code === code) {
+                    if (!confirm("هذا الكود موجود بالفعل. هل تريد تحديث الكمية؟")) return;
+                    items[i].qty = (parseFloat(items[i].qty) || 0) + qty;
+                    items[i].name = name;
+                    items[i].buy = buy;
+                    items[i].sell = sell;
+                    items[i].min = min;
+                    items[i].unit = unit;
+                    saveData();
+                    renderItems();
+                    clearItemForm();
+                    showToast("✅ تم تحديث المادة", "success");
+                    return;
+                }
+            }
+        }
+
+        items.push({
+            code: code,
+            name: name,
+            buy: buy,
+            sell: sell,
+            min: min,
+            qty: qty,
+            unit: unit,
+            date: new Date().toISOString()
+        });
+
+        saveData();
+        renderItems();
+        clearItemForm();
+        showToast("✅ تمت إضافة المادة بنجاح", "success");
+    } catch (e) {
+        showToast("❌ خطأ في الإضافة", "error");
+    }
+}
+
+function clearItemForm() {
+    try {
+        get("ic").value = "";
+        get("in").value = "";
+        get("ib").value = "";
+        get("is").value = "";
+        get("im").value = "";
+        get("iq").value = "";
+        get("iu").value = "";
+        get("ic").focus();
+    } catch (e) {}
+}
+
+function deleteItem(index) {
+    try {
+        if (!confirm("هل أنت متأكد من حذف هذه المادة؟")) return;
+        items.splice(index, 1);
+        saveData();
+        renderItems();
+        showToast("✅ تم الحذف", "success");
+    } catch (e) {
+        showToast("❌ خطأ في الحذف", "error");
+    }
+}
+
+function editItem(index) {
+    try {
+        var it = items[index];
+        if (!it) return;
+        currentEditIndex = index;
+        var form = get("edit-form");
+        form.innerHTML = 
+            '<div class="edit-row"><input id="edit-code" value="' + escapeHtml(it.code || "") + '" placeholder="الكود"></div>' +
+            '<div class="edit-row"><input id="edit-name" value="' + escapeHtml(it.name || "") + '" placeholder="الاسم *"></div>' +
+            '<div class="edit-row"><input id="edit-buy" value="' + (it.buy || "") + '" placeholder="سعر الشراء" type="number" step="0.01"></div>' +
+            '<div class="edit-row"><input id="edit-sell" value="' + (it.sell || "") + '" placeholder="سعر البيع" type="number" step="0.01"></div>' +
+            '<div class="edit-row"><input id="edit-min" value="' + (it.min || "") + '" placeholder="حد أدنى" type="number"></div>' +
+            '<div class="edit-row"><input id="edit-qty" value="' + (it.qty || "") + '" placeholder="الكمية" type="number"></div>' +
+            '<div class="edit-row"><input id="edit-unit" value="' + escapeHtml(it.unit || "قطعة") + '" placeholder="الوحدة"></div>' +
+            '<button class="btn-blue" style="width:100%;margin-top:10px" onclick="saveEditItem()">💾 حفظ التعديلات</button>';
+        get("edit-modal").style.display = "flex";
+    } catch (e) {}
+}
+
+function saveEditItem() {
+    try {
+        if (currentEditIndex < 0 || currentEditIndex >= items.length) return;
+        var name = get("edit-name").value.trim();
+        if (!name) {
+            showToast("❌ اسم المادة مطلوب", "error");
+            return;
+        }
+        items[currentEditIndex] = {
+            code: get("edit-code").value.trim(),
+            name: name,
+            buy: parseFloat(get("edit-buy").value) || 0,
+            sell: parseFloat(get("edit-sell").value) || 0,
+            min: parseFloat(get("edit-min").value) || 0,
+            qty: parseFloat(get("edit-qty").value) || 0,
+            unit: get("edit-unit").value.trim() || "قطعة",
+            date: items[currentEditIndex].date || new Date().toISOString()
+        };
+        saveData();
+        renderItems();
+        closeEditModal();
+        showToast("✅ تم التعديل بنجاح", "success");
+    } catch (e) {
+        showToast("❌ خطأ في التعديل", "error");
+    }
+}
+function closeEditModal() {
+    try {
+        get("edit-modal").style.display = "none";
+        currentEditIndex = -1;
+    } catch (e) {}
+}
+
+// ====== MISSING ITEMS ======
+function renderMissing() {
+    try {
+        var tbody = get("mtb");
+        if (!tbody) return;
+        var miss = [];
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            if (!it) continue;
+            var q = parseFloat(it.qty || 0);
+            var m = parseFloat(it.min || 0);
+            if (q <= m && m > 0) miss.push(it);
+        }
+        var html = "";
+        if (miss.length === 0) {
+            html = '<tr><td colspan="3" class="empty">لا توجد مواد ناقصة 🎉</td></tr>';
+        } else {
+            for (var j = 0; j < miss.length; j++) {
+                html += '<tr><td>' + escapeHtml(miss[j].code || "—") + '</td><td style="text-align:right">' + escapeHtml(miss[j].name || "—") + '</td><td>' + miss[j].qty + ' ' + escapeHtml(miss[j].unit || "قطعة") + '</td></tr>';
+            }
+        }
+        tbody.innerHTML = html;
+        get("mp-date").innerText = new Date().toLocaleString("ar-TN");
     } catch (e) {}
 }
 
 // ====== SETTINGS ======
 function showSettings() {
-    try {
-        get("settings-modal").style.display = "flex";
-        get("pass-msg").innerHTML = "";
-    } catch (e) {}
+    try { get("settings-modal").style.display = "flex"; } catch (e) {}
 }
 
 function closeSettings() {
-    try {
-        get("settings-modal").style.display = "none";
-    } catch (e) {}
+    try { get("settings-modal").style.display = "none"; } catch (e) {}
 }
 
 function changePassword() {
@@ -533,7 +822,7 @@ function changePassword() {
         var c = get("confirm-pass").value;
         var m = get("pass-msg");
         if (o !== currentPass) { m.innerHTML = "❌ كلمة المرور الحالية غير صحيحة"; return; }
-        if (n.length < 4) { m.innerHTML = "❌ كلمة المرور الجديدة قصيرة جداً"; return; }
+        if (n.length < 4) { m.innerHTML = "❌ كلمة المرور الجديدة قصيرة جداً (4 أحرف على الأقل)"; return; }
         if (n !== c) { m.innerHTML = "❌ كلمتا المرور غير متطابقتين"; return; }
         currentPass = n;
         saveData();
@@ -542,587 +831,426 @@ function changePassword() {
         get("old-pass").value = "";
         get("new-pass").value = "";
         get("confirm-pass").value = "";
+        showToast("✅ تم تغيير كلمة المرور", "success");
     } catch (e) {}
 }
 
-// ====== NATIVE CAMERA (APK FIX) ======
-function openNativeCamera() {
-    try {
-        isNativeCamera = true;
-        var overlay = get("native-camera-overlay");
-        var video = get("native-camera-video");
-        var status = get("cam-status");
-        overlay.style.display = "flex";
-        status.innerText = "جاري طلب إذن الكاميرا...";
-        
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            status.innerText = "⚠️ الكاميرا غير مدعومة في هذا الجهاز";
-            setTimeout(function(){ closeNativeCamera(); openScannerFallback(); }, 2000);
-            return;
-        }
-        
-        var constraints = {
-            video: {
-                facingMode: currentFacing,
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
-            audio: false
-        };
-        
-        navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-            nativeStream = stream;
-            video.srcObject = stream;
-            video.play();
-            status.innerText = "📷 وجه الكاميرا نحو الباركود واضغط الزر الأخضر";
-            
-            // Auto-scan every 500ms using inline decoder
-            window._scanInterval = setInterval(function(){
-                if(!nativeStream || video.paused) return;
-                var result = BarcodeDecoder.fromVideo(video);
-                if(result){
-                    status.innerText = "✅ تم قراءة: " + result;
-                    get("ic").value = result;
-                    setTimeout(function(){
-                        closeNativeCamera();
-                        get("in").focus();
-                    }, 800);
-                }
-            }, 500);
-            
-        }).catch(function(err) {
-            console.error("Camera error:", err);
-            status.innerText = "⚠️ فشل فتح الكاميرا: " + (err.name || err.message);
-            setTimeout(function(){ 
-                closeNativeCamera(); 
-                openScannerFallback(); 
-            }, 2500);
-        });
-    } catch (e) {
-        console.error("Native camera error", e);
-        closeNativeCamera();
-        openScannerFallback();
-    }
-}
-
-function closeNativeCamera() {
-    try {
-        isNativeCamera = false;
-        if(window._scanInterval) {
-            clearInterval(window._scanInterval);
-            window._scanInterval = null;
-        }
-        if(nativeStream) {
-            nativeStream.getTracks().forEach(function(track){ track.stop(); });
-            nativeStream = null;
-        }
-        var video = get("native-camera-video");
-        if(video) {
-            video.srcObject = null;
-            video.pause();
-        }
-        var overlay = get("native-camera-overlay");
-        if(overlay) overlay.style.display = "none";
-    } catch(e) {
-        console.error("Close native camera error", e);
-    }
-}
-
-function flipCamera() {
-    try {
-        currentFacing = (currentFacing === "environment") ? "user" : "environment";
-        closeNativeCamera();
-        setTimeout(function(){ openNativeCamera(); }, 300);
-    } catch(e) {}
-}
-
-function captureBarcode() {
-    try {
-        var video = get("native-camera-video");
-        if(!video) return;
-        var result = BarcodeDecoder.fromVideo(video);
-        if(result) {
-            get("cam-status").innerText = "✅ تم قراءة: " + result;
-            get("ic").value = result;
-            setTimeout(function(){
-                closeNativeCamera();
-                get("in").focus();
-            }, 800);
-        } else {
-            get("cam-status").innerText = "❌ لم يتم العثور على باركود. حاول مرة أخرى";
-        }
-    } catch(e) {
-        console.error("Capture error", e);
-    }
-}
-
-// ====== SCANNER (Unified Entry Point) ======
+// ====== CAMERA / SCANNER ======
 function openScanner() {
     try {
-        // In APK/WebView, try native camera first
-        if(window.Android && window.Android.openCamera) {
-            // If Android interface exists, use it
-            window.Android.openCamera();
-            return;
-        }
-        // Otherwise try native getUserMedia
-        openNativeCamera();
-    } catch (e) {
-        console.error("Open scanner error", e);
-        openScannerFallback();
-    }
-}
-
-function openScannerFallback() {
-    try {
-        get("scanner-modal").style.display = "flex";
-        get("manual-scan").focus();
-        if (typeof Html5Qrcode !== "undefined") {
-            startHtml5QrCode();
+        // Try native camera first
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            openNativeCamera();
         } else {
-            var checkInterval = setInterval(function() {
-                if (typeof Html5Qrcode !== "undefined") {
-                    clearInterval(checkInterval);
-                    startHtml5QrCode();
-                }
-            }, 500);
-            setTimeout(function() {
-                clearInterval(checkInterval);
-                if (typeof Html5Qrcode === "undefined") {
-                    console.warn("html5-qrcode not available");
-                }
-            }, 10000);
+            // Fallback: show modal with manual input
+            get("scanner-modal").style.display = "flex";
         }
     } catch (e) {
-        console.error("Fallback scanner error", e);
+        get("scanner-modal").style.display = "flex";
     }
 }
 
 function closeScanner() {
     try {
         get("scanner-modal").style.display = "none";
-        stopHtml5QrCode();
-    } catch (e) {
-        console.error("Close scanner error", e);
-    }
+    } catch (e) {}
 }
 
-function startHtml5QrCode() {
+function manualScan(code) {
     try {
-        if (typeof Html5Qrcode === "undefined") return;
-        if (html5QrCode) {
-            html5QrCode.stop().catch(function(e) { console.log("Stop error", e); });
-            html5QrCode = null;
-        }
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            function(decodedText, decodedResult) {
-                console.log("Barcode detected:", decodedText);
-                get("ic").value = decodedText;
-                closeScanner();
-                get("in").focus();
-            },
-            function(errorMessage) {}
-        ).catch(function(err) {
-            console.error("Start scanner error", err);
-        });
-    } catch (e) {
-        console.error("Html5Qrcode init error", e);
-    }
-}
-
-function stopHtml5QrCode() {
-    try {
-        if (html5QrCode) {
-            html5QrCode.stop().then(function() {
-                html5QrCode = null;
-            }).catch(function(e) {
-                html5QrCode = null;
-            });
-        }
-    } catch (e) {
-        console.error("Stop scanner error", e);
-    }
+        if (!code || !code.trim()) return;
+        get("ic").value = code.trim();
+        closeScanner();
+        get("in").focus();
+        showToast("✅ تم إدخال الكود: " + code.trim(), "success");
+    } catch (e) {}
 }
 
 function scanFromFile(file) {
     try {
-        // Try inline decoder first (works offline)
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var img = new Image();
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                var result = BarcodeDecoder.detect(canvas);
-                if(result) {
-                    get("ic").value = result;
-                    get("in").focus();
-                    alert("✅ تم قراءة الباركود: " + result);
-                    return;
-                }
-                // Fallback to html5-qrcode if available
-                if(typeof Html5Qrcode !== "undefined") {
-                    var tempScanner = new Html5Qrcode("reader");
-                    tempScanner.scanFile(file, false).then(function(decodedText) {
-                        get("ic").value = decodedText;
-                        get("in").focus();
-                        alert("✅ تم قراءة الباركود: " + decodedText);
-                    }).catch(function(err) {
-                        alert("❌ لم يتم العثور على باركود في الصورة.");
-                    });
-                } else {
-                    alert("❌ لم يتم العثور على باركود في الصورة.");
-                }
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    } catch (e) {
-        console.error("Scan from file error", e);
-        alert("❌ خطأ في مسح الصورة.");
-    }
-}
-
-function manualScan(val) {
-    try {
-        if (val) {
-            get("ic").value = val.trim();
-            closeScanner();
-            closeNativeCamera();
-            get("in").focus();
-        }
-    } catch (e) {
-        console.error("Manual scan error", e);
-    }
-}
-
-// ====== NAVIGATION ======
-function showSection(id) {
-    try {
-        var sections = ["inv", "miss"];
-        for (var i = 0; i < sections.length; i++) {
-            var sec = get(sections[i]);
-            var nav = get("nav-" + sections[i]);
-            if (sec) sec.style.display = (sections[i] === id) ? "block" : "none";
-            if (nav) nav.className = (sections[i] === id) ? "active" : "";
-        }
-        if (id === "inv") renderItems();
-        if (id === "miss") renderMissing();
-    } catch (e) {
-        console.error("Show section error", e);
-    }
-}
-
-function clearItemForm() {
-    try {
-        var ids = ["ic", "in", "ib", "is", "im", "iq", "iu"];
-        for (var i = 0; i < ids.length; i++) {
-            var el = get(ids[i]);
-            if (el) el.value = "";
-        }
-    } catch (e) {
-        console.error("Clear form error", e);
-    }
-}
-
-function addItem() {
-    try {
-        var c = get("ic").value.trim() || ("ITM" + Date.now());
-        var n = get("in").value.trim();
-        if (!n) { alert("اسم المادة مطلوب"); return; }
-        var b = parseFloat(get("ib").value) || 0;
-        var e = parseFloat(get("is").value) || 0;
-        var m = parseFloat(get("im").value) || 0;
-        var q = parseFloat(get("iq").value) || 0;
-        var u = get("iu").value.trim() || "قطعة";
-        items.push({ code: c, name: n, buy: b, sell: e, min: m, qty: q, unit: u });
-        saveData();
-        clearItemForm();
-        renderItems();
-    } catch (err) {
-        console.error("Add item error", err);
-        alert("خطأ في إضافة المادة: " + err.message);
-    }
-}
-
-// ====== SEARCH WITH HIGHLIGHT ======
-function highlightText(text, query) {
-    if (!query || !text) return text;
-    var lowerText = String(text).toLowerCase();
-    var lowerQuery = query.toLowerCase();
-    var idx = lowerText.indexOf(lowerQuery);
-    if (idx === -1) return text;
-    var before = String(text).substring(0, idx);
-    var match = String(text).substring(idx, idx + lowerQuery.length);
-    var after = String(text).substring(idx + lowerQuery.length);
-    return before + '<span class="search-highlight">' + match + '</span>' + after;
-}
-
-function renderItems() {
-    try {
-        if (!Array.isArray(items)) items = [];
-        var searchEl = get("search-items");
-        var q = searchEl ? searchEl.value.trim().toLowerCase() : "";
-        var t = get("itb");
-        if (!t) return;
-        t.innerHTML = "";
-        var shown = 0;
-        for (var i = 0; i < items.length; i++) {
-            var it = items[i];
-            if (!it) continue;
-            var codeMatch = it.code && String(it.code).toLowerCase().indexOf(q) !== -1;
-            var nameMatch = it.name && String(it.name).toLowerCase().indexOf(q) !== -1;
-            if (q && !codeMatch && !nameMatch) continue;
-            shown++;
-            var cls = parseFloat(it.qty || 0) <= parseFloat(it.min || 0) ? "low-stock" : "";
-            var displayCode = q ? highlightText(it.code || "", q) : (it.code || "");
-            var displayName = q ? highlightText(it.name || "", q) : (it.name || "");
-            t.innerHTML += "<tr><td>" + displayCode + "</td><td>" + displayName + "</td><td>" + (it.sell || 0) + " د.ت</td><td class=\"" + cls + "\">" + (it.qty || 0) + " " + (it.unit || "قطعة") + "</td><td><button class=\"btn-red\" onclick=\"delItem(" + i + ")\">حذف</button></td></tr>";
-        }
-        if (shown === 0 && q) {
-            t.innerHTML = '<tr><td colspan="5" class="empty">لا توجد نتائج لـ "' + q + '"</td></tr>';
-        }
-    } catch (e) {
-        console.error("Render items error", e);
-    }
-}
-
-function delItem(i) {
-    try {
-        if (!confirm("حذف المادة؟")) return;
-        items.splice(i, 1);
-        saveData();
-        renderItems();
-    } catch (e) {
-        console.error("Delete item error", e);
-    }
-}
-
-function renderMissing() {
-    try {
-        if (!Array.isArray(items)) items = [];
-        var t = get("mtb");
-        if (!t) return;
-        t.innerHTML = "";
-        var c = 0;
-        for (var i = 0; i < items.length; i++) {
-            var it = items[i];
-            if (!it) continue;
-            var q = parseFloat(it.qty || 0);
-            var m = parseFloat(it.min || 0);
-            if (q <= m && m > 0) {
-                c++;
-                t.innerHTML += "<tr><td style=\"border:1px solid #ddd;padding:8px\">" + (it.code || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;font-weight:bold\">" + (it.name || "") + "</td><td style=\"border:1px solid #ddd;padding:8px;color:#ef4444;font-weight:bold\">" + q + " " + (it.unit || "قطعة") + "</td></tr>";
-            }
-        }
-        if (c === 0) t.innerHTML = "<tr><td colspan=\"3\" class=\"empty\" style=\"border:1px solid #ddd;padding:20px\">لا توجد نواقص 🎉</td></tr>";
-        var mpDate = get("mp-date");
-        if (mpDate) mpDate.innerText = new Date().toLocaleString("ar-TN");
-    } catch (e) {
-        console.error("Render missing error", e);
-    }
-}
-// ====== EXPORT / IMPORT ======
-function exportData() {
-    try {
-        if (!Array.isArray(items) || items.length === 0) {
-            alert("لا توجد بيانات للتصدير!");
-            return;
-        }
-        var data = {
-            app: "Mawadi-Pro",
-            version: "1.0",
-            date: new Date().toISOString(),
-            items: items,
-            totalItems: items.length
-        };
-        var json = JSON.stringify(data, null, 2);
-        var blob = new Blob([json], { type: "application/json" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "Mawadi-Pro-Backup-" + new Date().toISOString().slice(0, 10) + ".json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert("✅ تم تصدير " + items.length + " مادة بنجاح!");
-    } catch (e) {
-        alert("خطأ في التصدير: " + e.message);
-    }
-}
-
-function exportCSV() {
-    try {
-        if (!Array.isArray(items) || items.length === 0) {
-            alert("لا توجد بيانات للتصدير!");
-            return;
-        }
-        var csv = "الكود,الاسم,سعر الشراء,سعر البيع,حد أدنى,الكمية,الوحدة\n";
-        for (var i = 0; i < items.length; i++) {
-            var it = items[i];
-            if (!it) continue;
-            csv += '"' + (it.code || "") + '","' + (it.name || "") + '",' + (it.buy || 0) + "," + (it.sell || 0) + "," + (it.min || 0) + "," + (it.qty || 0) + ',"' + (it.unit || "قطعة") + '"\n';
-        }
-        var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "Mawadi-Pro-CSV-" + new Date().toISOString().slice(0, 10) + ".csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert("✅ تم تصدير CSV بنجاح!");
-    } catch (e) {
-        alert("خطأ في تصدير CSV: " + e.message);
-    }
-}
-
-function importData(file) {
-    try {
         var reader = new FileReader();
         reader.onload = function(e) {
             try {
-                var content = e.target.result;
-                var ext = file.name.split(".").pop().toLowerCase();
-                if (ext === "json") {
-                    var data = JSON.parse(content);
-                    if (data.items && Array.isArray(data.items)) {
-                        if (confirm("سيتم استبدال " + items.length + " مادة بـ " + data.items.length + " مادة. متأكد؟")) {
-                            items = data.items;
-                            saveData();
-                            renderItems();
-                            alert("✅ تم استيراد " + data.items.length + " مادة بنجاح!");
-                        }
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    var result = BarcodeScanner.scan(canvas);
+                    if (result) {
+                        get("ic").value = result;
+                        showToast("✅ باركود: " + result, "success");
+                        get("in").focus();
                     } else {
-                        alert("❌ ملف JSON غير صالح!");
+                        showToast("❌ لم يتم التعرف على الباركود", "error");
                     }
-                } else if (ext === "csv") {
-                    importCSV(content);
-                } else {
-                    alert("❌ صيغة الملف غير مدعومة. استخدم JSON أو CSV.");
-                }
+                };
+                img.src = e.target.result;
             } catch (err) {
-                alert("❌ خطأ في قراءة الملف: " + err.message);
+                showToast("❌ خطأ في قراءة الصورة", "error");
             }
         };
-        reader.readAsText(file);
+        reader.readAsDataURL(file);
     } catch (e) {
-        alert("خطأ في الاستيراد: " + e.message);
+        showToast("❌ خطأ في المسح", "error");
     }
 }
 
-function importCSV(csvText) {
+function openNativeCamera() {
     try {
-        var lines = csvText.replace(/\uFEFF/g, "").split("\n");
-        var newItems = [];
-        for (var i = 1; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (!line) continue;
-            var parts = line.split(',');
-            if (parts.length < 2) continue;
-            newItems.push({
-                code: parts[0] ? parts[0].trim().replace(/^"|"$/g, '') : '',
-                name: parts[1] ? parts[1].trim().replace(/^"|"$/g, '') : '',
-                buy: parseFloat(parts[2]) || 0,
-                sell: parseFloat(parts[3]) || 0,
-                min: parseFloat(parts[4]) || 0,
-                qty: parseFloat(parts[5]) || 0,
-                unit: parts[6] ? parts[6].trim().replace(/^"|"$/g, '') : 'قطعة'
-            });
+        var overlay = get("native-camera-overlay");
+        var video = get("native-camera-video");
+        var status = get("cam-status");
+        overlay.style.display = "flex";
+        status.innerText = "جاري طلب إذن الكاميرا...";
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            status.innerText = "⚠️ الكاميرا غير مدعومة";
+            setTimeout(closeNativeCamera, 2000);
+            return;
         }
-        if (newItems.length === 0) { alert("❌ لا توجد بيانات صالحة في ملف CSV!"); return; }
-        if (confirm("سيتم استبدال " + items.length + " مادة بـ " + newItems.length + " مادة. متأكد؟")) {
-            items = newItems;
-            saveData();
-            renderItems();
-            alert("✅ تم استيراد " + newItems.length + " مادة من CSV بنجاح!");
+
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        }).then(function(stream) {
+            nativeStream = stream;
+            video.srcObject = stream;
+            video.play();
+            status.innerText = "📷 وجه الكاميرا نحو الباركود";
+
+            scanTimer = setInterval(function() {
+                if (!nativeStream || video.paused) return;
+                try {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var result = BarcodeScanner.scan(canvas);
+                    if (result) {
+                        status.innerText = "✅ تم قراءة: " + result;
+                        get("ic").value = result;
+                        var lastResult = get("last-scan-result");
+                        lastResult.innerText = result;
+                        lastResult.style.display = "block";
+                        clearInterval(scanTimer);
+                        scanTimer = null;
+                        setTimeout(function() {
+                            closeNativeCamera();
+                            get("in").focus();
+                            showToast("✅ باركود: " + result, "success");
+                        }, 1200);
+                    }
+                } catch (e) {}
+            }, 500);
+
+        }).catch(function(err) {
+            status.innerText = "⚠️ فشل: " + (err.name || err.message);
+            setTimeout(function() {
+                closeNativeCamera();
+                get("scanner-modal").style.display = "flex";
+            }, 2000);
+        });
+    } catch (e) {
+        closeNativeCamera();
+        get("scanner-modal").style.display = "flex";
+    }
+}
+
+function closeNativeCamera() {
+    try {
+        if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+        if (nativeStream) {
+            nativeStream.getTracks().forEach(function(t) { t.stop(); });
+            nativeStream = null;
+        }
+        var video = get("native-camera-video");
+        if (video) { video.srcObject = null; video.pause(); }
+        var lastResult = get("last-scan-result");
+        if (lastResult) lastResult.style.display = "none";
+        get("native-camera-overlay").style.display = "none";
+    } catch (e) {}
+}
+
+function flipCamera() {
+    currentFacing = (currentFacing === "environment") ? "user" : "environment";
+    closeNativeCamera();
+    setTimeout(openNativeCamera, 300);
+}
+
+function captureBarcode() {
+    try {
+        var video = get("native-camera-video");
+        var status = get("cam-status");
+        if (!video || !nativeStream) return;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        var result = BarcodeScanner.scan(canvas);
+        if (result) {
+            status.innerText = "✅ تم قراءة: " + result;
+            get("ic").value = result;
+            var lastResult = get("last-scan-result");
+            lastResult.innerText = result;
+            lastResult.style.display = "block";
+            setTimeout(function() {
+                closeNativeCamera();
+                get("in").focus();
+                showToast("✅ باركود: " + result, "success");
+            }, 1000);
+        } else {
+            status.innerText = "❌ لم يتم التعرف على الباركود، حاول مرة أخرى";
+            setTimeout(function() {
+                status.innerText = "📷 وجه الكاميرا نحو الباركود";
+            }, 2000);
         }
     } catch (e) {
-        alert("❌ خطأ في استيراد CSV: " + e.message);
+        showToast("❌ خطأ في المسح", "error");
     }
+}
+
+// ====== EXPORT / IMPORT ======
+function exportData(){
+try{
+if(!Array.isArray(items)||items.length===0){
+showToast("❌ لا توجد بيانات للتصدير","error");
+return;
+}
+var data={
+app:"Mawadi-Pro",
+version:"1.0",
+date:new Date().toISOString(),
+items:items,
+totalItems:items.length
+};
+var json=JSON.stringify(data,null,2);
+var blob=new Blob([json],{type:"application/json"});
+var url=URL.createObjectURL(blob);
+var a=document.createElement("a");
+a.href=url;
+a.download="Mawadi-Pro-Backup-"+new Date().toISOString().slice(0,10)+".json";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+showToast("✅ تم تصدير "+items.length+" مادة","success");
+}catch(e){
+showToast("❌ خطأ في التصدير","error");
+}
+}
+
+function exportCSV(){
+try{
+if(!Array.isArray(items)||items.length===0){
+showToast("❌ لا توجد بيانات للتصدير","error");
+return;
+}
+var csv="الكود,الاسم,سعر الشراء,سعر البيع,حد أدنى,الكمية,الوحدة\n";
+for(var i=0;i<items.length;i++){
+var it=items[i];
+if(!it)continue;
+csv+='"'+(it.code||"")+'","'+(it.name||"")+'",'+(it.buy||0)+","+(it.sell||0)+","+(it.min||0)+","+(it.qty||0)+',"'+(it.unit||"قطعة")+'"\n';
+}
+var blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+var url=URL.createObjectURL(blob);
+var a=document.createElement("a");
+a.href=url;
+a.download="Mawadi-Pro-CSV-"+new Date().toISOString().slice(0,10)+".csv";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+showToast("✅ تم تصدير CSV","success");
+}catch(e){
+showToast("❌ خطأ في تصدير CSV","error");
+}
+}
+
+function importData(file){
+try{
+var reader=new FileReader();
+reader.onload=function(e){
+try{
+var content=e.target.result;
+var ext=file.name.split(".").pop().toLowerCase();
+if(ext==="json"){
+var data=JSON.parse(content);
+if(data.items&&Array.isArray(data.items)){
+if(confirm("سيتم استبدال "+items.length+" مادة بـ "+data.items.length+" مادة. متأكد؟")){
+items=data.items;
+saveData();
+renderItems();
+showToast("✅ تم استيراد "+data.items.length+" مادة","success");
+}
+}else{
+showToast("❌ ملف JSON غير صالح","error");
+}
+}else if(ext==="csv"){
+importCSV(content);
+}else{
+showToast("❌ صيغة غير مدعومة","error");
+}
+}catch(err){
+showToast("❌ خطأ في قراءة الملف","error");
+}
+};
+reader.readAsText(file);
+}catch(e){
+showToast("❌ خطأ في الاستيراد","error");
+}
+}
+
+function importCSV(csvText){
+try{
+var lines=csvText.replace(/\uFEFF/g,"").split("\n");
+var newItems=[];
+for(var i=1;i<lines.length;i++){
+var line=lines[i].trim();
+if(!line)continue;
+var parts=line.split(',');
+if(parts.length<2)continue;
+newItems.push({
+code:parts[0]?parts[0].trim().replace(/^"|"$/g,''):'',
+name:parts[1]?parts[1].trim().replace(/^"|"$/g,''):'',
+buy:parseFloat(parts[2])||0,
+sell:parseFloat(parts[3])||0,
+min:parseFloat(parts[4])||0,
+qty:parseFloat(parts[5])||0,
+unit:parts[6]?parts[6].trim().replace(/^"|"$/g,''):'قطعة'
+});
+}
+if(newItems.length===0){showToast("❌ لا توجد بيانات صالحة","error");return;}
+if(confirm("سيتم استبدال "+items.length+" مادة بـ "+newItems.length+" مادة. متأكد؟")){
+items=newItems;
+saveData();
+renderItems();
+showToast("✅ تم استيراد "+newItems.length+" مادة","success");
+}
+}catch(e){
+showToast("❌ خطأ في استيراد CSV","error");
+}
 }
 
 // ====== WHATSAPP SHARE ======
-function shareWhatsApp() {
-    try {
-        var miss = [];
-        for (var i = 0; i < items.length; i++) {
-            var it = items[i];
-            if (!it) continue;
-            var q = parseFloat(it.qty || 0);
-            var m = parseFloat(it.min || 0);
-            if (q <= m && m > 0) miss.push(it);
-        }
-        if (miss.length === 0) { alert("لا توجد مواد ناقصة!"); return; }
-        var txt = "*📑 تقرير النواقص — Mawadi-Pro*\n";
-        txt += new Date().toLocaleString("ar-TN") + "\n\n";
-        for (var j = 0; j < miss.length; j++) {
-            txt += (j + 1) + ". " + miss[j].name + " — الكمية: " + miss[j].qty + " " + (miss[j].unit || "قطعة") + "\n";
-        }
-        var phone = get("wa-phone").value.trim().replace(/^\+/, "");
-        var url = phone ? "https://wa.me/" + phone + "?text=" + encodeURIComponent(txt) : "https://wa.me/?text=" + encodeURIComponent(txt);
-        window.open(url, "_blank");
-    } catch (e) {
-        alert("خطأ في مشاركة واتساب: " + e.message);
-    }
+function shareWhatsApp(){
+try{
+var miss=[];
+for(var i=0;i<items.length;i++){
+var it=items[i];
+if(!it)continue;
+var q=parseFloat(it.qty||0);
+var m=parseFloat(it.min||0);
+if(q<=m&&m>0)miss.push(it);
+}
+if(miss.length===0){showToast("لا توجد مواد ناقصة","error");return;}
+var txt="*📑 تقرير النواقص — Mawadi-Pro*\n";
+txt+=new Date().toLocaleString("ar-TN")+"\n\n";
+for(var j=0;j<miss.length;j++){
+txt+=(j+1)+". "+miss[j].name+" — الكمية: "+miss[j].qty+" "+(miss[j].unit||"قطعة")+"\n";
+}
+var phone=get("wa-phone").value.trim().replace(/^\+/,"");
+var url=phone?"https://wa.me/"+phone+"?text="+encodeURIComponent(txt):"https://wa.me/?text="+encodeURIComponent(txt);
+window.open(url,"_blank");
+}catch(e){
+showToast("❌ خطأ في مشاركة واتساب","error");
+}
 }
 
 // ====== PRINT / PDF ======
-function printMissing() {
-    try {
-        var miss = [];
-        for (var i = 0; i < items.length; i++) {
-            var it = items[i];
-            if (!it) continue;
-            var q = parseFloat(it.qty || 0);
-            var m = parseFloat(it.min || 0);
-            if (q <= m && m > 0) miss.push(it);
-        }
-        if (miss.length === 0) { alert("لا توجد مواد ناقصة!"); return; }
-        var printWindow = window.open("", "_blank");
-        var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير النواقص</title>';
-        html += '<style>body{font-family:Arial,sans-serif;padding:20px;direction:rtl}h2{color:#ef4444;text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ddd;padding:10px;text-align:center}th{background:#fee2e2;color:#333;font-weight:bold}td{color:#ef4444;font-weight:bold}.info{text-align:center;color:#888;font-size:12px;margin-top:5px}</style></head><body>';
-        html += '<h2>📑 تقرير النواقص</h2>';
-        html += '<div class="info">Mawadi-Pro | ' + new Date().toLocaleString("ar-TN") + '</div>';
-        html += '<table><thead><tr><th>الكود</th><th>اسم المادة</th><th>الكمية</th></tr></thead><tbody>';
-        for (var k = 0; k < miss.length; k++) {
-            html += '<tr><td>' + (miss[k].code || "") + '</td><td style="text-align:right">' + (miss[k].name || "") + '</td><td>' + miss[k].qty + ' ' + (miss[k].unit || "قطعة") + '</td></tr>';
-        }
-        html += '</tbody></table></body></html>';
-        printWindow.document.write(html);
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(function() { printWindow.print(); }, 500);
-    } catch (e) {
-        alert("خطأ في الطباعة: " + e.message);
-    }
+function printMissing(){
+try{
+var miss=[];
+for(var i=0;i<items.length;i++){
+var it=items[i];
+if(!it)continue;
+var q=parseFloat(it.qty||0);
+var m=parseFloat(it.min||0);
+if(q<=m&&m>0)miss.push(it);
+}
+if(miss.length===0){showToast("لا توجد مواد ناقصة","error");return;}
+var printWindow=window.open("","_blank");
+var html='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير النواقص</title>';
+html+='<style>body{font-family:Arial,sans-serif;padding:20px;direction:rtl}h2{color:#ef4444;text-align:center;border-bottom:2px solid #ef4444;padding-bottom:10px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{border:1px solid #ddd;padding:10px;text-align:center}th{background:#fee2e2;color:#333;font-weight:bold}td{color:#ef4444;font-weight:bold}.info{text-align:center;color:#888;font-size:12px;margin-top:5px}</style></head><body>';
+html+='<h2>📑 تقرير النواقص</h2>';
+html+='<div class="info">Mawadi-Pro | '+new Date().toLocaleString("ar-TN")+'</div>';
+html+='<table><thead><tr><th>الكود</th><th>اسم المادة</th><th>الكمية</th></tr></thead><tbody>';
+for(var k=0;k<miss.length;k++){
+html+='<tr><td>'+(miss[k].code||"")+'</td><td style="text-align:right">'+(miss[k].name||"")+'</td><td>'+miss[k].qty+' '+(miss[k].unit||"قطعة")+'</td></tr>';
+}
+html+='</tbody></table></body></html>';
+printWindow.document.write(html);
+printWindow.document.close();
+printWindow.focus();
+setTimeout(function(){printWindow.print();},500);
+}catch(e){
+showToast("❌ خطأ في الطباعة","error");
+}
 }
 
-// ====== ANDROID BRIDGE (for AppsGeyser / WebView) ======
-// This allows Android Java to call JS and vice versa
-window.receiveBarcodeFromAndroid = function(barcode) {
-    try {
-        if(barcode) {
-            get("ic").value = barcode;
-            get("in").focus();
-            alert("✅ تم قراءة الباركود: " + barcode);
-        }
-    } catch(e) {
-        console.error("Android bridge error", e);
-    }
+// ====== ANDROID BRIDGE ======
+window.receiveBarcodeFromAndroid=function(barcode){
+try{
+if(barcode){
+get("ic").value=barcode;
+get("in").focus();
+showToast("✅ باركود: "+barcode,"success");
+}
+}catch(e){}
 };
 
-// ====== INIT ======
+// ====== EVENT LISTENERS (CRITICAL FOR APK) ======
+document.addEventListener("DOMContentLoaded",function(){
+// File inputs
+var scannerFile=get("scanner-file-input");
+if(scannerFile){
+scannerFile.addEventListener("change",function(){
+if(this.files&&this.files[0])scanFromFile(this.files[0]);
+});
+}
+
+var importFile=get("import-file-input");
+if(importFile){
+importFile.addEventListener("change",function(){
+if(this.files&&this.files[0])importData(this.files[0]);
+});
+}
+
+// Login buttons - ensure they work
+var btnLogin=get("btn-login");
+if(btnLogin){
+btnLogin.addEventListener("touchstart",function(e){e.preventDefault();doLogin();});
+btnLogin.addEventListener("click",function(e){e.preventDefault();doLogin();});
+}
+
+var btnFast=get("btn-fast");
+if(btnFast){
+btnFast.addEventListener("touchstart",function(e){e.preventDefault();doLoginFast();});
+btnFast.addEventListener("click",function(e){e.preventDefault();doLoginFast();});
+}
+
+// Prevent double-tap zoom
+document.addEventListener("touchstart",function(){},{passive:true});
+
+// Initialize
+checkLS();
 loadData();
 initTheme();
+
+console.log("Mawadi-Pro v1.0 initialized successfully");
+});
+
+// ====== INIT ======
+checkLS();
+loadData();
+initTheme();
+
 </script>
 </body>
 </html>
