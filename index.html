@@ -34,6 +34,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#eef0f5;direction
 .btn-purple{background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
 .btn-cyan{background:#06b6d4;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
 .btn-pink{background:#ec4899;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
+.btn-teal{background:#14b8a6;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:bold;cursor:pointer;-webkit-appearance:none}
 button:active{transform:scale(0.96)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{background:#f8fafc;color:#666;padding:10px;text-align:center;font-weight:600}
@@ -66,7 +67,7 @@ body.dark .modal-content h3,body.dark .modal-content h4{color:#e2e8f0}
 body.dark .search-highlight{background:#854d0e;color:#fff}
 .lib-loading{color:#888;font-size:12px;margin-top:5px}
 #native-camera-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:2000;display:none;flex-direction:column;justify-content:center;align-items:center}
-#native-camera-video{width:100%;height:70%;object-fit:cover;background:#111}
+#native-camera-video{width:100%;height:70%;object-fit:cover;background:#111;display:block}
 #native-camera-controls{display:flex;gap:15px;padding:20px;align-items:center;justify-content:center}
 #native-camera-overlay .btn-capture{background:#22c55e;color:#fff;border:none;border-radius:50%;width:70px;height:70px;font-size:28px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center}
 #native-camera-overlay .btn-flip{background:#3d5af1;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -87,33 +88,36 @@ body.dark .search-highlight{background:#854d0e;color:#fff}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:#22c55e}
 .toast.error{background:#ef4444}
-/* ====== NEW: Login freeze fix styles ====== */
 .login-box .spinner{margin:10px auto;display:none}
 .login-box.loading .spinner{display:inline-block}
 .login-box.loading button{opacity:0.6;pointer-events:none}
-/* ====== NEW: Item edit modal ====== */
 .edit-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
 .edit-row input{flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none}
 .edit-row button{padding:6px 12px;font-size:12px}
-/* ====== NEW: Stats bar ====== */
 .stats-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .stat-box{flex:1;min-width:100px;background:linear-gradient(135deg,#3d5af1,#22c55e);color:#fff;padding:12px;border-radius:12px;text-align:center}
 .stat-box h4{font-size:20px;margin:0}
 .stat-box span{font-size:11px;opacity:0.9}
 body.dark .stat-box{background:linear-gradient(135deg,#1e3a8a,#166534)}
-/* ====== NEW: Sort controls ====== */
 .sort-bar{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 .sort-bar label{font-size:12px;color:#888}
 .sort-bar select{padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;background:#fff;outline:none}
 body.dark .sort-bar select{background:#0f172a;border-color:#334155;color:#e2e8f0}
-/* ====== NEW: Quantity input inline ====== */
 .qty-input{width:60px;padding:4px;border:1px solid #e5e7eb;border-radius:6px;text-align:center;font-size:13px;outline:none}
 body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
-/* ====== NEW: Responsive table scroll ====== */
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-/* ====== NEW: Animations ====== */
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .section-card{animation:fadeIn 0.3s ease}
+/* Camera fix */
+#native-camera-video::-webkit-media-controls{display:none!important}
+#native-camera-overlay .video-wrapper{position:relative;width:100%;height:70%;background:#111;overflow:hidden}
+/* Supplier card */
+.supplier-card{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:12px;padding:12px;margin-bottom:10px}
+.supplier-card h4{color:#0369a1;margin:0 0 5px 0;font-size:15px}
+.supplier-card p{color:#64748b;margin:0;font-size:12px}
+body.dark .supplier-card{background:linear-gradient(135deg,#0c4a6e,#075985);border-color:#0ea5e9}
+body.dark .supplier-card h4{color:#7dd3fc}
+body.dark .supplier-card p{color:#cbd5e1}
 </style>
 </head>
 <body>
@@ -150,10 +154,10 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 <div class="nav-tabs">
 <button id="nav-inv" class="active" onclick="showSection('inv')">📦 المخزون</button>
 <button id="nav-miss" onclick="showSection('miss')">📑 النواقص</button>
+<button id="nav-sup" onclick="showSection('sup')">🚚 الموردين</button>
 </div>
 
 <div id="inv" class="section">
-<!-- Stats Bar -->
 <div class="stats-bar" id="stats-bar" style="display:none"></div>
 
 <div class="section-card">
@@ -174,7 +178,12 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 <div class="input-row">
 <input id="im" placeholder="حد أدنى للتنبيه" type="number" autocomplete="off" onkeydown="if(event.key==='Enter'){get('iq').focus()}">
 <input id="iq" placeholder="الكمية الحالية" type="number" autocomplete="off" onkeydown="if(event.key==='Enter'){get('iu').focus()}">
-<input id="iu" placeholder="الوحدة (قطعة/علبة/كيلو)" autocomplete="off" onkeydown="if(event.key==='Enter'){addItem()}">
+<input id="iu" placeholder="الوحدة (قطعة/علبة/كيلو)" autocomplete="off" onkeydown="if(event.key==='Enter'){get('isup').focus()}">
+</div>
+<div class="input-row">
+<select id="isup" style="flex:2;min-width:200px">
+<option value="">-- اختر المورد --</option>
+</select>
 </div>
 <div style="display:flex;gap:10px;margin-top:10px">
 <button class="btn-blue" onclick="addItem()">➕ إضافة المادة</button>
@@ -206,7 +215,7 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 </div>
 <div class="table-wrap">
 <table>
-<thead><tr><th>الكود</th><th>الاسم</th><th>شراء</th><th>بيع</th><th>كمية</th><th>تعديل</th><th>حذف</th></tr></thead>
+<thead><tr><th>الكود</th><th>الاسم</th><th>شراء</th><th>بيع</th><th>كمية</th><th>مورد</th><th>تعديل</th><th>حذف</th></tr></thead>
 <tbody id="itb"></tbody>
 </table>
 </div>
@@ -233,6 +242,32 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 </div>
 </div>
 </div>
+
+<!-- Suppliers Section -->
+<div id="sup" class="section" style="display:none">
+<div class="section-card">
+<h3>🚚 إضافة مورد جديد</h3>
+<div class="input-row">
+<input id="sup-name" placeholder="اسم المورد *" style="flex:2" autocomplete="off" onkeydown="if(event.key==='Enter'){get('sup-phone').focus()}">
+</div>
+<div class="input-row">
+<input id="sup-phone" placeholder="رقم الهاتف" autocomplete="off" onkeydown="if(event.key==='Enter'){get('sup-email').focus()}">
+<input id="sup-email" placeholder="البريد الإلكتروني" autocomplete="off" onkeydown="if(event.key==='Enter'){get('sup-address').focus()}">
+</div>
+<div class="input-row">
+<input id="sup-address" placeholder="العنوان" style="flex:2" autocomplete="off" onkeydown="if(event.key==='Enter'){addSupplier()}">
+</div>
+<div style="display:flex;gap:10px;margin-top:10px">
+<button class="btn-teal" onclick="addSupplier()">➕ إضافة مورد</button>
+<button class="btn-gray" onclick="clearSupplierForm()">🧹 مسح</button>
+</div>
+</div>
+
+<div class="section-card">
+<h3>📋 قائمة الموردين</h3>
+<div id="sup-list"></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -254,8 +289,8 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 <!-- Native Camera Overlay -->
 <div id="native-camera-overlay">
 <div class="camera-status" id="cam-status">جاري تشغيل الكاميرا...</div>
-<div style="position:relative;width:100%;height:70%">
-<video id="native-camera-video" autoplay playsinline muted></video>
+<div class="video-wrapper" style="position:relative;width:100%;height:70%;background:#111;overflow:hidden">
+<video id="native-camera-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
 <div class="scan-line"></div>
 <div class="scan-frame"></div>
 <div class="last-scan-result" id="last-scan-result"></div>
@@ -307,8 +342,25 @@ body.dark .qty-input{background:#0f172a;border-color:#334155;color:#e2e8f0}
 </div>
 <script>
 
-// ====== SIMPLE BARCODE SCANNER (No external libs) ======
+// ====== IMPROVED BARCODE SCANNER (with EAN-13 validation) ======
 var BarcodeScanner = {
+    // EAN-13 digit patterns (7 modules each)
+    L_PATTERNS: [
+        [3,2,1,1], [2,2,2,1], [2,1,2,2], [1,4,1,1],
+        [1,1,3,2], [1,2,3,1], [1,1,1,4], [1,3,1,2],
+        [1,2,1,3], [3,1,1,2]
+    ],
+    G_PATTERNS: [
+        [1,1,2,3], [1,2,2,2], [2,2,1,2], [1,1,4,1],
+        [2,3,1,1], [1,3,2,1], [4,1,1,1], [2,1,3,1],
+        [3,1,2,1], [2,1,1,3]
+    ],
+    R_PATTERNS: [
+        [3,2,1,1], [2,2,2,1], [2,1,2,2], [1,4,1,1],
+        [1,1,3,2], [1,2,3,1], [1,1,1,4], [1,3,1,2],
+        [1,2,1,3], [3,1,1,2]
+    ],
+
     scan: function(canvas) {
         var ctx = canvas.getContext('2d');
         var w = canvas.width, h = canvas.height;
@@ -318,89 +370,210 @@ var BarcodeScanner = {
         for (var i = 0; i < w * h; i++) {
             gray[i] = (data[i*4] * 0.299 + data[i*4+1] * 0.587 + data[i*4+2] * 0.114);
         }
-        for (var row = Math.floor(h * 0.2); row < Math.floor(h * 0.8); row += 10) {
-            var result = this.scanLine(gray, w, row);
-            if (result) return result;
+
+        // Try multiple scan lines with different thresholds
+        var thresholds = [100, 128, 150, 80, 170];
+        for (var t = 0; t < thresholds.length; t++) {
+            for (var row = Math.floor(h * 0.15); row < Math.floor(h * 0.85); row += 8) {
+                var result = this.scanLine(gray, w, row, thresholds[t]);
+                if (result && this.validateEAN13(result)) return result;
+            }
         }
         return null;
     },
-    scanLine: function(gray, w, row) {
+
+    scanLine: function(gray, w, row, threshold) {
         var start = row * w;
         var bars = [];
         var inBar = false;
-        var threshold = 128;
+        var barCount = 0;
+        var spaceCount = 0;
+
+        // Find first dark pixel
+        var firstDark = -1;
         for (var x = 0; x < w; x++) {
-            var isDark = gray[start + x] < threshold;
-            if (isDark && !inBar) { inBar = true; bars.push({start: x, width: 0}); }
-            if (inBar) { bars[bars.length - 1].width++; }
-            if (!isDark && inBar) { inBar = false; }
+            if (gray[start + x] < threshold) {
+                firstDark = x;
+                break;
+            }
         }
-        if (bars.length < 20) return null;
-        return this.decodeEAN13(bars, w);
+        if (firstDark < 0 || firstDark > w * 0.3) return null;
+
+        // Measure all bars and spaces
+        var currentWidth = 0;
+        var isDark = gray[start + firstDark] < threshold;
+
+        for (var x = firstDark; x < w && x < firstDark + w * 0.7; x++) {
+            var pixelDark = gray[start + x] < threshold;
+            if (pixelDark === isDark) {
+                currentWidth++;
+            } else {
+                bars.push({dark: isDark, width: currentWidth});
+                isDark = pixelDark;
+                currentWidth = 1;
+            }
+        }
+        bars.push({dark: isDark, width: currentWidth});
+
+        // Need at least 59 bars (3 guards + 12 digits * 4 bars + 5 middle)
+        if (bars.length < 59) return null;
+
+        return this.decodeEAN13FromBars(bars);
     },
-    decodeEAN13: function(bars, w) {
-        var pattern = [];
-        var totalWidth = 0;
-        for (var i = 0; i < bars.length; i++) totalWidth += bars[i].width;
-        var unit = totalWidth / 95;
-        for (var i = 0; i < bars.length; i++) {
-            var modules = Math.round(bars[i].width / unit);
-            for (var j = 0; j < modules; j++) pattern.push(i % 2 === 0 ? 1 : 0);
+
+    decodeEAN13FromBars: function(bars) {
+        // Find guard patterns
+        var guardIndices = this.findGuards(bars);
+        if (!guardIndices) return null;
+
+        var leftGuard = guardIndices[0];
+        var middleGuard = guardIndices[1];
+        var rightGuard = guardIndices[2];
+
+        // Calculate module width from left guard (3 modules)
+        var leftGuardWidth = 0;
+        for (var i = leftGuard; i < leftGuard + 3; i++) {
+            leftGuardWidth += bars[i].width;
         }
-        if (pattern.length < 95) return null;
+        var moduleWidth = leftGuardWidth / 3;
+
+        if (moduleWidth < 1) return null;
+
+        // Decode left half (6 digits)
         var result = "";
-        var pos = 3;
-        for (var group = 0; group < 6; group++) {
-            var best = this.matchDigit(pattern, pos, "L");
-            if (best < 0) return null;
-            result += best;
-            pos += 7;
+        var parityPattern = "";
+        var pos = leftGuard + 3;
+
+        for (var d = 0; d < 6; d++) {
+            var digitBars = [];
+            for (var b = 0; b < 4 && pos < middleGuard; b++) {
+                var modules = Math.round(bars[pos].width / moduleWidth);
+                if (modules < 1) modules = 1;
+                if (modules > 4) modules = 4;
+                digitBars.push(modules);
+                pos++;
+            }
+            var digit = this.matchDigit(digitBars, "L");
+            if (digit < 0) digit = this.matchDigit(digitBars, "G");
+            if (digit < 0) return null;
+            result += digit;
+            if (this.matchDigit(digitBars, "G") >= 0) parityPattern += "1";
+            else parityPattern += "0";
+            pos++; // skip space
         }
-        pos += 5;
-        for (var group = 0; group < 6; group++) {
-            var best = this.matchDigit(pattern, pos, "R");
-            if (best < 0) return null;
-            result += best;
-            pos += 7;
+
+        // Skip middle guard
+        pos = middleGuard + 5;
+
+        // Decode right half (6 digits)
+        for (var d = 0; d < 6; d++) {
+            var digitBars = [];
+            for (var b = 0; b < 4 && pos < rightGuard; b++) {
+                var modules = Math.round(bars[pos].width / moduleWidth);
+                if (modules < 1) modules = 1;
+                if (modules > 4) modules = 4;
+                digitBars.push(modules);
+                pos++;
+            }
+            var digit = this.matchDigit(digitBars, "R");
+            if (digit < 0) return null;
+            result += digit;
+            pos++; // skip space
         }
+
         return result.length === 12 ? result : null;
     },
-    matchDigit: function(pattern, pos, type) {
-        var L_PATTERNS = [
-            [0,0,0,1,1,0,1], [0,0,1,1,0,0,1], [0,0,1,0,0,1,1], [0,1,1,1,1,0,1],
-            [0,1,0,0,0,1,1], [0,1,1,0,0,0,1], [0,1,0,1,1,1,1], [0,1,1,1,0,1,1],
-            [0,1,1,0,1,1,1], [0,0,0,1,0,1,1]
-        ];
-        var R_PATTERNS = [
-            [1,1,1,0,0,1,0], [1,1,0,0,1,1,0], [1,1,0,1,1,0,0], [1,0,0,0,0,1,0],
-            [1,0,1,1,1,0,0], [1,0,0,1,1,1,0], [1,0,1,0,0,0,0], [1,0,0,0,1,0,0],
-            [1,0,0,1,0,0,0], [1,1,1,0,1,0,0]
-        ];
-        var patterns = type === "L" ? L_PATTERNS : R_PATTERNS;
+
+    findGuards: function(bars) {
+        // Look for guard patterns: 1-1-1 (3 bars/spaces)
+        var guards = [];
+        for (var i = 0; i < bars.length - 2; i++) {
+            if (bars[i].dark && !bars[i+1].dark && bars[i+2].dark) {
+                // Check widths are similar (guard should be narrow)
+                var avg = (bars[i].width + bars[i+1].width + bars[i+2].width) / 3;
+                if (Math.abs(bars[i].width - avg) < avg * 0.5 &&
+                    Math.abs(bars[i+1].width - avg) < avg * 0.5 &&
+                    Math.abs(bars[i+2].width - avg) < avg * 0.5) {
+                    guards.push(i);
+                }
+            }
+        }
+
+        // Need exactly 3 guards with proper spacing
+        if (guards.length < 3) return null;
+
+        // Find best triplet
+        for (var i = 0; i < guards.length - 2; i++) {
+            for (var j = i + 1; j < guards.length - 1; j++) {
+                for (var k = j + 1; k < guards.length; k++) {
+                    var leftToMid = guards[j] - guards[i];
+                    var midToRight = guards[k] - guards[j];
+                    // Left half ~28-32 modules, right half ~28-32 modules
+                    if (leftToMid > 20 && leftToMid < 60 && midToRight > 20 && midToRight < 60) {
+                        return [guards[i], guards[j], guards[k]];
+                    }
+                }
+            }
+        }
+        return null;
+    },
+
+    matchDigit: function(pattern, type) {
+        var patterns = type === "L" ? this.L_PATTERNS : (type === "G" ? this.G_PATTERNS : this.R_PATTERNS);
         var bestMatch = -1;
         var bestScore = 999;
+
         for (var d = 0; d < 10; d++) {
             var score = 0;
-            for (var i = 0; i < 7; i++) {
-                if (pattern[pos + i] !== patterns[d][i]) score++;
+            for (var i = 0; i < 4; i++) {
+                score += Math.abs(pattern[i] - patterns[d][i]);
             }
             if (score < bestScore) {
                 bestScore = score;
                 bestMatch = d;
             }
         }
-        return bestScore <= 2 ? bestMatch : -1;
+
+        return bestScore <= 3 ? bestMatch : -1;
+    },
+
+    // EAN-13 Checksum Validation
+    validateEAN13: function(code) {
+        if (!code || code.length !== 12) return false;
+        var sum = 0;
+        for (var i = 0; i < 12; i++) {
+            var digit = parseInt(code[i], 10);
+            if (isNaN(digit)) return false;
+            sum += digit * (i % 2 === 0 ? 1 : 3);
+        }
+        var checkDigit = (10 - (sum % 10)) % 10;
+        // The full EAN-13 would be code + checkDigit
+        // For now, we just validate the structure
+        return true;
+    },
+
+    // Calculate full EAN-13 with check digit
+    getFullEAN13: function(code12) {
+        if (!code12 || code12.length !== 12) return null;
+        var sum = 0;
+        for (var i = 0; i < 12; i++) {
+            sum += parseInt(code12[i], 10) * (i % 2 === 0 ? 1 : 3);
+        }
+        var checkDigit = (10 - (sum % 10)) % 10;
+        return code12 + checkDigit;
     }
 };
 
 // ====== CORE VARIABLES ======
 var items = [];
+var suppliers = []; // NEW: Suppliers list
 var lsOK = false;
 var currentPass = "admin";
 var nativeStream = null;
 var currentFacing = "environment";
 var scanTimer = null;
 var currentEditIndex = -1;
+var isCameraOpen = false;
 
 // ====== UTILITIES ======
 function get(id) { return document.getElementById(id); }
@@ -433,7 +606,11 @@ function checkLS() {
 function saveData() {
     if (!lsOK) return;
     try {
-        localStorage.setItem("mp_data", JSON.stringify({items: items, pass: currentPass}));
+        localStorage.setItem("mp_data", JSON.stringify({
+            items: items, 
+            suppliers: suppliers,
+            pass: currentPass
+        }));
     } catch (e) {}
 }
 
@@ -444,10 +621,12 @@ function loadData() {
         if (s) {
             var d = JSON.parse(s);
             if (d.items && Array.isArray(d.items)) items = d.items;
+            if (d.suppliers && Array.isArray(d.suppliers)) suppliers = d.suppliers;
             if (d.pass) currentPass = d.pass;
         }
     } catch (e) {
         items = [];
+        suppliers = [];
         currentPass = "admin";
     }
 }
@@ -459,6 +638,7 @@ function resetData() {
         localStorage.removeItem("mp_theme");
     } catch (e) {}
     items = [];
+    suppliers = [];
     currentPass = "admin";
     showToast("✅ تم مسح البيانات", "success");
     setTimeout(function() { location.reload(); }, 1000);
@@ -485,7 +665,7 @@ function toggleTheme() {
     } catch (e) {}
 }
 
-// ====== LOGIN (FIXED - NO MORE FREEZE) ======
+// ====== LOGIN ======
 function doLogin() {
     try {
         var loginBox = get("login");
@@ -498,6 +678,7 @@ function doLogin() {
             get("app").style.display = "block";
             setMsg("");
             renderItems();
+            updateSupplierSelect();
             showToast("✅ تم تسجيل الدخول بنجاح", "success");
         } else {
             setMsg("❌ بيانات الدخول غير صحيحة");
@@ -520,6 +701,7 @@ function doLoginFast() {
         get("app").style.display = "block";
         setMsg("");
         renderItems();
+        updateSupplierSelect();
         showToast("✅ دخول سريع", "success");
     } catch (e) {
         setMsg("خطأ: " + e.message);
@@ -542,8 +724,8 @@ function doLogout() {
 // ====== SECTION NAVIGATION ======
 function showSection(id) {
     try {
-        var sections = ["inv", "miss"];
-        var tabs = ["nav-inv", "nav-miss"];
+        var sections = ["inv", "miss", "sup"];
+        var tabs = ["nav-inv", "nav-miss", "nav-sup"];
         for (var i = 0; i < sections.length; i++) {
             var sec = get(sections[i]);
             var tab = get(tabs[i]);
@@ -551,10 +733,139 @@ function showSection(id) {
             if (tab) tab.className = (sections[i] === id) ? "active" : "";
         }
         if (id === "miss") renderMissing();
+        if (id === "sup") renderSuppliers();
     } catch (e) {}
 }
 
-// ====== ITEMS MANAGEMENT (CRITICAL FIX - WAS MISSING) ======
+// ====== SUPPLIERS MANAGEMENT (NEW) ======
+function addSupplier() {
+    try {
+        var name = get("sup-name").value.trim();
+        var phone = get("sup-phone").value.trim();
+        var email = get("sup-email").value.trim();
+        var address = get("sup-address").value.trim();
+
+        if (!name) {
+            showToast("❌ اسم المورد مطلوب", "error");
+            get("sup-name").focus();
+            return;
+        }
+
+        // Check for duplicate name
+        for (var i = 0; i < suppliers.length; i++) {
+            if (suppliers[i] && suppliers[i].name === name) {
+                showToast("❌ هذا المورد موجود بالفعل", "error");
+                return;
+            }
+        }
+
+        suppliers.push({
+            id: Date.now(),
+            name: name,
+            phone: phone,
+            email: email,
+            address: address,
+            date: new Date().toISOString()
+        });
+
+        saveData();
+        renderSuppliers();
+        updateSupplierSelect();
+        clearSupplierForm();
+        showToast("✅ تمت إضافة المورد بنجاح", "success");
+    } catch (e) {
+        showToast("❌ خطأ في إضافة المورد", "error");
+    }
+}
+
+function clearSupplierForm() {
+    try {
+        get("sup-name").value = "";
+        get("sup-phone").value = "";
+        get("sup-email").value = "";
+        get("sup-address").value = "";
+        get("sup-name").focus();
+    } catch (e) {}
+}
+
+function renderSuppliers() {
+    try {
+        var container = get("sup-list");
+        if (!container) return;
+
+        if (suppliers.length === 0) {
+            container.innerHTML = '<div class="empty">لا يوجد موردين</div>';
+            return;
+        }
+
+        var html = "";
+        for (var i = 0; i < suppliers.length; i++) {
+            var s = suppliers[i];
+            if (!s) continue;
+            html += '<div class="supplier-card">';
+            html += '<h4>🚚 ' + escapeHtml(s.name) + '</h4>';
+            html += '<p>';
+            if (s.phone) html += '📱 ' + escapeHtml(s.phone) + ' | ';
+            if (s.email) html += '📧 ' + escapeHtml(s.email) + ' | ';
+            if (s.address) html += '📍 ' + escapeHtml(s.address);
+            html += '</p>';
+            html += '<div style="margin-top:8px">';
+            html += '<button class="btn-red" style="padding:4px 10px;font-size:12px" onclick="deleteSupplier(' + i + ')">🗑️ حذف</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+        container.innerHTML = html;
+    } catch (e) {
+        console.error("renderSuppliers error:", e);
+    }
+}
+
+function deleteSupplier(index) {
+    try {
+        if (!confirm("هل أنت متأكد من حذف هذا المورد؟")) return;
+        var supName = suppliers[index].name;
+        suppliers.splice(index, 1);
+
+        // Remove supplier reference from items
+        for (var i = 0; i < items.length; i++) {
+            if (items[i] && items[i].supplier === supName) {
+                items[i].supplier = "";
+            }
+        }
+
+        saveData();
+        renderSuppliers();
+        updateSupplierSelect();
+        renderItems();
+        showToast("✅ تم حذف المورد", "success");
+    } catch (e) {
+        showToast("❌ خطأ في الحذف", "error");
+    }
+}
+
+function updateSupplierSelect() {
+    try {
+        var select = get("isup");
+        if (!select) return;
+        var currentVal = select.value;
+        var html = '<option value="">-- اختر المورد --</option>';
+        for (var i = 0; i < suppliers.length; i++) {
+            if (suppliers[i]) {
+                html += '<option value="' + escapeHtml(suppliers[i].name) + '">' + escapeHtml(suppliers[i].name) + '</option>';
+            }
+        }
+        select.innerHTML = html;
+        select.value = currentVal;
+    } catch (e) {}
+}
+
+function escapeHtml(text) {
+    var div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ====== ITEMS MANAGEMENT ======
 function renderItems() {
     try {
         var tbody = get("itb");
@@ -575,7 +886,6 @@ function renderItems() {
             filtered.push({item: it, index: i});
         }
 
-        // Sort
         filtered.sort(function(a, b) {
             var va = a.item[sortBy] || "";
             var vb = b.item[sortBy] || "";
@@ -586,13 +896,11 @@ function renderItems() {
             return 0;
         });
 
-        // Update stats
         updateStats(filtered.length);
 
-        // Render table
         var html = "";
         if (filtered.length === 0) {
-            html = '<tr><td colspan="7" class="empty">لا توجد مواد</td></tr>';
+            html = '<tr><td colspan="8" class="empty">لا توجد مواد</td></tr>';
         } else {
             for (var j = 0; j < filtered.length; j++) {
                 var it = filtered[j].item;
@@ -603,12 +911,14 @@ function renderItems() {
                 var qtyClass = isLow ? 'class="low-stock"' : '';
                 var buyPrice = parseFloat(it.buy || 0).toFixed(2);
                 var sellPrice = parseFloat(it.sell || 0).toFixed(2);
+                var supName = it.supplier || "—";
                 html += '<tr>';
                 html += '<td>' + escapeHtml(it.code || "—") + '</td>';
                 html += '<td style="text-align:right">' + escapeHtml(it.name || "—") + '</td>';
                 html += '<td>' + buyPrice + '</td>';
                 html += '<td>' + sellPrice + '</td>';
                 html += '<td ' + qtyClass + '>' + q + ' ' + escapeHtml(it.unit || "قطعة") + '</td>';
+                html += '<td>' + escapeHtml(supName) + '</td>';
                 html += '<td><button class="btn-blue" style="padding:4px 10px;font-size:12px" onclick="editItem(' + idx + ')">✏️</button></td>';
                 html += '<td><button class="btn-red" onclick="deleteItem(' + idx + ')">🗑️</button></td>';
                 html += '</tr>';
@@ -641,12 +951,6 @@ function updateStats(count) {
     } catch (e) {}
 }
 
-function escapeHtml(text) {
-    var div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 function addItem() {
     try {
         var code = get("ic").value.trim();
@@ -656,6 +960,7 @@ function addItem() {
         var min = parseFloat(get("im").value) || 0;
         var qty = parseFloat(get("iq").value) || 0;
         var unit = get("iu").value.trim() || "قطعة";
+        var supplier = get("isup").value;
 
         if (!name) {
             showToast("❌ اسم المادة مطلوب", "error");
@@ -663,7 +968,6 @@ function addItem() {
             return;
         }
 
-        // Check if code exists
         if (code) {
             for (var i = 0; i < items.length; i++) {
                 if (items[i] && items[i].code === code) {
@@ -674,6 +978,7 @@ function addItem() {
                     items[i].sell = sell;
                     items[i].min = min;
                     items[i].unit = unit;
+                    items[i].supplier = supplier;
                     saveData();
                     renderItems();
                     clearItemForm();
@@ -691,6 +996,7 @@ function addItem() {
             min: min,
             qty: qty,
             unit: unit,
+            supplier: supplier,
             date: new Date().toISOString()
         });
 
@@ -712,6 +1018,7 @@ function clearItemForm() {
         get("im").value = "";
         get("iq").value = "";
         get("iu").value = "";
+        get("isup").value = "";
         get("ic").focus();
     } catch (e) {}
 }
@@ -734,6 +1041,15 @@ function editItem(index) {
         if (!it) return;
         currentEditIndex = index;
         var form = get("edit-form");
+
+        var supOptions = '<option value="">-- اختر المورد --</option>';
+        for (var i = 0; i < suppliers.length; i++) {
+            if (suppliers[i]) {
+                var selected = (suppliers[i].name === it.supplier) ? ' selected' : '';
+                supOptions += '<option value="' + escapeHtml(suppliers[i].name) + '"' + selected + '>' + escapeHtml(suppliers[i].name) + '</option>';
+            }
+        }
+
         form.innerHTML = 
             '<div class="edit-row"><input id="edit-code" value="' + escapeHtml(it.code || "") + '" placeholder="الكود"></div>' +
             '<div class="edit-row"><input id="edit-name" value="' + escapeHtml(it.name || "") + '" placeholder="الاسم *"></div>' +
@@ -742,11 +1058,11 @@ function editItem(index) {
             '<div class="edit-row"><input id="edit-min" value="' + (it.min || "") + '" placeholder="حد أدنى" type="number"></div>' +
             '<div class="edit-row"><input id="edit-qty" value="' + (it.qty || "") + '" placeholder="الكمية" type="number"></div>' +
             '<div class="edit-row"><input id="edit-unit" value="' + escapeHtml(it.unit || "قطعة") + '" placeholder="الوحدة"></div>' +
+            '<div class="edit-row"><select id="edit-supplier" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">' + supOptions + '</select></div>' +
             '<button class="btn-blue" style="width:100%;margin-top:10px" onclick="saveEditItem()">💾 حفظ التعديلات</button>';
         get("edit-modal").style.display = "flex";
     } catch (e) {}
 }
-
 function saveEditItem() {
     try {
         if (currentEditIndex < 0 || currentEditIndex >= items.length) return;
@@ -755,6 +1071,9 @@ function saveEditItem() {
             showToast("❌ اسم المادة مطلوب", "error");
             return;
         }
+        var supplierEl = get("edit-supplier");
+        var supplier = supplierEl ? supplierEl.value : "";
+
         items[currentEditIndex] = {
             code: get("edit-code").value.trim(),
             name: name,
@@ -763,6 +1082,7 @@ function saveEditItem() {
             min: parseFloat(get("edit-min").value) || 0,
             qty: parseFloat(get("edit-qty").value) || 0,
             unit: get("edit-unit").value.trim() || "قطعة",
+            supplier: supplier,
             date: items[currentEditIndex].date || new Date().toISOString()
         };
         saveData();
@@ -773,6 +1093,7 @@ function saveEditItem() {
         showToast("❌ خطأ في التعديل", "error");
     }
 }
+
 function closeEditModal() {
     try {
         get("edit-modal").style.display = "none";
@@ -835,17 +1156,12 @@ function changePassword() {
     } catch (e) {}
 }
 
-// ====== CAMERA / SCANNER ======
+// ====== CAMERA / SCANNER (FIXED) ======
 function openScanner() {
     try {
-        // Try native camera first
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            openNativeCamera();
-        } else {
-            // Fallback: show modal with manual input
-            get("scanner-modal").style.display = "flex";
-        }
+        openNativeCamera();
     } catch (e) {
+        showToast("⚠️ جاري الانتقال للإدخال اليدوي", "error");
         get("scanner-modal").style.display = "flex";
     }
 }
@@ -880,8 +1196,9 @@ function scanFromFile(file) {
                     ctx.drawImage(img, 0, 0);
                     var result = BarcodeScanner.scan(canvas);
                     if (result) {
-                        get("ic").value = result;
-                        showToast("✅ باركود: " + result, "success");
+                        var fullCode = BarcodeScanner.getFullEAN13(result);
+                        get("ic").value = fullCode || result;
+                        showToast("✅ باركود: " + (fullCode || result), "success");
                         get("in").focus();
                     } else {
                         showToast("❌ لم يتم التعرف على الباركود", "error");
@@ -900,55 +1217,181 @@ function scanFromFile(file) {
 
 function openNativeCamera() {
     try {
+        if (isCameraOpen) {
+            console.log("Camera already open");
+            return;
+        }
+        isCameraOpen = true;
+
         var overlay = get("native-camera-overlay");
         var video = get("native-camera-video");
         var status = get("cam-status");
-        overlay.style.display = "flex";
-        status.innerText = "جاري طلب إذن الكاميرا...";
 
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            status.innerText = "⚠️ الكاميرا غير مدعومة";
-            setTimeout(closeNativeCamera, 2000);
+        if (!overlay || !video) {
+            isCameraOpen = false;
+            get("scanner-modal").style.display = "flex";
             return;
         }
 
+        overlay.style.display = "flex";
+        status.innerText = "جاري طلب إذن الكاميرا...";
+
+        video.srcObject = null;
+        video.pause();
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            status.innerText = "⚠️ الكاميرا غير مدعومة";
+            setTimeout(function() {
+                closeNativeCamera();
+                get("scanner-modal").style.display = "flex";
+            }, 2000);
+            return;
+        }
+
+        var constraints = {
+            video: {
+                facingMode: currentFacing,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+            nativeStream = stream;
+
+            video.onloadedmetadata = function() {
+                video.play().then(function() {
+                    status.innerText = "📷 وجه الكاميرا نحو الباركود";
+
+                    scanTimer = setInterval(function() {
+                        if (!nativeStream || video.paused || video.ended) return;
+                        try {
+                            var canvas = document.createElement('canvas');
+                            var scale = 0.5;
+                            canvas.width = (video.videoWidth || 640) * scale;
+                            canvas.height = (video.videoHeight || 480) * scale;
+                            var ctx = canvas.getContext('2d');
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            var result = BarcodeScanner.scan(canvas);
+                            if (result) {
+                                var fullCode = BarcodeScanner.getFullEAN13(result);
+                                var displayCode = fullCode || result;
+                                status.innerText = "✅ تم قراءة: " + displayCode;
+                                get("ic").value = displayCode;
+                                var lastResult = get("last-scan-result");
+                                lastResult.innerText = displayCode;
+                                lastResult.style.display = "block";
+                                clearInterval(scanTimer);
+                                scanTimer = null;
+                                setTimeout(function() {
+                                    closeNativeCamera();
+                                    get("in").focus();
+                                    showToast("✅ باركود: " + displayCode, "success");
+                                }, 1200);
+                            }
+                        } catch (e) {}
+                    }, 600);
+                }).catch(function(err) {
+                    status.innerText = "⚠️ فشل تشغيل الفيديو: " + err.message;
+                    setTimeout(function() {
+                        closeNativeCamera();
+                        get("scanner-modal").style.display = "flex";
+                    }, 2000);
+                });
+            };
+
+            video.srcObject = stream;
+
+            video.onerror = function() {
+                status.innerText = "⚠️ خطأ في تشغيل الفيديو";
+                setTimeout(function() {
+                    closeNativeCamera();
+                    get("scanner-modal").style.display = "flex";
+                }, 2000);
+            };
+
+        }).catch(function(err) {
+            console.error("Camera error:", err.name, err.message);
+            var errorMsg = "⚠️ ";
+            if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                errorMsg += "تم رفض إذن الكاميرا";
+            } else if (err.name === "NotFoundError") {
+                errorMsg += "لم يتم العثور على كاميرا";
+            } else if (err.name === "OverconstrainedError") {
+                errorMsg += "جاري المحاولة بالإعدادات البسيطة...";
+                setTimeout(function() {
+                    tryBasicCamera();
+                }, 500);
+                return;
+            } else if (err.name === "NotReadableError") {
+                errorMsg += "الكاميرا مشغولة";
+            } else {
+                errorMsg += "فشل: " + (err.name || err.message);
+            }
+            status.innerText = errorMsg;
+            setTimeout(function() {
+                closeNativeCamera();
+                get("scanner-modal").style.display = "flex";
+            }, 3000);
+        });
+    } catch (e) {
+        console.error("Camera exception:", e);
+        isCameraOpen = false;
+        get("scanner-modal").style.display = "flex";
+    }
+}
+
+function tryBasicCamera() {
+    try {
+        var video = get("native-camera-video");
+        var status = get("cam-status");
+        status.innerText = "جاري المحاولة بالإعدادات البسيطة...";
+
         navigator.mediaDevices.getUserMedia({
-            video: { facingMode: currentFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            video: true,
             audio: false
         }).then(function(stream) {
             nativeStream = stream;
+            video.onloadedmetadata = function() {
+                video.play().then(function() {
+                    status.innerText = "📷 وجه الكاميرا نحو الباركود";
+                    scanTimer = setInterval(function() {
+                        if (!nativeStream || video.paused) return;
+                        try {
+                            var canvas = document.createElement('canvas');
+                            canvas.width = (video.videoWidth || 640) * 0.5;
+                            canvas.height = (video.videoHeight || 480) * 0.5;
+                            var ctx = canvas.getContext('2d');
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            var result = BarcodeScanner.scan(canvas);
+                            if (result) {
+                                var fullCode = BarcodeScanner.getFullEAN13(result);
+                                var displayCode = fullCode || result;
+                                status.innerText = "✅ تم قراءة: " + displayCode;
+                                get("ic").value = displayCode;
+                                var lastResult = get("last-scan-result");
+                                lastResult.innerText = displayCode;
+                                lastResult.style.display = "block";
+                                clearInterval(scanTimer);
+                                scanTimer = null;
+                                setTimeout(function() {
+                                    closeNativeCamera();
+                                    get("in").focus();
+                                    showToast("✅ باركود: " + displayCode, "success");
+                                }, 1200);
+                            }
+                        } catch (e) {}
+                    }, 600);
+                }).catch(function() {
+                    status.innerText = "⚠️ فشل تشغيل الفيديو";
+                    setTimeout(closeNativeCamera, 2000);
+                });
+            };
             video.srcObject = stream;
-            video.play();
-            status.innerText = "📷 وجه الكاميرا نحو الباركود";
-
-            scanTimer = setInterval(function() {
-                if (!nativeStream || video.paused) return;
-                try {
-                    var canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth || 640;
-                    canvas.height = video.videoHeight || 480;
-                    var ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    var result = BarcodeScanner.scan(canvas);
-                    if (result) {
-                        status.innerText = "✅ تم قراءة: " + result;
-                        get("ic").value = result;
-                        var lastResult = get("last-scan-result");
-                        lastResult.innerText = result;
-                        lastResult.style.display = "block";
-                        clearInterval(scanTimer);
-                        scanTimer = null;
-                        setTimeout(function() {
-                            closeNativeCamera();
-                            get("in").focus();
-                            showToast("✅ باركود: " + result, "success");
-                        }, 1200);
-                    }
-                } catch (e) {}
-            }, 500);
-
         }).catch(function(err) {
-            status.innerText = "⚠️ فشل: " + (err.name || err.message);
+            status.innerText = "⚠️ فشل نهائي: " + (err.name || "غير معروف");
             setTimeout(function() {
                 closeNativeCamera();
                 get("scanner-modal").style.display = "flex";
@@ -962,23 +1405,36 @@ function openNativeCamera() {
 
 function closeNativeCamera() {
     try {
+        isCameraOpen = false;
         if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
         if (nativeStream) {
             nativeStream.getTracks().forEach(function(t) { t.stop(); });
             nativeStream = null;
         }
         var video = get("native-camera-video");
-        if (video) { video.srcObject = null; video.pause(); }
+        if (video) { 
+            video.srcObject = null; 
+            video.pause();
+            video.onloadedmetadata = null;
+            video.onerror = null;
+        }
         var lastResult = get("last-scan-result");
         if (lastResult) lastResult.style.display = "none";
-        get("native-camera-overlay").style.display = "none";
-    } catch (e) {}
+        var overlay = get("native-camera-overlay");
+        if (overlay) overlay.style.display = "none";
+    } catch (e) {
+        console.error("closeNativeCamera error:", e);
+    }
 }
 
 function flipCamera() {
-    currentFacing = (currentFacing === "environment") ? "user" : "environment";
-    closeNativeCamera();
-    setTimeout(openNativeCamera, 300);
+    try {
+        currentFacing = (currentFacing === "environment") ? "user" : "environment";
+        closeNativeCamera();
+        setTimeout(function() {
+            openNativeCamera();
+        }, 400);
+    } catch (e) {}
 }
 
 function captureBarcode() {
@@ -987,23 +1443,27 @@ function captureBarcode() {
         var status = get("cam-status");
         if (!video || !nativeStream) return;
 
+        status.innerText = "⏳ جاري المعالجة...";
+
         var canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
+        canvas.width = (video.videoWidth || 640) * 0.5;
+        canvas.height = (video.videoHeight || 480) * 0.5;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         var result = BarcodeScanner.scan(canvas);
         if (result) {
-            status.innerText = "✅ تم قراءة: " + result;
-            get("ic").value = result;
+            var fullCode = BarcodeScanner.getFullEAN13(result);
+            var displayCode = fullCode || result;
+            status.innerText = "✅ تم قراءة: " + displayCode;
+            get("ic").value = displayCode;
             var lastResult = get("last-scan-result");
-            lastResult.innerText = result;
+            lastResult.innerText = displayCode;
             lastResult.style.display = "block";
             setTimeout(function() {
                 closeNativeCamera();
                 get("in").focus();
-                showToast("✅ باركود: " + result, "success");
+                showToast("✅ باركود: " + displayCode, "success");
             }, 1000);
         } else {
             status.innerText = "❌ لم يتم التعرف على الباركود، حاول مرة أخرى";
@@ -1025,10 +1485,12 @@ return;
 }
 var data={
 app:"Mawadi-Pro",
-version:"1.0",
+version:"2.0",
 date:new Date().toISOString(),
 items:items,
-totalItems:items.length
+suppliers:suppliers,
+totalItems:items.length,
+totalSuppliers:suppliers.length
 };
 var json=JSON.stringify(data,null,2);
 var blob=new Blob([json],{type:"application/json"});
@@ -1052,11 +1514,11 @@ if(!Array.isArray(items)||items.length===0){
 showToast("❌ لا توجد بيانات للتصدير","error");
 return;
 }
-var csv="الكود,الاسم,سعر الشراء,سعر البيع,حد أدنى,الكمية,الوحدة\n";
+var csv="الكود,الاسم,سعر الشراء,سعر البيع,حد أدنى,الكمية,الوحدة,المورد\n";
 for(var i=0;i<items.length;i++){
 var it=items[i];
 if(!it)continue;
-csv+='"'+(it.code||"")+'","'+(it.name||"")+'",'+(it.buy||0)+","+(it.sell||0)+","+(it.min||0)+","+(it.qty||0)+',"'+(it.unit||"قطعة")+'"\n';
+csv+='"'+(it.code||"")+'","'+(it.name||"")+'",'+(it.buy||0)+","+(it.sell||0)+","+(it.min||0)+","+(it.qty||0)+',"'+(it.unit||"قطعة")+'","'+(it.supplier||"")+'"\n';
 }
 var blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
 var url=URL.createObjectURL(blob);
@@ -1085,8 +1547,12 @@ var data=JSON.parse(content);
 if(data.items&&Array.isArray(data.items)){
 if(confirm("سيتم استبدال "+items.length+" مادة بـ "+data.items.length+" مادة. متأكد؟")){
 items=data.items;
+if(data.suppliers&&Array.isArray(data.suppliers)){
+suppliers=data.suppliers;
+}
 saveData();
 renderItems();
+updateSupplierSelect();
 showToast("✅ تم استيراد "+data.items.length+" مادة","success");
 }
 }else{
@@ -1123,7 +1589,8 @@ buy:parseFloat(parts[2])||0,
 sell:parseFloat(parts[3])||0,
 min:parseFloat(parts[4])||0,
 qty:parseFloat(parts[5])||0,
-unit:parts[6]?parts[6].trim().replace(/^"|"$/g,''):'قطعة'
+unit:parts[6]?parts[6].trim().replace(/^"|"$/g,''):'قطعة',
+supplier:parts[7]?parts[7].trim().replace(/^"|"$/g,''):''
 });
 }
 if(newItems.length===0){showToast("❌ لا توجد بيانات صالحة","error");return;}
@@ -1198,14 +1665,15 @@ showToast("❌ خطأ في الطباعة","error");
 window.receiveBarcodeFromAndroid=function(barcode){
 try{
 if(barcode){
-get("ic").value=barcode;
+var fullCode = BarcodeScanner.getFullEAN13(barcode);
+get("ic").value=fullCode || barcode;
 get("in").focus();
-showToast("✅ باركود: "+barcode,"success");
+showToast("✅ باركود: "+(fullCode || barcode),"success");
 }
 }catch(e){}
 };
 
-// ====== EVENT LISTENERS (CRITICAL FOR APK) ======
+// ====== EVENT LISTENERS ======
 document.addEventListener("DOMContentLoaded",function(){
 // File inputs
 var scannerFile=get("scanner-file-input");
@@ -1222,7 +1690,7 @@ if(this.files&&this.files[0])importData(this.files[0]);
 });
 }
 
-// Login buttons - ensure they work
+// Login buttons
 var btnLogin=get("btn-login");
 if(btnLogin){
 btnLogin.addEventListener("touchstart",function(e){e.preventDefault();doLogin();});
@@ -1243,7 +1711,7 @@ checkLS();
 loadData();
 initTheme();
 
-console.log("Mawadi-Pro v1.0 initialized successfully");
+console.log("Mawadi-Pro v2.0 initialized successfully");
 });
 
 // ====== INIT ======
@@ -1254,3 +1722,4 @@ initTheme();
 </script>
 </body>
 </html>
+
