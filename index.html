@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="description" content="Mawadi Pro - نظام إدارة المخزون الذكي">
 <title>Mawadi Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -31,6 +36,49 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 #scanVideo{width:100%;height:100%;object-fit:cover;border-radius:0}
 .slideUp{animation:slideUp 0.3s ease}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* ===== DARK MODE ===== */
+body.dark{background:#0b1220;color:#e2e8f0}
+body.dark .glass{background:rgba(15,23,42,0.92);border-color:rgba(51,65,85,0.6)}
+body.dark .bg-white{background-color:#1e293b!important}
+body.dark .bg-slate-50{background-color:#0f172a!important}
+body.dark .bg-slate-100{background-color:#334155!important}
+body.dark .bg-slate-200{background-color:#475569!important}
+body.dark .text-slate-900{color:#f1f5f9!important}
+body.dark .text-slate-800{color:#e2e8f0!important}
+body.dark .text-slate-700{color:#cbd5e1!important}
+body.dark .text-slate-600{color:#94a3b8!important}
+body.dark .text-slate-500{color:#94a3b8!important}
+body.dark .text-slate-400{color:#64748b!important}
+body.dark .border-slate-100{border-color:#334155!important}
+body.dark .border-slate-200{border-color:#475569!important}
+body.dark .border-slate-300{border-color:#64748b!important}
+body.dark .hover\:bg-slate-50:hover{background-color:#334155!important}
+body.dark .hover\:bg-blue-50:hover{background-color:rgba(37,99,235,0.15)!important}
+body.dark .hover\:bg-green-50:hover{background-color:rgba(34,197,94,0.15)!important}
+body.dark .hover\:bg-red-50:hover{background-color:rgba(239,68,68,0.15)!important}
+body.dark .bg-blue-50{background-color:rgba(37,99,235,0.15)!important}
+body.dark .bg-green-50{background-color:rgba(34,197,94,0.15)!important}
+body.dark .bg-red-50{background-color:rgba(239,68,68,0.15)!important}
+body.dark .bg-amber-50{background-color:rgba(245,158,11,0.15)!important}
+body.dark .bg-purple-50{background-color:rgba(168,85,247,0.15)!important}
+body.dark .bg-blue-100{background-color:rgba(37,99,235,0.25)!important}
+body.dark .bg-green-100{background-color:rgba(34,197,94,0.25)!important}
+body.dark .bg-red-100{background-color:rgba(239,68,68,0.25)!important}
+body.dark .bg-amber-100{background-color:rgba(245,158,11,0.25)!important}
+body.dark .bg-purple-100{background-color:rgba(168,85,247,0.25)!important}
+body.dark .nav-btn.active{color:#93c5fd;background:rgba(37,99,235,0.2)}
+body.dark input,body.dark select,body.dark textarea{background-color:#0f172a!important;color:#e2e8f0!important;border-color:#475569!important}
+body.dark input::placeholder,body.dark textarea::placeholder{color:#64748b}
+body.dark .shadow-sm,body.dark .shadow-lg,body.dark .shadow-xl,body.dark .shadow-2xl{box-shadow:0 4px 20px rgba(0,0,0,0.35)!important}
+body.dark #userMenu{background:#1e293b;border-color:#334155}
+body.dark .border-blue-200{border-color:rgba(59,130,246,0.35)!important}
+body.dark .border-green-200{border-color:rgba(34,197,94,0.35)!important}
+body.dark .border-red-200{border-color:rgba(239,68,68,0.35)!important}
+body.dark .border-amber-200{border-color:rgba(245,158,11,0.35)!important}
+body.dark .border-purple-200{border-color:rgba(168,85,247,0.35)!important}
+body.dark .bg-white\/80{background-color:rgba(30,41,59,0.9)!important}
+body.dark #loginPage .glass,body.dark #regPage .glass{background:rgba(15,23,42,0.88)}
 </style>
 </head>
 <body class="text-slate-800">
@@ -45,7 +93,7 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 </div>
 <h1 class="text-xl font-bold text-slate-900">Mawadi Pro</h1>
 <p class="text-slate-500 text-xs mt-1">نظام إدارة المخزون الذكي</p>
-<p id="storageWarn" class="text-[9px] text-amber-600 mt-1 hidden">⚠️ وضع الذاكرة المؤقتة</p>
+<p id="storageWarn" class="text-[9px] text-amber-600 mt-1 hidden">⚠️ وضع الذاكرة المؤقتة — البيانات لن تُحفظ بعد إغلاق الصفحة</p>
 </div>
 
 <div class="space-y-4">
@@ -73,13 +121,7 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <button onclick="showReg()" class="w-full py-2 text-blue-600 text-xs font-semibold">ليس لديك حساب؟ إنشاء حساب</button>
 </div>
 
-<div class="mt-5 pt-4 border-t border-slate-200 text-center">
-<p class="text-[10px] text-slate-400 mb-2">الدخول السريع:</p>
-<div class="flex gap-2 justify-center">
-<button onclick="quickLogin('admin','admin123')" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold">مدير</button>
-<button onclick="quickLogin('user','user123')" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold">مستخدم</button>
-</div>
-</div>
+
 </div>
 </div>
 </div>
@@ -117,16 +159,19 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <div><h1 class="font-bold text-slate-900 text-xs">Mawadi Pro</h1><p class="text-[10px] text-slate-500" id="welcomeName">مرحباً</p></div>
 </div>
 <div class="flex items-center gap-1.5">
-<button onclick="toggleMenu()" class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center"><i class="fas fa-user text-blue-700 text-xs"></i></button>
+<button type="button" onclick="toggleDark()" id="darkToggleBtn" class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center" title="الوضع الليلي" aria-label="تبديل الوضع الليلي"><i id="darkToggleIcon" class="fas fa-moon text-slate-700 text-xs"></i></button>
+<button type="button" onclick="toggleMenu()" class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center" aria-label="قائمة المستخدم"><i class="fas fa-user text-blue-700 text-xs"></i></button>
 </div>
 </div>
 <div id="userMenu" class="hidden absolute left-3 top-12 w-52 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
 <div class="p-3 border-b border-slate-100"><p class="font-bold text-slate-900 text-xs" id="menuName">المستخدم</p><p class="text-[10px] text-slate-500" id="menuRole">مدير</p></div>
 <div class="p-1.5">
+<button onclick="goPage('shortage');toggleMenu()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-slate-50 text-xs text-slate-700 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-amber-500 w-3"></i> المواد الناقصة</button>
+<button onclick="goPage('categories');toggleMenu()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-slate-50 text-xs text-slate-700 flex items-center gap-2"><i class="fas fa-tags text-slate-400 w-3"></i> الفئات</button>
 <button onclick="goPage('settings');toggleMenu()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-slate-50 text-xs text-slate-700 flex items-center gap-2"><i class="fas fa-cog text-slate-400 w-3"></i> الإعدادات</button>
 <button onclick="goPage('about');toggleMenu()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-slate-50 text-xs text-slate-700 flex items-center gap-2"><i class="fas fa-info-circle text-slate-400 w-3"></i> حول</button>
 <div class="border-t border-slate-100 my-1"></div>
-<button onclick="doLogout()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-red-50 text-xs text-red-600 flex items-center gap-2"><i class="fas fa-sign-out-alt w-3"></i> خروج</button>
+<button onclick="confirmLogout()" class="w-full text-right px-3 py-2 rounded-xl hover:bg-red-50 text-xs text-red-600 flex items-center gap-2"><i class="fas fa-sign-out-alt w-3"></i> خروج</button>
 </div>
 </div>
 </header>
@@ -139,9 +184,9 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <div class="flex items-center justify-between mb-1.5"><div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><i class="fas fa-box text-blue-600 text-xs"></i></div></div>
 <p class="text-xl font-bold text-slate-900" id="stTotal">0</p><p class="text-[10px] text-slate-500">المنتجات</p>
 </div>
-<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100">
+<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 cursor-pointer card-hover" onclick="goPage('shortage')">
 <div class="flex items-center justify-between mb-1.5"><div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><i class="fas fa-exclamation-triangle text-amber-600 text-xs"></i></div></div>
-<p class="text-xl font-bold text-slate-900" id="stLow">0</p><p class="text-[10px] text-slate-500">منخفض</p>
+<p class="text-xl font-bold text-slate-900" id="stLow">0</p><p class="text-[10px] text-slate-500">نواقص ←</p>
 </div>
 <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100">
 <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center mb-1.5"><i class="fas fa-dollar-sign text-green-600 text-xs"></i></div>
@@ -159,6 +204,9 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <button onclick="goPage('products')" class="btn-press p-2.5 rounded-xl bg-green-50 border border-green-200 text-center"><i class="fas fa-list text-green-600 text-sm mb-1 block"></i><span class="text-[9px] font-bold text-green-700">المنتجات</span></button>
 <button onclick="goPage('categories')" class="btn-press p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-center"><i class="fas fa-tags text-purple-600 text-sm mb-1 block"></i><span class="text-[9px] font-bold text-purple-700">الفئات</span></button>
 <button onclick="goPage('reports')" class="btn-press p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center"><i class="fas fa-chart-pie text-amber-600 text-sm mb-1 block"></i><span class="text-[9px] font-bold text-amber-700">تقارير</span></button>
+</div>
+<div class="grid grid-cols-1 gap-2 mt-2">
+<button onclick="goPage('shortage')" class="btn-press p-2.5 rounded-xl bg-red-50 border border-red-200 text-center flex items-center justify-center gap-2"><i class="fas fa-exclamation-circle text-red-600 text-sm"></i><span class="text-[10px] font-bold text-red-700">المواد الناقصة — مشاركة عبر واتساب</span></button>
 </div>
 </div>
 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
@@ -178,7 +226,7 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 </div>
 <div class="flex gap-2">
 <select id="filterCat" onchange="renderProds()" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"><option value="">كل الفئات</option></select>
-<select id="filterStock" onchange="renderProds()" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"><option value="">كل المخزون</option><option value="low">منخفض</option><option value="out">نفذ</option></select>
+<select id="filterStock" onchange="renderProds()" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"><option value="">كل المخزون</option><option value="low">منخفض</option><option value="out">نفذ</option><option value="ok">متوفر</option></select>
 </div>
 </div>
 <div id="prodGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
@@ -197,9 +245,51 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <div id="supList" class="space-y-2.5"></div>
 </div>
 
+
+<!-- SHORTAGE / المواد الناقصة -->
+<div id="pg-shortage" class="page">
+<div class="flex items-center justify-between mb-3 gap-2">
+<h2 class="text-lg font-bold text-slate-900 shrink-0">المواد الناقصة</h2>
+<div class="flex gap-1.5 flex-wrap justify-end">
+<button type="button" onclick="exportShortagePDF()" class="btn-press px-3 py-2 bg-red-600 text-white rounded-xl font-bold text-xs shadow-lg" title="معاينة/طباعة PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+<button type="button" onclick="shareShortagePDF()" class="btn-press px-3 py-2 bg-green-600 text-white rounded-xl font-bold text-xs shadow-lg" title="مشاركة PDF"><i class="fab fa-whatsapp"></i> مشاركة PDF</button>
+<button type="button" onclick="shareAllShortagesWA()" class="btn-press px-3 py-2 bg-emerald-500 text-white rounded-xl font-bold text-xs shadow-lg"><i class="fab fa-whatsapp"></i> نص</button>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 mb-3">
+<div class="flex gap-2 mb-2">
+<select id="filterShortage" onchange="renderShortage()" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs">
+<option value="all">الكل (منخفض + نفذ)</option>
+<option value="out">نفذ فقط</option>
+<option value="low">منخفض فقط</option>
+</select>
+<select id="filterShortageSup" onchange="renderShortage()" class="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs">
+<option value="">كل الموردين</option>
+</select>
+</div>
+<p class="text-[10px] text-slate-500" id="shortageSummary">0 منتج ناقص</p>
+</div>
+<div id="shortageList" class="space-y-3"></div>
+<div id="shortageEmpty" class="hidden text-center py-12">
+<div class="w-16 h-16 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center"><i class="fas fa-check-circle text-2xl text-green-500"></i></div>
+<p class="text-slate-500 text-xs font-bold">لا توجد مواد ناقصة 🎉</p>
+<p class="text-slate-400 text-[10px] mt-1">جميع المنتجات فوق الحد الأدنى</p>
+</div>
+</div>
+
 <!-- REPORTS -->
 <div id="pg-reports" class="page">
 <h2 class="text-lg font-bold text-slate-900 mb-3">التقارير</h2>
+<div class="grid grid-cols-2 gap-2.5 mb-3">
+<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center">
+<p class="text-[10px] text-slate-500 mb-1">قيمة البيع (د.ت)</p>
+<p class="text-lg font-bold text-green-700" id="repSellVal">0</p>
+</div>
+<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center">
+<p class="text-[10px] text-slate-500 mb-1">تكلفة الشراء (د.ت)</p>
+<p class="text-lg font-bold text-blue-700" id="repCostVal">0</p>
+</div>
+</div>
 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-3">
 <h3 class="font-bold text-slate-900 mb-3 text-xs">حسب الفئة</h3>
 <div id="repCats" class="space-y-2"></div>
@@ -218,10 +308,44 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <!-- SETTINGS -->
 <div id="pg-settings" class="page">
 <h2 class="text-lg font-bold text-slate-900 mb-3">الإعدادات</h2>
+
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-3">
+<div class="p-3 border-b border-slate-100"><h3 class="font-bold text-slate-900 text-xs">المظهر</h3></div>
+<div class="p-3 flex items-center justify-between gap-3">
+<div>
+<p class="text-xs font-bold text-slate-800">الوضع الليلي</p>
+<p class="text-[10px] text-slate-500">تبديل بين الوضع الفاتح والداكن</p>
+</div>
+<button type="button" onclick="toggleDark()" id="darkSwitch" class="relative w-14 h-8 rounded-full bg-slate-200 transition-colors" aria-label="الوضع الليلي">
+<span id="darkSwitchKnob" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-white shadow transition-transform"></span>
+</button>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-3">
+<div class="p-3 border-b border-slate-100"><h3 class="font-bold text-slate-900 text-xs">تغيير كلمة المرور</h3></div>
+<div class="p-3 space-y-2.5">
+<div>
+<label class="block text-[10px] font-bold text-slate-600 mb-1">كلمة المرور الحالية</label>
+<input type="password" id="pwdCurrent" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs" autocomplete="current-password">
+</div>
+<div>
+<label class="block text-[10px] font-bold text-slate-600 mb-1">كلمة المرور الجديدة</label>
+<input type="password" id="pwdNew" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs" autocomplete="new-password">
+</div>
+<div>
+<label class="block text-[10px] font-bold text-slate-600 mb-1">تأكيد كلمة المرور الجديدة</label>
+<input type="password" id="pwdConfirm" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs" autocomplete="new-password">
+</div>
+<button type="button" onclick="changePassword()" class="btn-press w-full py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-lg"><i class="fas fa-key"></i> حفظ كلمة المرور</button>
+</div>
+</div>
+
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-3">
 <div class="p-3 border-b border-slate-100"><h3 class="font-bold text-slate-900 text-xs">إدارة البيانات</h3></div>
 <div class="p-3 space-y-2">
 <button onclick="exportJSON()" class="btn-press w-full p-3 rounded-xl border-2 border-slate-200 hover:bg-blue-50 flex items-center gap-2 text-right"><i class="fas fa-file-export text-blue-600"></i><span class="text-xs font-bold">تصدير JSON</span></button>
+<button onclick="exportCSV()" class="btn-press w-full p-3 rounded-xl border-2 border-slate-200 hover:bg-indigo-50 flex items-center gap-2 text-right"><i class="fas fa-file-csv text-indigo-600"></i><span class="text-xs font-bold">تصدير CSV (المنتجات)</span></button>
 <button onclick="document.getElementById('impFile').click()" class="btn-press w-full p-3 rounded-xl border-2 border-slate-200 hover:bg-green-50 flex items-center gap-2 text-right"><i class="fas fa-file-import text-green-600"></i><span class="text-xs font-bold">استيراد JSON</span></button>
 <input type="file" id="impFile" accept=".json" class="hidden" onchange="importJSON(this)">
 </div>
@@ -237,7 +361,7 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <div class="text-center py-8">
 <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-xl"><i class="fas fa-boxes-stacked text-3xl text-white"></i></div>
 <h2 class="text-xl font-bold text-slate-900">Mawadi Pro</h2>
-<p class="text-slate-500 text-xs mb-5">v2.1.0 - أغسطس 2026</p>
+<p class="text-slate-500 text-xs mb-5">v2.5.1 - أغسطس 2026</p>
 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 max-w-sm mx-auto text-right space-y-2">
 <p class="text-xs text-slate-600 leading-relaxed">
 <i class="fas fa-barcode text-blue-500 ml-1"></i>
@@ -247,6 +371,10 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <i class="fas fa-bolt text-yellow-500 ml-1"></i>
 <strong>فلاش الكاميرا:</strong> دعم تشغيل الكشاف أثناء المسح في الإضاءة المنخفضة.
 </p>
+<p class="text-xs text-slate-600 leading-relaxed">
+<i class="fas fa-exclamation-triangle text-red-500 ml-1"></i>
+<strong>المواد الناقصة:</strong> قائمة النواقص مجمّعة حسب المورد مع مشاركة واتساب.
+</p>
 </div>
 </div>
 </div>
@@ -254,12 +382,12 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 
 <!-- Bottom Nav -->
 <nav class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-slate-200/60">
-<div class="max-w-lg mx-auto flex items-center justify-around py-1.5">
-<button onclick="goPage('dashboard')" data-pg="dashboard" class="nav-btn active flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition"><i class="fas fa-home text-sm"></i><span class="text-[9px] font-bold">الرئيسية</span></button>
-<button onclick="goPage('products')" data-pg="products" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-box text-sm"></i><span class="text-[9px] font-bold">المنتجات</span></button>
-<button onclick="goPage('categories')" data-pg="categories" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-tags text-sm"></i><span class="text-[9px] font-bold">الفئات</span></button>
-<button onclick="goPage('suppliers')" data-pg="suppliers" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-truck text-sm"></i><span class="text-[9px] font-bold">الموردين</span></button>
-<button onclick="goPage('reports')" data-pg="reports" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-chart-bar text-sm"></i><span class="text-[9px] font-bold">تقارير</span></button>
+<div class="max-w-lg mx-auto flex items-center justify-around py-1.5 px-1">
+<button onclick="goPage('dashboard')" data-pg="dashboard" class="nav-btn active flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition"><i class="fas fa-home text-sm"></i><span class="text-[8px] font-bold">الرئيسية</span></button>
+<button onclick="goPage('products')" data-pg="products" class="nav-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-box text-sm"></i><span class="text-[8px] font-bold">المنتجات</span></button>
+<button onclick="goPage('shortage')" data-pg="shortage" class="nav-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-exclamation-triangle text-sm"></i><span class="text-[8px] font-bold">نواقص</span></button>
+<button onclick="goPage('suppliers')" data-pg="suppliers" class="nav-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-truck text-sm"></i><span class="text-[8px] font-bold">الموردين</span></button>
+<button onclick="goPage('reports')" data-pg="reports" class="nav-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition"><i class="fas fa-chart-bar text-sm"></i><span class="text-[8px] font-bold">تقارير</span></button>
 </div>
 </nav>
 </div>
@@ -285,11 +413,16 @@ body{margin:0;background:#f1f5f9;overflow-x:hidden}
 <div><label class="block text-[10px] font-bold mb-1">الفئة *</label><select id="mProdCat" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"><option value="">اختر</option></select></div>
 </div>
 <div class="grid grid-cols-2 gap-2">
-<div><label class="block text-[10px] font-bold mb-1">سعر الشراء</label><input type="number" id="mProdCost" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
-<div><label class="block text-[10px] font-bold mb-1">سعر البيع *</label><input type="number" id="mProdPrice" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
+<div><label class="block text-[10px] font-bold mb-1">سعر الشراء (د.ت)</label><input type="number" id="mProdCost" min="0" step="0.001" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
+<div><label class="block text-[10px] font-bold mb-1">سعر البيع (د.ت) *</label><input type="number" id="mProdPrice" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
 </div>
 <div class="grid grid-cols-2 gap-2">
-<div><label class="block text-[10px] font-bold mb-1">الكمية *</label><input type="number" id="mProdQty" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
+<div><label class="block text-[10px] font-bold mb-1">الكمية *</label>
+<div class="flex items-center gap-1">
+<button type="button" onclick="adjQty(-1)" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold text-sm">−</button>
+<input type="number" id="mProdQty" min="0" class="flex-1 px-2 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs text-center" value="0">
+<button type="button" onclick="adjQty(1)" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold text-sm">+</button>
+</div></div>
 <div><label class="block text-[10px] font-bold mb-1">الحد الأدنى</label><input type="number" id="mProdMin" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"></div>
 </div>
 <div><label class="block text-[10px] font-bold mb-1">المورد</label><select id="mProdSup" class="w-full px-3 py-2.5 rounded-xl border-2 border-slate-200 outline-none bg-slate-50 text-xs"><option value="">بدون</option></select></div>
@@ -422,7 +555,8 @@ var DB = {
     prods: 'mp_prods',
     cats: 'mp_cats',
     sups: 'mp_sups',
-    cur: 'mp_cur'
+    cur: 'mp_cur',
+    theme: 'mp_theme'
 };
 
 var COLORS = {
@@ -446,7 +580,17 @@ function setA(k, v) { LSET(k, JSON.stringify(v)); }
 function getO(k) { try { var r = LGET(k); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
 function setO(k, v) { LSET(k, JSON.stringify(v)); }
 function esc(t) { if (!t) return ''; var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-function fmt(n) { if (n >= 1000000) return (n/1000000).toFixed(1) + 'M'; if (n >= 1000) return (n/1000).toFixed(1) + 'K'; return n.toFixed(2); }
+var CURRENCY = 'د.ت';
+function fmt(n) {
+    n = Number(n) || 0;
+    if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1) + 'M';
+    if (Math.abs(n) >= 10000) return (n/1000).toFixed(1) + 'K';
+    // الدينار التونسي: 3 خانات (مليم)
+    return n.toFixed(3);
+}
+function money(n) {
+    return fmt(n) + ' ' + CURRENCY;
+}
 function toast(msg, type) {
     var box = $('toastBox');
     var div = document.createElement('div');
@@ -506,8 +650,13 @@ function startCamera() {
             scanTrack = stream.getVideoTracks()[0];
             var cap = scanTrack.getCapabilities ? scanTrack.getCapabilities() : {};
             if (cap && cap.torch) { $('torchBtn').classList.remove('hidden'); }
-            $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
             initDetector();
+            if (scanDetector) {
+                $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
+            } else {
+                $('scanStatus').textContent = 'الماسح غير مدعوم — استخدم الإدخال اليدوي';
+                toast('BarcodeDetector غير مدعوم. استخدم Chrome/Edge أو أدخل يدوياً', 'warning');
+            }
             scanLoop();
         };
     }).catch(function(err) {
@@ -518,10 +667,13 @@ function startCamera() {
 }
 
 function initDetector() {
+    scanDetector = null;
     if ('BarcodeDetector' in window) {
-        scanDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'code_128', 'qr_code', 'data_matrix'] });
-    } else {
-        scanDetector = null;
+        try {
+            scanDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'code_128', 'qr_code', 'data_matrix', 'itf', 'codabar'] });
+        } catch (e) {
+            try { scanDetector = new BarcodeDetector(); } catch (e2) { scanDetector = null; }
+        }
     }
 }
 
@@ -534,14 +686,19 @@ function scanLoop() {
     scanRaf = requestAnimationFrame(scanLoop);
 }
 
+var lastScanCode = '';
+var lastScanTime = 0;
 function detectBarcode(vid) {
     if (!scanDetector) return;
     scanDetector.detect(vid).then(function(codes) {
         if (codes && codes.length > 0) {
-            var raw = codes[0].rawValue;
-            if (raw) {
-                onBarcodeFound(raw);
-            }
+            var raw = (codes[0].rawValue || '').trim();
+            if (!raw) return;
+            var now = Date.now();
+            if (raw === lastScanCode && (now - lastScanTime) < 1500) return;
+            lastScanCode = raw;
+            lastScanTime = now;
+            onBarcodeFound(raw);
         }
     }).catch(function(e) {});
 }
@@ -609,8 +766,123 @@ function toggleTorch() {
     }).catch(function() {});
 }
 
+
+// ===== THEME (DARK MODE) =====
+function isDark() {
+    return document.body.classList.contains('dark');
+}
+function applyTheme(dark) {
+    if (dark) {
+        document.body.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#0b1220');
+    } else {
+        document.body.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#1e3a8a');
+    }
+    // icons
+    var icon = $('darkToggleIcon');
+    if (icon) {
+        icon.className = dark ? 'fas fa-sun text-amber-400 text-xs' : 'fas fa-moon text-slate-700 text-xs';
+    }
+    var btn = $('darkToggleBtn');
+    if (btn) {
+        btn.className = dark
+            ? 'w-9 h-9 rounded-xl bg-slate-700 flex items-center justify-center'
+            : 'w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center';
+    }
+    // settings switch
+    var sw = $('darkSwitch');
+    var knob = $('darkSwitchKnob');
+    if (sw && knob) {
+        if (dark) {
+            sw.classList.remove('bg-slate-200');
+            sw.classList.add('bg-blue-600');
+            knob.style.transform = 'translateX(-24px)';
+        } else {
+            sw.classList.add('bg-slate-200');
+            sw.classList.remove('bg-blue-600');
+            knob.style.transform = 'translateX(0)';
+        }
+    }
+    LSET(DB.theme, dark ? 'dark' : 'light');
+}
+function toggleDark() {
+    applyTheme(!isDark());
+    toast(isDark() ? 'تم تفعيل الوضع الليلي' : 'تم تفعيل الوضع الفاتح', 'info');
+}
+function loadTheme() {
+    var t = LGET(DB.theme);
+    if (!t) {
+        // system preference
+        try {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+        } catch (e) {}
+    }
+    applyTheme(t === 'dark');
+}
+
+// ===== CHANGE PASSWORD =====
+function changePassword() {
+    if (!gUser) {
+        toast('يجب تسجيل الدخول أولاً', 'error');
+        return;
+    }
+    var cur = ($('pwdCurrent') && $('pwdCurrent').value) || '';
+    var nw = ($('pwdNew') && $('pwdNew').value) || '';
+    var conf = ($('pwdConfirm') && $('pwdConfirm').value) || '';
+    if (!cur || !nw || !conf) {
+        toast('املأ جميع الحقول', 'error');
+        return;
+    }
+    if (nw.length < 4) {
+        toast('كلمة المرور الجديدة قصيرة (4 أحرف على الأقل)', 'error');
+        return;
+    }
+    if (nw !== conf) {
+        toast('كلمتا المرور الجديدتان غير متطابقتين', 'error');
+        return;
+    }
+    var users = getA(DB.users);
+    var idx = -1;
+    for (var i = 0; i < users.length; i++) {
+        if (users[i].id === gUser.id || users[i].user === gUser.user) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx < 0) {
+        toast('المستخدم غير موجود', 'error');
+        return;
+    }
+    if (String(users[idx].pass) !== String(cur)) {
+        toast('كلمة المرور الحالية غير صحيحة', 'error');
+        return;
+    }
+    if (String(cur) === String(nw)) {
+        toast('كلمة المرور الجديدة مطابقة للحالية', 'warning');
+        return;
+    }
+    users[idx].pass = nw;
+    setA(DB.users, users);
+    // update session if password stored there
+    if (gUser) {
+        gUser.pass = nw;
+        if (gUser.rem) setO(DB.cur, gUser);
+    }
+    if ($('pwdCurrent')) $('pwdCurrent').value = '';
+    if ($('pwdNew')) $('pwdNew').value = '';
+    if ($('pwdConfirm')) $('pwdConfirm').value = '';
+    toast('تم تغيير كلمة المرور بنجاح', 'success');
+}
+
+
 // ===== INIT =====
 function init() {
+    loadTheme();
     if (!LS_OK) {
         var el = $('storageWarn');
         if (el) el.classList.remove('hidden');
@@ -637,13 +909,14 @@ function init() {
         ]);
     }
     if (!getA(DB.prods).length) {
+        var now = Date.now();
         setA(DB.prods, [
-            { id: 'p1', name: 'لابتوب Dell XPS', code: 'DL-XPS-001', cat: 'c1', cost: 3500, price: 4500, qty: 12, min: 3, sup: 's1', desc: 'لابتوب Dell XPS 13' },
-            { id: 'p2', name: 'آيفون 15 Pro', code: 'AP-15P-002', cat: 'c1', cost: 3800, price: 4800, qty: 8, min: 2, sup: 's1', desc: 'آيفون 15 Pro 256GB' },
-            { id: 'p3', name: 'أرز بسمتي 5كغ', code: 'RZ-BS-003', cat: 'c2', cost: 25, price: 35, qty: 45, min: 10, sup: 's2', desc: 'أرز بسمتي هندي' },
-            { id: 'p4', name: 'زيت زيتون 1لتر', code: 'OL-EV-004', cat: 'c2', cost: 30, price: 42, qty: 3, min: 5, sup: 's2', desc: 'زيت زيتون بكر' },
-            { id: 'p5', name: 'تيشيرت قطني', code: 'TS-CT-005', cat: 'c3', cost: 20, price: 45, qty: 0, min: 5, sup: '', desc: 'تيشيرت قطني 100%' },
-            { id: 'p6', name: 'خلاط كهربائي', code: 'MX-EL-006', cat: 'c4', cost: 80, price: 120, qty: 15, min: 4, sup: 's1', desc: 'خلاط متعدد السرعات' }
+            { id: 'p1', name: 'لابتوب Dell XPS', code: 'DL-XPS-001', cat: 'c1', cost: 3500, price: 4500, qty: 12, min: 3, sup: 's1', desc: 'لابتوب Dell XPS 13', ts: now - 60000 },
+            { id: 'p2', name: 'آيفون 15 Pro', code: 'AP-15P-002', cat: 'c1', cost: 3800, price: 4800, qty: 8, min: 2, sup: 's1', desc: 'آيفون 15 Pro 256GB', ts: now - 50000 },
+            { id: 'p3', name: 'أرز بسمتي 5كغ', code: 'RZ-BS-003', cat: 'c2', cost: 25, price: 35, qty: 45, min: 10, sup: 's2', desc: 'أرز بسمتي هندي', ts: now - 40000 },
+            { id: 'p4', name: 'زيت زيتون 1لتر', code: 'OL-EV-004', cat: 'c2', cost: 30, price: 42, qty: 3, min: 5, sup: 's2', desc: 'زيت زيتون بكر', ts: now - 30000 },
+            { id: 'p5', name: 'تيشيرت قطني', code: 'TS-CT-005', cat: 'c3', cost: 20, price: 45, qty: 0, min: 5, sup: '', desc: 'تيشيرت قطني 100%', ts: now - 20000 },
+            { id: 'p6', name: 'خلاط كهربائي', code: 'MX-EL-006', cat: 'c4', cost: 80, price: 120, qty: 15, min: 4, sup: 's1', desc: 'خلاط متعدد السرعات', ts: now - 10000 }
         ]);
     }
     var saved = getO(DB.cur);
@@ -702,6 +975,14 @@ function doRegister() {
     showLogin();
 }
 
+function confirmLogout() {
+    toggleMenu();
+    gConfirmFn = doLogout;
+    $('cfTitle').textContent = 'تسجيل الخروج';
+    $('cfMsg').textContent = 'هل تريد الخروج من الحساب؟';
+    show('modalConfirm');
+}
+
 function doLogout() {
     gUser = null;
     LREM(DB.cur);
@@ -745,6 +1026,7 @@ function goPage(pg) {
     if (pg === 'categories') renderCats();
     if (pg === 'suppliers') renderSups();
     if (pg === 'reports') renderReports();
+    if (pg === 'shortage') renderShortage();
 }
 
 function toggleMenu() {
@@ -758,6 +1040,7 @@ function refreshAll() {
     renderCats();
     renderSups();
     renderReports();
+    if ($('pg-shortage') && $('pg-shortage').classList.contains('active')) renderShortage();
 }
 
 function updateStats() {
@@ -787,8 +1070,11 @@ function renderProds() {
         var ms = search === '' || p.name.toLowerCase().indexOf(search) !== -1 || (p.code || '').toLowerCase().indexOf(search) !== -1;
         var mc = fcat === '' || p.cat === fcat;
         var ms2 = true;
-        if (fstock === 'low') ms2 = p.qty <= (p.min || 0) && p.qty > 0;
-        else if (fstock === 'out') ms2 = p.qty === 0;
+        var qty = Number(p.qty) || 0;
+        var min = Number(p.min) || 0;
+        if (fstock === 'low') ms2 = qty > 0 && qty <= min;
+        else if (fstock === 'out') ms2 = qty === 0;
+        else if (fstock === 'ok') ms2 = qty > min;
         if (ms && mc && ms2) out.push(p);
     }
     var grid = $('prodGrid');
@@ -808,13 +1094,37 @@ function renderProds() {
         html += '<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 card-hover ' + (isLow ? 'low-stock' : '') + '">';
         html += '<div class="flex items-start justify-between mb-2"><div class="flex-1"><h4 class="font-bold text-slate-900 text-xs">' + esc(p.name) + '</h4><p class="text-[10px] text-slate-500">' + esc(p.code || '---') + '</p></div>';
         html += '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold ' + col.bg + ' ' + col.txt + '">' + (cat ? esc(cat.name) : '---') + '</span></div>';
-        html += '<div class="flex items-center justify-between mb-3"><div><p class="text-[10px] text-slate-500">السعر</p><p class="text-sm font-bold">' + (p.price || 0) + ' ر.س</p></div>';
+        html += '<div class="flex items-center justify-between mb-3"><div><p class="text-[10px] text-slate-500">السعر</p><p class="text-sm font-bold">' + money(p.price) + '</p></div>';
         html += '<div class="text-center"><p class="text-[10px] text-slate-500">الكمية</p><p class="text-sm font-bold ' + (isOut ? 'text-red-600' : isLow ? 'text-amber-600' : '') + '">' + (p.qty || 0) + '</p></div>';
         html += '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold ' + sc + '">' + st + '</span></div>';
-        html += '<div class="flex gap-1.5"><button onclick="editProd(\'' + p.id + '\')" class="flex-1 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-[10px] font-bold">تعديل</button>';
-        html += '<button onclick="delProd(\'' + p.id + '\')" class="flex-1 py-1.5 rounded-lg bg-red-50 text-red-700 text-[10px] font-bold">حذف</button></div></div>';
+        html += '<div class="flex gap-1.5">';
+        html += '<button onclick="adjStock(\'' + p.id + '\',-1)" class="w-8 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold" title="تقليل">−</button>';
+        html += '<button onclick="editProd(\'' + p.id + '\')" class="flex-1 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-[10px] font-bold">تعديل</button>';
+        html += '<button onclick="delProd(\'' + p.id + '\')" class="flex-1 py-1.5 rounded-lg bg-red-50 text-red-700 text-[10px] font-bold">حذف</button>';
+        html += '<button onclick="adjStock(\'' + p.id + '\',1)" class="w-8 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold" title="زيادة">+</button>';
+        html += '</div></div>';
+
     }
     grid.innerHTML = html;
+}
+
+function adjStock(id, delta) {
+    var prods = getA(DB.prods);
+    for (var i = 0; i < prods.length; i++) {
+        if (prods[i].id === id) {
+            var q = (Number(prods[i].qty) || 0) + delta;
+            if (q < 0) q = 0;
+            prods[i].qty = q;
+            prods[i].ts = Date.now();
+            setA(DB.prods, prods);
+            renderProds();
+            renderRecent();
+            updateStats();
+            if ($('pg-shortage') && !$('pg-shortage').classList.contains('hidden') && $('pg-shortage').classList.contains('active')) renderShortage();
+            toast(delta > 0 ? 'تمت الزيادة' : 'تم التقليل', 'success');
+            return;
+        }
+    }
 }
 
 function renderRecent() {
@@ -831,9 +1141,16 @@ function renderRecent() {
         html += '<div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer" onclick="editProd(\'' + p.id + '\')">';
         html += '<div class="w-10 h-10 rounded-xl ' + col.bg + ' flex items-center justify-center"><i class="fas fa-box ' + col.txt + ' text-xs"></i></div>';
         html += '<div class="flex-1"><p class="font-bold text-slate-900 text-xs">' + esc(p.name) + '</p><p class="text-[10px] text-slate-500">' + (cat ? esc(cat.name) : '---') + '</p></div>';
-        html += '<div class="text-left"><p class="text-xs font-bold">' + (p.price || 0) + '</p><p class="text-[9px] text-slate-500">ر.س</p></div></div>';
+        html += '<div class="text-left"><p class="text-xs font-bold">' + money(p.price) + '</p></div></div>';
     }
     $('recentList').innerHTML = html;
+}
+
+function adjQty(delta) {
+    var inp = $('mProdQty');
+    var v = (parseInt(inp.value, 10) || 0) + delta;
+    if (v < 0) v = 0;
+    inp.value = v;
 }
 
 function openProdModal() {
@@ -876,20 +1193,33 @@ function editProd(id) {
 
 function saveProd() {
     var name = $('mProdName').value.trim();
-    var price = parseFloat($('mProdPrice').value) || 0;
-    var qty = parseInt($('mProdQty').value) || 0;
+    var price = parseFloat($('mProdPrice').value);
+    var qty = parseInt($('mProdQty').value, 10);
+    var cat = $('mProdCat').value;
+    var code = $('mProdCode').value.trim();
     if (!name) { toast('أدخل اسم المنتج', 'error'); return; }
+    if (!cat) { toast('اختر الفئة', 'error'); return; }
+    if (isNaN(price) || price < 0) { toast('أدخل سعر بيع صالح', 'error'); return; }
+    if (isNaN(qty) || qty < 0) { toast('أدخل كمية صالحة', 'error'); return; }
     var prods = getA(DB.prods);
+    if (code) {
+        for (var i = 0; i < prods.length; i++) {
+            if (prods[i].code === code && prods[i].id !== gEditId) {
+                toast('الباركود مستخدم لمنتج آخر', 'error');
+                return;
+            }
+        }
+    }
     var data = {
         id: gEditId || ('p' + Date.now()),
         name: name,
-        code: $('mProdCode').value.trim(),
-        cat: $('mProdCat').value,
+        code: code,
+        cat: cat,
         cost: parseFloat($('mProdCost').value) || 0,
         price: price,
         qty: qty,
-        min: parseInt($('mProdMin').value) || 0,
-        sup: $('mProdSup').value,
+        min: parseInt($('mProdMin').value, 10) || 0,
+        sup: $('mProdSup').value || '',
         desc: $('mProdDesc').value.trim(),
         ts: Date.now()
     };
@@ -904,6 +1234,7 @@ function saveProd() {
     renderProds();
     renderRecent();
     updateStats();
+    if ($('pg-shortage') && $('pg-shortage').classList.contains('active')) renderShortage();
 }
 
 function delProd(id) {
@@ -916,6 +1247,7 @@ function delProd(id) {
         renderProds();
         renderRecent();
         updateStats();
+        if ($('pg-shortage') && $('pg-shortage').classList.contains('active')) renderShortage();
     };
     $('cfTitle').textContent = 'حذف منتج';
     $('cfMsg').textContent = 'هل أنت متأكد؟';
@@ -1123,9 +1455,18 @@ function delSup(id) {
 function renderReports() {
     var prods = getA(DB.prods);
     var cats = getA(DB.cats);
+    var sellVal = 0, costVal = 0;
     var counts = {};
     for (var i = 0; i < cats.length; i++) counts[cats[i].id] = 0;
-    for (var i = 0; i < prods.length; i++) { if (prods[i].cat) counts[prods[i].cat] = (counts[prods[i].cat] || 0) + 1; }
+    for (var i = 0; i < prods.length; i++) {
+        var p = prods[i];
+        var qty = Number(p.qty) || 0;
+        sellVal += (Number(p.price) || 0) * qty;
+        costVal += (Number(p.cost) || 0) * qty;
+        if (p.cat) counts[p.cat] = (counts[p.cat] || 0) + 1;
+    }
+    if ($('repSellVal')) $('repSellVal').textContent = fmt(sellVal);
+    if ($('repCostVal')) $('repCostVal').textContent = fmt(costVal);
     var maxc = 0;
     for (var k in counts) { if (counts[k] > maxc) maxc = counts[k]; }
     if (maxc === 0) maxc = 1;
@@ -1157,6 +1498,570 @@ function renderReports() {
 }
 
 // ===== EXPORT/IMPORT =====
+
+// ===== SHORTAGE / المواد الناقصة =====
+function getShortageItems(mode) {
+    mode = mode || 'all';
+    var prods = getA(DB.prods);
+    var out = [];
+    for (var i = 0; i < prods.length; i++) {
+        var p = prods[i];
+        var qty = Number(p.qty) || 0;
+        var min = Number(p.min) || 0;
+        var isOut = qty === 0;
+        var isLow = !isOut && qty <= min;
+        // products with min=0 only show when qty is 0
+        if (!isOut && min <= 0) continue;
+        if (mode === 'out' && !isOut) continue;
+        if (mode === 'low' && !isLow) continue;
+        if (mode === 'all' && !isOut && !isLow) continue;
+        // quantity to order to reach minimum (at least 1 if out of stock)
+        var need = min - qty;
+        if (need < 1) need = isOut ? 1 : 0;
+        if (need < 1) continue;
+        out.push({
+            prod: p,
+            qty: qty,
+            min: min,
+            need: need,
+            status: isOut ? 'out' : 'low'
+        });
+    }
+    out.sort(function(a, b) {
+        if (a.status !== b.status) return a.status === 'out' ? -1 : 1;
+        return (b.need || 0) - (a.need || 0);
+    });
+    return out;
+}
+
+function fillShortageSupSelect() {
+    var sel = $('filterShortageSup');
+    if (!sel) return;
+    var v = sel.value;
+    var items = getShortageItems('all');
+    var supIds = {};
+    for (var i = 0; i < items.length; i++) {
+        var sid = items[i].prod.sup || '';
+        if (sid) supIds[sid] = true;
+    }
+    var sups = getA(DB.sups);
+    sel.innerHTML = '<option value="">كل الموردين</option><option value="__none__">بدون مورد</option>';
+    for (var i = 0; i < sups.length; i++) {
+        if (supIds[sups[i].id]) {
+            sel.innerHTML += '<option value="' + esc(sups[i].id) + '">' + esc(sups[i].name) + '</option>';
+        }
+    }
+    if (v) sel.value = v;
+}
+
+function renderShortage() {
+    var mode = ($('filterShortage') && $('filterShortage').value) || 'all';
+    var fsup = ($('filterShortageSup') && $('filterShortageSup').value) || '';
+    fillShortageSupSelect();
+    if ($('filterShortageSup') && fsup) $('filterShortageSup').value = fsup;
+
+    var items = getShortageItems(mode);
+    if (fsup === '__none__') {
+        items = items.filter(function(x) { return !x.prod.sup; });
+    } else if (fsup) {
+        items = items.filter(function(x) { return x.prod.sup === fsup; });
+    }
+
+    var list = $('shortageList');
+    var empty = $('shortageEmpty');
+    if (!items.length) {
+        list.innerHTML = '';
+        show('shortageEmpty');
+        if ($('shortageSummary')) $('shortageSummary').textContent = '0 منتج ناقص';
+        return;
+    }
+    hide('shortageEmpty');
+
+    var outCount = 0, lowCount = 0;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].status === 'out') outCount++;
+        else lowCount++;
+    }
+    if ($('shortageSummary')) {
+        $('shortageSummary').textContent = items.length + ' منتج ناقص (' + outCount + ' نفذ، ' + lowCount + ' منخفض)';
+    }
+
+    // Group by supplier
+    var groups = {};
+    var order = [];
+    for (var i = 0; i < items.length; i++) {
+        var sid = items[i].prod.sup || '__none__';
+        if (!groups[sid]) {
+            groups[sid] = [];
+            order.push(sid);
+        }
+        groups[sid].push(items[i]);
+    }
+
+    var sups = getA(DB.sups);
+    var supMap = {};
+    for (var i = 0; i < sups.length; i++) supMap[sups[i].id] = sups[i];
+
+    var html = '';
+    for (var g = 0; g < order.length; g++) {
+        var sid = order[g];
+        var group = groups[sid];
+        var sup = sid !== '__none__' ? supMap[sid] : null;
+        var title = sup ? (sup.name || 'مورد') : 'بدون مورد';
+        var phone = sup && sup.phone ? String(sup.phone).replace(/[^0-9+]/g, '') : '';
+
+        html += '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">';
+        html += '<div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-2">';
+        html += '<div class="min-w-0"><p class="font-bold text-slate-900 text-xs truncate"><i class="fas fa-truck text-amber-600 ml-1"></i>' + esc(title) + '</p>';
+        html += '<p class="text-[10px] text-slate-500">' + group.length + ' صنف';
+        if (sup && sup.phone) html += ' · ' + esc(sup.phone);
+        html += '</p></div>';
+        html += '<div class="flex gap-1 shrink-0 flex-wrap justify-end">';
+        html += '<button type="button" onclick="exportShortagePDF(\'' + sid + '\')" class="btn-press px-2 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold"><i class="fas fa-file-pdf"></i> PDF</button>';
+        html += '<button type="button" onclick="shareShortagePDF(\'' + sid + '\')" class="btn-press px-2 py-1.5 rounded-xl bg-green-600 text-white text-[10px] font-bold"><i class="fab fa-whatsapp"></i> PDF واتساب</button>';
+        html += '<button type="button" onclick="shareShortageWA(\'' + sid + '\')" class="btn-press px-2 py-1.5 rounded-xl bg-emerald-500 text-white text-[10px] font-bold"><i class="fab fa-whatsapp"></i> نص</button>';
+        html += '</div>';
+        html += '</div><div class="p-2 space-y-1.5">';
+
+        for (var j = 0; j < group.length; j++) {
+            var it = group[j];
+            var p = it.prod;
+            var badge = it.status === 'out'
+                ? '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-red-100 text-red-700">نفذ</span>'
+                : '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-700">منخفض</span>';
+            html += '<div class="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50">';
+            html += '<div class="flex-1 min-w-0"><p class="font-bold text-slate-900 text-xs truncate">' + esc(p.name) + '</p>';
+            html += '<p class="text-[10px] text-slate-500">الحالي: ' + it.qty + ' · الحد: ' + it.min + ' · المطلوب: <strong class="text-red-600">' + it.need + '</strong></p></div>';
+            html += badge;
+            html += '<button type="button" onclick="editProd(\'' + p.id + '\')" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 text-[10px]"><i class="fas fa-pen"></i></button>';
+            html += '</div>';
+        }
+        html += '</div></div>';
+    }
+    list.innerHTML = html;
+}
+
+function buildShortageMessage(items, supName) {
+    var lines = [];
+    lines.push('📦 *طلب توريد — مواد ناقصة*');
+    lines.push('من: Mawadi Pro');
+    if (supName) lines.push('إلى: ' + supName);
+    lines.push('التاريخ: ' + new Date().toLocaleDateString('ar-SA'));
+    lines.push('────────────');
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        var p = it.prod;
+        var st = it.status === 'out' ? '❌ نفذ' : '⚠️ منخفض';
+        lines.push((i + 1) + '. *' + (p.name || '') + '*');
+        if (p.code) lines.push('   الباركود: ' + p.code);
+        lines.push('   الحالة: ' + st);
+        lines.push('   الكمية الحالية: ' + it.qty);
+        lines.push('   الحد الأدنى: ' + it.min);
+        lines.push('   *المطلوب توريده: ' + it.need + '*');
+        lines.push('');
+    }
+    lines.push('────────────');
+    lines.push('الإجمالي: ' + items.length + ' صنف');
+    lines.push('يرجى التوريد في أقرب وقت. شكراً 🙏');
+    return lines.join('\n');
+}
+
+function openWhatsApp(phone, message) {
+    var msg = encodeURIComponent(message);
+    var url;
+    if (phone) {
+        var ph = String(phone).replace(/[^0-9]/g, '');
+        // Saudi local 05xxxxxxxx -> 9665xxxxxxxx
+        if (ph.length === 10 && ph.charAt(0) === '0') ph = '966' + ph.slice(1);
+        // 5xxxxxxxx (9 digits) -> 9665xxxxxxxx
+        if (ph.length === 9 && ph.charAt(0) === '5') ph = '966' + ph;
+        url = 'https://wa.me/' + ph + '?text=' + msg;
+    } else {
+        url = 'https://wa.me/?text=' + msg;
+    }
+    window.open(url, '_blank');
+}
+
+function shareShortageWA(supId) {
+    var mode = ($('filterShortage') && $('filterShortage').value) || 'all';
+    var items = getShortageItems(mode);
+    var sups = getA(DB.sups);
+    var sup = null;
+    var title = 'بدون مورد';
+    var phone = '';
+
+    if (supId === '__none__') {
+        items = items.filter(function(x) { return !x.prod.sup; });
+    } else {
+        items = items.filter(function(x) { return x.prod.sup === supId; });
+        for (var i = 0; i < sups.length; i++) {
+            if (sups[i].id === supId) { sup = sups[i]; break; }
+        }
+        if (sup) {
+            title = sup.name || 'مورد';
+            phone = sup.phone ? String(sup.phone).replace(/[^0-9+]/g, '') : '';
+        }
+    }
+
+    if (!items.length) {
+        toast('لا توجد نواقص لهذا المورد', 'warning');
+        return;
+    }
+
+    var msg = buildShortageMessage(items, title);
+    openWhatsApp(phone, msg);
+    toast('جاري فتح واتساب...', 'success');
+}
+
+
+
+function getShortageForSupplier(supId) {
+    var mode = ($('filterShortage') && $('filterShortage').value) || 'all';
+    var items = getShortageItems(mode);
+    var supTitle = '';
+    var phone = '';
+    // If no explicit supplier: use page filter dropdown
+    if (supId === undefined || supId === null || supId === '') {
+        var fsup = ($('filterShortageSup') && $('filterShortageSup').value) || '';
+        if (fsup) supId = fsup;
+    }
+    if (supId === '__none__') {
+        items = items.filter(function(x) { return !x.prod.sup; });
+        supTitle = 'بدون مورد';
+    } else if (supId) {
+        items = items.filter(function(x) { return x.prod.sup === supId; });
+        var sups = getA(DB.sups);
+        for (var i = 0; i < sups.length; i++) {
+            if (sups[i].id === supId) {
+                supTitle = sups[i].name || '';
+                phone = sups[i].phone ? String(sups[i].phone).replace(/[^0-9+]/g, '') : '';
+                break;
+            }
+        }
+    }
+    return { items: items, supTitle: supTitle, phone: phone, supId: supId || '' };
+}
+
+
+
+function buildShortagePDFHTML(items, supTitle) {
+    var dateStr = new Date().toLocaleDateString('ar-SA');
+    var rows = '';
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        var bg = (i % 2 === 0) ? '#ffffff' : '#f1f5f9';
+        rows += '<tr style="background:' + bg + ';">' +
+            '<td style="padding:14px 16px;border:1px solid #94a3b8;text-align:center;font-size:18px;font-weight:bold;color:#b91c1c;width:30%;">' + it.need + '</td>' +
+            '<td style="padding:14px 16px;border:1px solid #94a3b8;text-align:right;font-size:16px;width:70%;">' + esc(it.prod.name || '') + '</td>' +
+            '</tr>';
+    }
+    // IMPORTANT: fixed LTR layout container so html2canvas captures correctly.
+    // Inner text stays Arabic; table columns ordered for visual RTL reading.
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+        '*{box-sizing:border-box;margin:0;padding:0;}' +
+        'body{background:#ffffff;}' +
+        '<\/style><\/head><body>' +
+        '<div id="pdfroot" style="width:794px;min-height:400px;padding:40px;background:#ffffff;font-family:Tahoma,Arial,sans-serif;color:#0f172a;direction:rtl;text-align:right;">' +
+        '<div style="text-align:center;margin-bottom:8px;font-size:22px;font-weight:bold;color:#1e3a8a;">قائمة المواد الناقصة</div>' +
+        (supTitle ? '<div style="text-align:center;margin-bottom:6px;font-size:16px;font-weight:bold;color:#1e40af;">المورد: ' + esc(supTitle) + '</div>' : '') +
+        '<div style="text-align:center;margin-bottom:20px;font-size:13px;color:#64748b;">Mawadi Pro — ' + dateStr + ' — العدد: ' + items.length + '</div>' +
+        '<table style="width:100%;border-collapse:collapse;direction:rtl;">' +
+        '<thead><tr>' +
+        '<th style="background:#1e3a8a;color:#ffffff;padding:12px;font-size:15px;border:1px solid #1e3a8a;text-align:center;width:30%;">الكمية الناقصة</th>' +
+        '<th style="background:#1e3a8a;color:#ffffff;padding:12px;font-size:15px;border:1px solid #1e3a8a;text-align:right;width:70%;">اسم المادة</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>' +
+        '<div style="text-align:center;margin-top:18px;font-size:11px;color:#94a3b8;">تم الإنشاء من نظام Mawadi Pro</div>' +
+        '</div><\/body><\/html>';
+}
+
+var gPdfBusy = false;
+
+function generateShortageCanvas(items, supTitle) {
+    return new Promise(function(resolve, reject) {
+        if (typeof html2canvas === 'undefined' && typeof html2pdf === 'undefined') {
+            reject(new Error('html2canvas missing'));
+            return;
+        }
+        var iframe = null;
+        try {
+            iframe = document.createElement('iframe');
+            iframe.setAttribute('aria-hidden', 'true');
+            // Visible size needed for correct layout; hide visually without display:none
+            iframe.style.cssText = 'position:fixed;left:0;top:0;width:820px;height:1200px;opacity:0.01;pointer-events:none;border:0;z-index:-1;';
+            document.body.appendChild(iframe);
+
+            var idoc = iframe.contentDocument || iframe.contentWindow.document;
+            idoc.open();
+            idoc.write(buildShortagePDFHTML(items, supTitle));
+            idoc.close();
+
+            // wait a tick for layout/fonts
+            setTimeout(function() {
+                try {
+                    var el = idoc.getElementById('pdfroot');
+                    if (!el) throw new Error('pdfroot missing');
+
+                    var w = Math.max(el.scrollWidth, el.offsetWidth, 794);
+                    var h = Math.max(el.scrollHeight, el.offsetHeight, 200);
+
+                    var h2c = null;
+                    if (typeof html2canvas === 'function') h2c = html2canvas;
+                    else if (window.html2pdf && html2pdf().worker) {
+                        // html2pdf bundles html2canvas
+                    }
+
+                    var doCapture = function(canvasFn) {
+                        canvasFn(el, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            width: w,
+                            height: h,
+                            windowWidth: w,
+                            windowHeight: h,
+                            scrollX: 0,
+                            scrollY: 0,
+                            x: 0,
+                            y: 0
+                        }).then(function(canvas) {
+                            try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+                            resolve(canvas);
+                        }).catch(function(err) {
+                            try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+                            reject(err);
+                        });
+                    };
+
+                    if (typeof html2canvas === 'function') {
+                        doCapture(html2canvas);
+                    } else if (typeof html2pdf !== 'undefined') {
+                        // Extract html2canvas from html2pdf bundle via temporary call pattern
+                        // Fallback: use html2pdf output as dataurl through intermediate
+                        var opt = {
+                            margin: 0,
+                            html2canvas: {
+                                scale: 2,
+                                useCORS: true,
+                                backgroundColor: '#ffffff',
+                                logging: false,
+                                width: w,
+                                height: h,
+                                windowWidth: w,
+                                scrollX: 0,
+                                scrollY: 0
+                            },
+                            jsPDF: { unit: 'px', format: [w, h], orientation: 'portrait' }
+                        };
+                        html2pdf().set(opt).from(el).outputPdf('blob').then(function(blob) {
+                            try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+                            // Also produce a canvas-like path via image for WA
+                            resolve({ __pdfBlob: blob, width: w, height: h });
+                        }).catch(function(err) {
+                            try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+                            reject(err);
+                        });
+                    } else {
+                        throw new Error('no renderer');
+                    }
+                } catch (err) {
+                    try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+                    reject(err);
+                }
+            }, 200);
+        } catch (err) {
+            try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch (e) {}
+            reject(err);
+        }
+    });
+}
+
+function canvasToPdfBlob(canvas) {
+    return new Promise(function(resolve, reject) {
+        try {
+            if (canvas && canvas.__pdfBlob) {
+                resolve(canvas.__pdfBlob);
+                return;
+            }
+            var JsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+            if (JsPDF && canvas && canvas.toDataURL) {
+                var img = canvas.toDataURL('image/jpeg', 0.95);
+                var pw = 210;
+                var ph = 297;
+                var margin = 12;
+                var maxW = pw - margin * 2;
+                var maxH = ph - margin * 2;
+                // Fit image into A4 while keeping aspect ratio
+                var aspect = canvas.height / canvas.width;
+                var imgW = maxW;
+                var imgH = imgW * aspect;
+                if (imgH > maxH) {
+                    imgH = maxH;
+                    imgW = imgH / aspect;
+                }
+                var doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                var x = (pw - imgW) / 2;
+                var y = margin;
+                doc.addImage(img, 'JPEG', x, y, imgW, imgH);
+                resolve(doc.output('blob'));
+                return;
+            }
+            canvas.toBlob(function(blob) {
+                if (blob) resolve(blob);
+                else reject(new Error('toBlob failed'));
+            }, 'image/jpeg', 0.95);
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
+function generateShortagePDFBlob(items, supTitle) {
+    return generateShortageCanvas(items, supTitle).then(function(canvas) {
+        return canvasToPdfBlob(canvas);
+    });
+}
+
+function shareShortagePDF(supId) {
+    if (gPdfBusy) {
+        toast('جاري تجهيز الملف، انتظر قليلاً...', 'info');
+        return;
+    }
+    var data = getShortageForSupplier(supId);
+    if (!data.items.length) {
+        toast('لا توجد مواد ناقصة لهذا المورد', 'warning');
+        return;
+    }
+
+    gPdfBusy = true;
+    toast('جاري تجهيز الملف...', 'info');
+
+    var safeName = (data.supTitle || 'نواقص').replace(/[\\/:*?"<>|]/g, '_');
+    var fileName = 'نواقص_' + safeName + '.pdf';
+    var imgName = 'نواقص_' + safeName + '.jpg';
+
+    generateShortageCanvas(data.items, data.supTitle).then(function(canvas) {
+        // Prefer sharing as IMAGE on mobile — WhatsApp displays Arabic perfectly
+        var finish = function(file, fallbackBlob, fallbackName) {
+            gPdfBusy = false;
+            if (navigator.canShare) {
+                try {
+                    if (navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'المواد الناقصة',
+                            text: data.supTitle ? ('نواقص: ' + data.supTitle) : 'قائمة المواد الناقصة'
+                        }).then(function() {
+                            toast('تمت المشاركة', 'success');
+                        }).catch(function(err) {
+                            if (err && err.name === 'AbortError') return;
+                            downloadAndOpenWA(fallbackBlob || file, fallbackName || file.name, data);
+                        });
+                        return;
+                    }
+                } catch (e) {}
+            }
+            downloadAndOpenWA(fallbackBlob || file, fallbackName || file.name, data);
+        };
+
+        // If we already got a pdf blob from html2pdf path
+        if (canvas && canvas.__pdfBlob) {
+            var pdfFile = new File([canvas.__pdfBlob], fileName, { type: 'application/pdf' });
+            finish(pdfFile, canvas.__pdfBlob, fileName);
+            return;
+        }
+
+        // Share IMAGE first — WhatsApp shows Arabic correctly (PDF preview often breaks RTL)
+        canvas.toBlob(function(imgBlob) {
+            if (!imgBlob) {
+                gPdfBusy = false;
+                toast('تعذر إنشاء الصورة', 'error');
+                return;
+            }
+            var imgFile = new File([imgBlob], imgName, { type: 'image/jpeg' });
+            finish(imgFile, imgBlob, imgName);
+        }, 'image/jpeg', 0.93);
+    }).catch(function(err) {
+        gPdfBusy = false;
+        console.error(err);
+        toast('تعذر إنشاء الملف — جاري فتح المعاينة', 'warning');
+        try { exportShortagePDF(supId); } catch (e2) {}
+    });
+}
+
+function downloadAndOpenWA(blob, fileName, data) {
+    try {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            try { document.body.removeChild(a); } catch (e) {}
+            URL.revokeObjectURL(url);
+        }, 1500);
+    } catch (e) {
+        console.error(e);
+    }
+
+    var msg = 'قائمة المواد الناقصة';
+    if (data.supTitle) msg += '\nالمورد: ' + data.supTitle;
+    msg += '\nعدد الأصناف: ' + data.items.length;
+    msg += '\nأرفق الملف من التنزيلات';
+
+    try { openWhatsApp(data.phone || '', msg); } catch (e) {}
+    toast('تم تنزيل الملف — أرفقه في واتساب', 'success');
+}
+
+function exportShortagePDF(supId) {
+    var data = getShortageForSupplier(supId);
+    if (!data.items.length) {
+        toast('لا توجد مواد ناقصة للتصدير', 'warning');
+        return;
+    }
+    var html = buildShortagePDFHTML(data.items, data.supTitle);
+    // enhance print version
+    html = html.replace('<\/style>', 
+        '@page{size:A4;margin:12mm}' +
+        '@media print{body{padding:0}}' +
+        '.noprint{margin-top:20px;text-align:center}' +
+        '@media print{.noprint{display:none!important}}' +
+        '<\/style>');
+    html = html.replace('<\/body>',
+        '<div class="noprint">' +
+        '<button onclick="window.print()" style="padding:10px 22px;background:#1e3a8a;color:#fff;border:0;border-radius:8px;font-size:14px;font-family:Tahoma;cursor:pointer">طباعة / حفظ PDF</button> ' +
+        '<button onclick="window.close()" style="padding:10px 22px;background:#64748b;color:#fff;border:0;border-radius:8px;font-size:14px;font-family:Tahoma;cursor:pointer">إغلاق</button>' +
+        '</div><\/body>');
+    var w = window.open('', '_blank', 'width=820,height=720');
+    if (!w) {
+        toast('اسمح بالنوافذ المنبثقة', 'error');
+        return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function() { try { w.focus(); w.print(); } catch (e) {} }, 400);
+    toast('اختر «حفظ كـ PDF» من نافذة الطباعة', 'success');
+}
+
+
+function shareAllShortagesWA() {
+    var mode = ($('filterShortage') && $('filterShortage').value) || 'all';
+    var items = getShortageItems(mode);
+    if (!items.length) {
+        toast('لا توجد مواد ناقصة', 'info');
+        return;
+    }
+    // Group and send one combined message (user can forward per supplier from individual buttons)
+    var msg = buildShortageMessage(items, null);
+    openWhatsApp('', msg);
+    toast('جاري فتح واتساب بالقائمة الكاملة', 'success');
+}
+
+
 function exportJSON() {
     var data = { version: '2.1.0', users: getA(DB.users), prods: getA(DB.prods), cats: getA(DB.cats), sups: getA(DB.sups) };
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1169,23 +2074,63 @@ function exportJSON() {
     toast('تم التصدير', 'success');
 }
 
+
+function exportCSV() {
+    var prods = getA(DB.prods);
+    var cats = getA(DB.cats);
+    var catMap = {};
+    for (var i = 0; i < cats.length; i++) catMap[cats[i].id] = cats[i].name;
+    var sups = getA(DB.sups);
+    var supMap = {};
+    for (var i = 0; i < sups.length; i++) supMap[sups[i].id] = sups[i].name;
+    var rows = [['الاسم', 'الباركود', 'الفئة', 'سعر الشراء', 'سعر البيع', 'الكمية', 'الحد الأدنى', 'المورد', 'الوصف']];
+    for (var i = 0; i < prods.length; i++) {
+        var p = prods[i];
+        rows.push([
+            p.name || '', p.code || '', catMap[p.cat] || '',
+            p.cost || 0, p.price || 0, p.qty || 0, p.min || 0,
+            supMap[p.sup] || '', (p.desc || '').replace(/"/g, '""')
+        ]);
+    }
+    var csv = rows.map(function(r) {
+        return r.map(function(c) {
+            var s = String(c);
+            if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) return '"' + s + '"';
+            return s;
+        }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'mawadi-products-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('تم تصدير CSV', 'success');
+}
+
 function importJSON(inp) {
     var file = inp.files[0];
     if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            var data = JSON.parse(e.target.result);
-            if (data.prods) setA(DB.prods, data.prods);
-            if (data.cats) setA(DB.cats, data.cats);
-            if (data.sups) setA(DB.sups, data.sups);
-            if (data.users) setA(DB.users, data.users);
-            toast('تم الاستيراد', 'success');
-            refreshAll();
-        } catch(err) { toast('ملف غير صالح', 'error'); }
-        inp.value = '';
+    gConfirmFn = function() {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var data = JSON.parse(e.target.result);
+                if (data.prods) setA(DB.prods, data.prods);
+                if (data.cats) setA(DB.cats, data.cats);
+                if (data.sups) setA(DB.sups, data.sups);
+                if (data.users) setA(DB.users, data.users);
+                toast('تم الاستيراد', 'success');
+                refreshAll();
+            } catch(err) { toast('ملف غير صالح', 'error'); }
+            inp.value = '';
+        };
+        reader.readAsText(file);
     };
-    reader.readAsText(file);
+    $('cfTitle').textContent = 'استيراد بيانات';
+    $('cfMsg').textContent = 'سيتم استبدال البيانات الحالية. هل تريد المتابعة؟';
+    show('modalConfirm');
 }
 
 function clearAll() {
@@ -1217,8 +2162,35 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// ===== KEYBOARD =====
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        ['modalProd', 'modalCat', 'modalSup', 'modalConfirm', 'modalScanner'].forEach(function(id) {
+            if ($(id) && !$(id).classList.contains('hidden')) {
+                if (id === 'modalScanner') closeScanner();
+                else closeModal(id);
+            }
+        });
+        var menu = $('userMenu');
+        if (menu && !menu.classList.contains('hidden')) menu.classList.add('hidden');
+    }
+});
+
 // ===== START =====
 init();
 </script>
 </body>
-</html>
+</html>Confirm() {
+    hide('modalConfirm');
+    if (gConfirmFn) { gConfirmFn(); gConfirmFn = null; }
+}
+
+function closeModal(id) {
+    hide(id);
+}
+
+// ===== EVENTS =====
+document.addEventListener('click', function(e) {
+    var menu = $('userMenu');
+    var btn = e.target.closest('button[onclick="toggleMenu()"]');
+    if (menu && !menu.classList.contains('hi
