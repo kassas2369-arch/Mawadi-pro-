@@ -361,7 +361,7 @@ body.dark #loginPage .glass,body.dark #regPage .glass{background:rgba(15,23,42,0
 <div class="text-center py-8">
 <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-xl"><i class="fas fa-boxes-stacked text-3xl text-white"></i></div>
 <h2 class="text-xl font-bold text-slate-900">Mawadi Pro</h2>
-<p class="text-slate-500 text-xs mb-5">v2.5.1 - أغسطس 2026</p>
+<p class="text-slate-500 text-xs mb-5">v2.5.2 - أغسطس 2026</p>
 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 max-w-sm mx-auto text-right space-y-2">
 <p class="text-xs text-slate-600 leading-relaxed">
 <i class="fas fa-barcode text-blue-500 ml-1"></i>
@@ -441,7 +441,7 @@ body.dark #loginPage .glass,body.dark #regPage .glass{background:rgba(15,23,42,0
 <div class="absolute inset-0 bg-black"></div>
 <div class="absolute inset-0 flex flex-col">
 <div class="relative flex-1 overflow-hidden">
-<video id="scanVideo" autoplay playsinline muted></video>
+<video id="scanVideo" autoplay playsinline webkit-playsinline muted></video>
 <div class="scanner-overlay">
 <div class="scanner-frame"><div class="scanner-line"></div></div>
 <p class="scanner-hint">وجه الكاميرا نحو الباركود</p>
@@ -612,14 +612,28 @@ var scanTrack = null;
 var scanRaf = null;
 var scanDetector = null;
 
+
 function openScanner(mode) {
     gScanMode = mode || 'product';
+    lastScanCode = '';
+    lastScanTime = 0;
+
+    // Camera requires secure context (HTTPS or localhost)
+    var isSecure = (typeof window.isSecureContext === 'boolean') ? window.isSecureContext :
+        (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+    if (!isSecure) {
+        toast('الكاميرا تحتاج فتح التطبيق عبر HTTPS وليس من ملف محلي', 'error');
+        return;
+    }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         toast('المتصفح لا يدعم الكاميرا', 'error');
         return;
     }
+
     show('modalScanner');
     $('scanStatus').textContent = 'جاري تشغيل الكاميرا...';
+    var torchBtn = $('torchBtn');
+    if (torchBtn) torchBtn.classList.add('hidden');
     startCamera();
 }
 
@@ -630,57 +644,206 @@ function closeScanner() {
 
 function stopCamera() {
     if (scanRaf) { cancelAnimationFrame(scanRaf); scanRaf = null; }
+    if (scanZXingControls && typeof scanZXingControls.stop === 'function') {
+        try { scanZXingControls.stop(); } catch (e) {}
+        scanZXingControls = null;
+    }
     if (scanStream) {
-        scanStream.getTracks().forEach(function(t) { t.stop(); });
+        try {
+            scanStream.getTracks().forEach(function(t) { t.stop(); });
+        } catch (e) {}
         scanStream = null;
     }
     scanTrack = null;
     var vid = $('scanVideo');
-    if (vid) { vid.srcObject = null; }
+    if (vid) {
+        try { vid.pause(); } catch (e) {}
+        vid.srcObject = null;
+    }
 }
 
 function startCamera() {
-    var constraints = { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } };
-    navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-        scanStream = stream;
-        var vid = $('scanVideo');
-        vid.srcObject = stream;
-        vid.onloadedmetadata = function() {
-            vid.play();
-            scanTrack = stream.getVideoTracks()[0];
-            var cap = scanTrack.getCapabilities ? scanTrack.getCapabilities() : {};
-            if (cap && cap.torch) { $('torchBtn').classList.remove('hidden'); }
-            initDetector();
-            if (scanDetector) {
-                $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
-            } else {
-                $('scanStatus').textContent = 'الماسح غير مدعوم — استخدم الإدخال اليدوي';
-                toast('BarcodeDetector غير مدعوم. استخدم Chrome/Edge أو أدخل يدوياً', 'warning');
+    stopCamera();
+    var attempts = [
+        { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+        { video: { facingMode: 'environment' }, audio: false },
+        { video: { facingMode: 'user' }, audio: false },
+        { video: true, audio: false }
+    ];
+
+    function tryNext(i) {
+        if (i >= attempts.length) {
+            $('scanStatus').textContent = 'تعذر تشغيل الكاميرا';
+            toast('تعذر الوصول للكاميرا — تحقق من الصلاحيات', 'error');
+            return;
+        }
+        navigator.mediaDevices.getUserMedia(attempts[i]).then(function(stream) {
+            scanStream = stream;
+            var vid = $('scanVideo');
+            if (!vid) return;
+            vid.setAttribute('playsinline', 'true');
+            vid.setAttribute('webkit-playsinline', 'true');
+            vid.muted = true;
+            vid.srcObject = stream;
+
+            var onReady = function() {
+                var p = vid.play();
+                if (p && typeof p.then === 'function') {
+                    p.catch(function() {
+                        // retry play on user gesture already happened (button click)
+                        setTimeout(function() { vid.play().catch(function(){}); }, 200);
+                    });
+                }
+                scanTrack = stream.getVideoTracks()[0] || null;
+                try {
+                    var cap = scanTrack && scanTrack.getCapabilities ? scanTrack.getCapabilities() : {};
+                    if (cap && cap.torch && $('torchBtn')) $('torchBtn').classList.remove('hidden');
+                } catch (e) {}
+
+                initDetector().then(function() {
+                    if (scanDetector) {
+                        $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
+                        scanLoop();
+                    } else if (window.ZXingBrowser || window.ZXing) {
+                        $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
+                        startZXingScan(vid);
+                    } else {
+                        $('scanStatus').textContent = 'جاري تحميل قارئ الباركود...';
+                        loadZXing().then(function() {
+                            $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
+                            startZXingScan(vid);
+                        }).catch(function() {
+                            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
+                            toast('الماسح غير متوفر في هذا المتصفح. أدخل الباركود يدوياً', 'warning');
+                        });
+                    }
+                });
+            };
+
+            if (vid.readyState >= 2) onReady();
+            else vid.onloadedmetadata = onReady;
+        }).catch(function(err) {
+            console.error('getUserMedia attempt', i, err);
+            var name = (err && err.name) || '';
+            if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+                $('scanStatus').textContent = 'تم رفض إذن الكاميرا';
+                toast('اسمح بالكاميرا من إعدادات المتصفح', 'error');
+                return;
             }
-            scanLoop();
-        };
-    }).catch(function(err) {
-        $('scanStatus').textContent = 'تعذر الوصول للكاميرا';
-        toast('تعذر الوصول للكاميرا', 'error');
-        console.error(err);
-    });
+            if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+                $('scanStatus').textContent = 'لا توجد كاميرا';
+                toast('لم يتم العثور على كاميرا', 'error');
+                return;
+            }
+            // try next constraint set
+            tryNext(i + 1);
+        });
+    }
+    tryNext(0);
 }
 
 function initDetector() {
     scanDetector = null;
-    if ('BarcodeDetector' in window) {
+    return new Promise(function(resolve) {
+        if (!('BarcodeDetector' in window)) {
+            resolve(null);
+            return;
+        }
         try {
-            scanDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'code_128', 'qr_code', 'data_matrix', 'itf', 'codabar'] });
+            var det = new BarcodeDetector({
+                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'code_128', 'code_93', 'qr_code', 'data_matrix', 'itf', 'codabar']
+            });
+            // some browsers expose the API but fail at runtime
+            if (det && typeof det.detect === 'function') {
+                scanDetector = det;
+            }
         } catch (e) {
             try { scanDetector = new BarcodeDetector(); } catch (e2) { scanDetector = null; }
         }
+        resolve(scanDetector);
+    });
+}
+
+var scanZXingControls = null;
+var zxingLoading = null;
+
+function loadZXing() {
+    if (window.ZXingBrowser || window.ZXing) return Promise.resolve();
+    if (zxingLoading) return zxingLoading;
+    zxingLoading = new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
+        s.async = true;
+        s.onload = function() { resolve(); };
+        s.onerror = function() {
+            // fallback mirror
+            var s2 = document.createElement('script');
+            s2.src = 'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js';
+            s2.onload = function() { resolve(); };
+            s2.onerror = function() { reject(new Error('zxing load failed')); };
+            document.head.appendChild(s2);
+        };
+        document.head.appendChild(s);
+    });
+    return zxingLoading;
+}
+
+
+function startZXingScan(vid) {
+    try {
+        var ZXingLib = window.ZXing;
+        if (!ZXingLib || !ZXingLib.BrowserMultiFormatReader) {
+            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
+            toast('قارئ الباركود غير متوفر', 'warning');
+            return;
+        }
+        var codeReader = new ZXingLib.BrowserMultiFormatReader();
+        scanZXingControls = codeReader;
+
+        var onResult = function(result, err) {
+            if (!result) return;
+            var raw = '';
+            try {
+                if (typeof result.getText === 'function') raw = result.getText();
+                else if (result.text) raw = result.text;
+            } catch (e) {}
+            raw = String(raw || '').trim();
+            if (raw) onBarcodeFound(raw);
+        };
+
+        // Prefer existing stream (already opened by startCamera)
+        if (scanStream && typeof codeReader.decodeFromStream === 'function') {
+            codeReader.decodeFromStream(scanStream, vid, onResult).catch(function(e) {
+                console.error(e);
+                tryDecodeFromDevice(codeReader, vid, onResult);
+            });
+            return;
+        }
+        tryDecodeFromDevice(codeReader, vid, onResult);
+    } catch (e) {
+        console.error(e);
+        $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
+        toast('تعذر تفعيل قارئ الباركود', 'warning');
+    }
+}
+
+function tryDecodeFromDevice(codeReader, vid, onResult) {
+    try {
+        codeReader.decodeFromVideoDevice(null, vid.id || 'scanVideo', onResult).catch(function(e) {
+            console.error(e);
+            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
+            toast('تعذر قراءة الباركود تلقائياً', 'warning');
+        });
+    } catch (e) {
+        console.error(e);
+        $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
     }
 }
 
 function scanLoop() {
     if (!scanStream) return;
     var vid = $('scanVideo');
-    if (vid.readyState === vid.HAVE_ENOUGH_DATA) {
+    if (vid && vid.readyState >= 2) {
         detectBarcode(vid);
     }
     scanRaf = requestAnimationFrame(scanLoop);
@@ -704,7 +867,13 @@ function detectBarcode(vid) {
 }
 
 function onBarcodeFound(code) {
-    // Beep sound
+    code = String(code || '').trim();
+    if (!code) return;
+    var now = Date.now();
+    if (code === lastScanCode && (now - lastScanTime) < 1500) return;
+    lastScanCode = code;
+    lastScanTime = now;
+
     try {
         var ctx = new (window.AudioContext || window.webkitAudioContext)();
         var osc = ctx.createOscillator();
@@ -715,38 +884,32 @@ function onBarcodeFound(code) {
         gain.gain.value = 0.1;
         osc.start();
         osc.stop(ctx.currentTime + 0.15);
-    } catch(e) {}
+    } catch (e) {}
 
     closeScanner();
 
     if (gScanMode === 'search') {
-        // Search mode: put barcode in search box and trigger search
-        $('searchProd').value = code;
+        if ($('searchProd')) $('searchProd').value = code;
         renderProds();
         toast('تم البحث عن: ' + code, 'success');
-        // Try to find and highlight
         var prods = getA(DB.prods);
         var found = null;
         for (var i = 0; i < prods.length; i++) {
-            if (prods[i].code === code) { found = prods[i]; break; }
+            if ((prods[i].code || '') === code) { found = prods[i]; break; }
         }
         if (found) {
-            setTimeout(function() {
-                editProd(found.id);
-            }, 400);
+            setTimeout(function() { editProd(found.id); }, 400);
         } else {
             toast('لا يوجد منتج بهذا الباركود', 'warning');
         }
     } else {
-        // Product mode: fill barcode field
-        $('mProdCode').value = code;
+        if ($('mProdCode')) $('mProdCode').value = code;
         toast('تم مسح الباركود: ' + code, 'success');
-        // Check if product exists
-        var prods = getA(DB.prods);
-        for (var i = 0; i < prods.length; i++) {
-            if (prods[i].code === code) {
+        var prods2 = getA(DB.prods);
+        for (var j = 0; j < prods2.length; j++) {
+            if ((prods2[j].code || '') === code) {
                 toast('المنتج موجود مسبقاً، تم فتحه للتعديل', 'info');
-                editProd(prods[i].id);
+                editProd(prods2[j].id);
                 return;
             }
         }
@@ -2193,4 +2356,14 @@ function closeModal(id) {
 document.addEventListener('click', function(e) {
     var menu = $('userMenu');
     var btn = e.target.closest('button[onclick="toggleMenu()"]');
-    if (menu && !menu.classList.contains('hi
+    if (menu && !menu.classList.contains('hidden') && !btn && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+    }
+});
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        ['modalProd', 'modalCat', 'modalSup', 'modalConfirm', 'modalScanner'].forEach(function(id) {
+            if ($(id) && !$(id).classList.contains('hidden')) {
+   
