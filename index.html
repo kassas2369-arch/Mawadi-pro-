@@ -361,7 +361,7 @@ body.dark #loginPage .glass,body.dark #regPage .glass{background:rgba(15,23,42,0
 <div class="text-center py-8">
 <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-xl"><i class="fas fa-boxes-stacked text-3xl text-white"></i></div>
 <h2 class="text-xl font-bold text-slate-900">Mawadi Pro</h2>
-<p class="text-slate-500 text-xs mb-5">v2.5.2 - أغسطس 2026</p>
+<p class="text-slate-500 text-xs mb-5">v2.5.3 - أغسطس 2026</p>
 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 max-w-sm mx-auto text-right space-y-2">
 <p class="text-xs text-slate-600 leading-relaxed">
 <i class="fas fa-barcode text-blue-500 ml-1"></i>
@@ -447,10 +447,16 @@ body.dark #loginPage .glass,body.dark #regPage .glass{background:rgba(15,23,42,0
 <p class="scanner-hint">وجه الكاميرا نحو الباركود</p>
 </div>
 </div>
-<div class="bg-slate-900 p-4 flex items-center justify-between gap-3">
-<button onclick="closeScanner()" class="px-4 py-2 rounded-xl bg-slate-700 text-white text-xs font-bold">إغلاق</button>
+<div class="bg-slate-900 p-3 space-y-2">
+<div class="flex items-center justify-between gap-2">
+<button type="button" onclick="closeScanner()" class="px-3 py-2 rounded-xl bg-slate-700 text-white text-xs font-bold">إغلاق</button>
 <p id="scanStatus" class="text-[10px] text-slate-400 flex-1 text-center">جاري البحث...</p>
-<button onclick="toggleTorch()" id="torchBtn" class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center hidden"><i class="fas fa-bolt text-yellow-400 text-xs"></i></button>
+<button type="button" onclick="toggleTorch()" id="torchBtn" class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center hidden"><i class="fas fa-bolt text-yellow-400 text-xs"></i></button>
+</div>
+<div class="flex gap-2">
+<input type="text" id="scanManualInput" inputmode="numeric" placeholder="أو أدخل الباركود يدوياً" class="flex-1 px-3 py-2 rounded-xl border border-slate-600 bg-slate-800 text-white text-xs outline-none">
+<button type="button" onclick="submitManualScan()" class="px-3 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">تأكيد</button>
+</div>
 </div>
 </div>
 </div>
@@ -606,23 +612,29 @@ function toast(msg, type) {
 function show(id) { $(id).classList.remove('hidden'); }
 function hide(id) { $(id).classList.add('hidden'); }
 
-// ===== BARCODE SCANNER =====
+// ===== BARCODE SCANNER (robust) =====
+var scanRaf = null;
 var scanStream = null;
 var scanTrack = null;
-var scanRaf = null;
 var scanDetector = null;
-
+var scanZXingReader = null;
+var scanBusy = false;
+var lastScanCode = '';
+var lastScanTime = 0;
+var zxingLoading = null;
+var scanFrameSkip = 0;
 
 function openScanner(mode) {
     gScanMode = mode || 'product';
     lastScanCode = '';
     lastScanTime = 0;
+    scanBusy = false;
+    scanFrameSkip = 0;
 
-    // Camera requires secure context (HTTPS or localhost)
     var isSecure = (typeof window.isSecureContext === 'boolean') ? window.isSecureContext :
         (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
     if (!isSecure) {
-        toast('الكاميرا تحتاج فتح التطبيق عبر HTTPS وليس من ملف محلي', 'error');
+        toast('الكاميرا تحتاج HTTPS', 'error');
         return;
     }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -632,8 +644,7 @@ function openScanner(mode) {
 
     show('modalScanner');
     $('scanStatus').textContent = 'جاري تشغيل الكاميرا...';
-    var torchBtn = $('torchBtn');
-    if (torchBtn) torchBtn.classList.add('hidden');
+    if ($('torchBtn')) $('torchBtn').classList.add('hidden');
     startCamera();
 }
 
@@ -644,21 +655,17 @@ function closeScanner() {
 
 function stopCamera() {
     if (scanRaf) { cancelAnimationFrame(scanRaf); scanRaf = null; }
-    if (scanZXingControls && typeof scanZXingControls.stop === 'function') {
-        try { scanZXingControls.stop(); } catch (e) {}
-        scanZXingControls = null;
-    }
+    scanBusy = false;
+    scanZXingReader = null;
     if (scanStream) {
-        try {
-            scanStream.getTracks().forEach(function(t) { t.stop(); });
-        } catch (e) {}
+        try { scanStream.getTracks().forEach(function(t) { t.stop(); }); } catch (e) {}
         scanStream = null;
     }
     scanTrack = null;
     var vid = $('scanVideo');
     if (vid) {
         try { vid.pause(); } catch (e) {}
-        vid.srcObject = null;
+        try { vid.srcObject = null; } catch (e) {}
     }
 }
 
@@ -667,120 +674,75 @@ function startCamera() {
     var attempts = [
         { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
         { video: { facingMode: 'environment' }, audio: false },
-        { video: { facingMode: 'user' }, audio: false },
         { video: true, audio: false }
     ];
 
     function tryNext(i) {
         if (i >= attempts.length) {
             $('scanStatus').textContent = 'تعذر تشغيل الكاميرا';
-            toast('تعذر الوصول للكاميرا — تحقق من الصلاحيات', 'error');
+            toast('تعذر الوصول للكاميرا', 'error');
             return;
         }
         navigator.mediaDevices.getUserMedia(attempts[i]).then(function(stream) {
             scanStream = stream;
             var vid = $('scanVideo');
-            if (!vid) return;
             vid.setAttribute('playsinline', 'true');
             vid.setAttribute('webkit-playsinline', 'true');
             vid.muted = true;
+            vid.playsInline = true;
             vid.srcObject = stream;
 
-            var onReady = function() {
-                var p = vid.play();
-                if (p && typeof p.then === 'function') {
-                    p.catch(function() {
-                        // retry play on user gesture already happened (button click)
-                        setTimeout(function() { vid.play().catch(function(){}); }, 200);
-                    });
-                }
+            var ready = function() {
+                vid.play().catch(function(){});
                 scanTrack = stream.getVideoTracks()[0] || null;
                 try {
                     var cap = scanTrack && scanTrack.getCapabilities ? scanTrack.getCapabilities() : {};
                     if (cap && cap.torch && $('torchBtn')) $('torchBtn').classList.remove('hidden');
                 } catch (e) {}
 
-                initDetector().then(function() {
-                    if (scanDetector) {
-                        $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
-                        scanLoop();
-                    } else if (window.ZXingBrowser || window.ZXing) {
-                        $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
-                        startZXingScan(vid);
-                    } else {
-                        $('scanStatus').textContent = 'جاري تحميل قارئ الباركود...';
-                        loadZXing().then(function() {
-                            $('scanStatus').textContent = 'وجه الكاميرا نحو الباركود...';
-                            startZXingScan(vid);
-                        }).catch(function() {
-                            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
-                            toast('الماسح غير متوفر في هذا المتصفح. أدخل الباركود يدوياً', 'warning');
-                        });
-                    }
+                $('scanStatus').textContent = 'جاري تجهيز قارئ الباركود...';
+                prepareScanner().then(function() {
+                    $('scanStatus').textContent = 'وجه الباركود داخل الإطار';
+                    scanLoop();
+                }).catch(function() {
+                    $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الرمز يدوياً بالأسفل';
+                    toast('تعذر تفعيل القارئ التلقائي', 'warning');
                 });
             };
-
-            if (vid.readyState >= 2) onReady();
-            else vid.onloadedmetadata = onReady;
+            if (vid.readyState >= 2) ready();
+            else vid.onloadedmetadata = ready;
         }).catch(function(err) {
-            console.error('getUserMedia attempt', i, err);
             var name = (err && err.name) || '';
             if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
                 $('scanStatus').textContent = 'تم رفض إذن الكاميرا';
                 toast('اسمح بالكاميرا من إعدادات المتصفح', 'error');
                 return;
             }
-            if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-                $('scanStatus').textContent = 'لا توجد كاميرا';
-                toast('لم يتم العثور على كاميرا', 'error');
-                return;
-            }
-            // try next constraint set
             tryNext(i + 1);
         });
     }
     tryNext(0);
 }
 
-function initDetector() {
-    scanDetector = null;
-    return new Promise(function(resolve) {
-        if (!('BarcodeDetector' in window)) {
-            resolve(null);
-            return;
-        }
-        try {
-            var det = new BarcodeDetector({
-                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'code_128', 'code_93', 'qr_code', 'data_matrix', 'itf', 'codabar']
-            });
-            // some browsers expose the API but fail at runtime
-            if (det && typeof det.detect === 'function') {
-                scanDetector = det;
-            }
-        } catch (e) {
-            try { scanDetector = new BarcodeDetector(); } catch (e2) { scanDetector = null; }
-        }
-        resolve(scanDetector);
-    });
-}
-
-var scanZXingControls = null;
-var zxingLoading = null;
-
 function loadZXing() {
-    if (window.ZXingBrowser || window.ZXing) return Promise.resolve();
+    if (window.ZXing && window.ZXing.BrowserMultiFormatReader) return Promise.resolve(window.ZXing);
     if (zxingLoading) return zxingLoading;
     zxingLoading = new Promise(function(resolve, reject) {
         var s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
         s.async = true;
-        s.onload = function() { resolve(); };
+        s.onload = function() {
+            if (window.ZXing) resolve(window.ZXing);
+            else reject(new Error('ZXing missing'));
+        };
         s.onerror = function() {
-            // fallback mirror
             var s2 = document.createElement('script');
             s2.src = 'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js';
-            s2.onload = function() { resolve(); };
-            s2.onerror = function() { reject(new Error('zxing load failed')); };
+            s2.onload = function() {
+                if (window.ZXing) resolve(window.ZXing);
+                else reject(new Error('ZXing missing'));
+            };
+            s2.onerror = function() { reject(new Error('load fail')); };
             document.head.appendChild(s2);
         };
         document.head.appendChild(s);
@@ -788,89 +750,185 @@ function loadZXing() {
     return zxingLoading;
 }
 
-
-function startZXingScan(vid) {
-    try {
-        var ZXingLib = window.ZXing;
-        if (!ZXingLib || !ZXingLib.BrowserMultiFormatReader) {
-            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
-            toast('قارئ الباركود غير متوفر', 'warning');
-            return;
-        }
-        var codeReader = new ZXingLib.BrowserMultiFormatReader();
-        scanZXingControls = codeReader;
-
-        var onResult = function(result, err) {
-            if (!result) return;
-            var raw = '';
-            try {
-                if (typeof result.getText === 'function') raw = result.getText();
-                else if (result.text) raw = result.text;
-            } catch (e) {}
-            raw = String(raw || '').trim();
-            if (raw) onBarcodeFound(raw);
-        };
-
-        // Prefer existing stream (already opened by startCamera)
-        if (scanStream && typeof codeReader.decodeFromStream === 'function') {
-            codeReader.decodeFromStream(scanStream, vid, onResult).catch(function(e) {
-                console.error(e);
-                tryDecodeFromDevice(codeReader, vid, onResult);
+function prepareScanner() {
+    scanDetector = null;
+    scanZXingReader = null;
+    // Try native first
+    if ('BarcodeDetector' in window) {
+        try {
+            scanDetector = new BarcodeDetector({
+                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'code_93', 'qr_code', 'data_matrix', 'itf', 'codabar']
             });
-            return;
+        } catch (e) {
+            try { scanDetector = new BarcodeDetector(); } catch (e2) { scanDetector = null; }
         }
-        tryDecodeFromDevice(codeReader, vid, onResult);
-    } catch (e) {
-        console.error(e);
-        $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
-        toast('تعذر تفعيل قارئ الباركود', 'warning');
     }
-}
-
-function tryDecodeFromDevice(codeReader, vid, onResult) {
-    try {
-        codeReader.decodeFromVideoDevice(null, vid.id || 'scanVideo', onResult).catch(function(e) {
+    // Always also load ZXing as primary reliable reader on mobile
+    return loadZXing().then(function(ZXing) {
+        try {
+            // Use low-level MultiFormatReader for more control
+            if (ZXing.MultiFormatReader && ZXing.HTMLCanvasElementLuminanceSource) {
+                var hints = new Map();
+                if (ZXing.DecodeHintType) {
+                    try {
+                        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+                        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+                            ZXing.BarcodeFormat.EAN_13,
+                            ZXing.BarcodeFormat.EAN_8,
+                            ZXing.BarcodeFormat.UPC_A,
+                            ZXing.BarcodeFormat.UPC_E,
+                            ZXing.BarcodeFormat.CODE_128,
+                            ZXing.BarcodeFormat.CODE_39,
+                            ZXing.BarcodeFormat.CODE_93,
+                            ZXing.BarcodeFormat.QR_CODE,
+                            ZXing.BarcodeFormat.DATA_MATRIX,
+                            ZXing.BarcodeFormat.ITF,
+                            ZXing.BarcodeFormat.CODABAR
+                        ]);
+                    } catch (e) {}
+                }
+                var reader = new ZXing.MultiFormatReader();
+                try { reader.setHints(hints); } catch (e) {}
+                scanZXingReader = reader;
+            } else if (ZXing.BrowserMultiFormatReader) {
+                scanZXingReader = new ZXing.BrowserMultiFormatReader();
+            }
+        } catch (e) {
             console.error(e);
-            $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
-            toast('تعذر قراءة الباركود تلقائياً', 'warning');
-        });
-    } catch (e) {
-        console.error(e);
-        $('scanStatus').textContent = 'الكاميرا تعمل — أدخل الباركود يدوياً';
-    }
+        }
+        if (!scanZXingReader && !scanDetector) throw new Error('no reader');
+    });
 }
 
 function scanLoop() {
     if (!scanStream) return;
-    var vid = $('scanVideo');
-    if (vid && vid.readyState >= 2) {
-        detectBarcode(vid);
-    }
     scanRaf = requestAnimationFrame(scanLoop);
+
+    // throttle: process ~ every 3rd frame for performance
+    scanFrameSkip++;
+    if (scanFrameSkip % 3 !== 0) return;
+    if (scanBusy) return;
+
+    var vid = $('scanVideo');
+    if (!vid || vid.readyState < 2) return;
+    if (!vid.videoWidth || !vid.videoHeight) return;
+
+    scanBusy = true;
+
+    // 1) Native BarcodeDetector
+    var nativePromise = Promise.resolve(null);
+    if (scanDetector) {
+        nativePromise = scanDetector.detect(vid).then(function(codes) {
+            if (codes && codes.length) {
+                var raw = (codes[0].rawValue || '').trim();
+                if (raw) return raw;
+            }
+            return null;
+        }).catch(function() { return null; });
+    }
+
+    nativePromise.then(function(code) {
+        if (code) {
+            scanBusy = false;
+            onBarcodeFound(code);
+            return;
+        }
+        // 2) ZXing from canvas (center crop for better focus on barcode area)
+        return decodeWithZXing(vid);
+    }).then(function(code) {
+        scanBusy = false;
+        if (code) onBarcodeFound(code);
+    }).catch(function() {
+        scanBusy = false;
+    });
 }
 
-var lastScanCode = '';
-var lastScanTime = 0;
-function detectBarcode(vid) {
-    if (!scanDetector) return;
-    scanDetector.detect(vid).then(function(codes) {
-        if (codes && codes.length > 0) {
-            var raw = (codes[0].rawValue || '').trim();
-            if (!raw) return;
-            var now = Date.now();
-            if (raw === lastScanCode && (now - lastScanTime) < 1500) return;
-            lastScanCode = raw;
-            lastScanTime = now;
-            onBarcodeFound(raw);
+function decodeWithZXing(vid) {
+    return new Promise(function(resolve) {
+        try {
+            var ZXing = window.ZXing;
+            if (!ZXing || !scanZXingReader) { resolve(null); return; }
+
+            var vw = vid.videoWidth;
+            var vh = vid.videoHeight;
+            // Crop center region (scanner frame area) — improves detection
+            var cropW = Math.floor(vw * 0.85);
+            var cropH = Math.floor(vh * 0.45);
+            var sx = Math.floor((vw - cropW) / 2);
+            var sy = Math.floor((vh - cropH) / 2);
+
+            var canvas = document.createElement('canvas');
+            canvas.width = cropW;
+            canvas.height = cropH;
+            var ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(vid, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
+
+            // If BrowserMultiFormatReader with decodeFromImageElement
+            if (scanZXingReader.decodeFromImageElement) {
+                // convert canvas to image
+                var img = new Image();
+                img.onload = function() {
+                    scanZXingReader.decodeFromImageElement(img).then(function(result) {
+                        var raw = result && (result.getText ? result.getText() : result.text);
+                        resolve(raw ? String(raw).trim() : null);
+                    }).catch(function() { resolve(null); });
+                };
+                img.onerror = function() { resolve(null); };
+                img.src = canvas.toDataURL('image/png');
+                return;
+            }
+
+            // Low-level MultiFormatReader
+            if (ZXing.HTMLCanvasElementLuminanceSource && ZXing.BinaryBitmap && ZXing.HybridBinarizer) {
+                var luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+                var binaryBitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminanceSource));
+                try {
+                    var result = scanZXingReader.decode(binaryBitmap);
+                    var raw = result && (result.getText ? result.getText() : result.text);
+                    resolve(raw ? String(raw).trim() : null);
+                    // reset reader between frames
+                    try { scanZXingReader.reset(); } catch (e) {}
+                    return;
+                } catch (e) {
+                    try { scanZXingReader.reset(); } catch (e2) {}
+                    // try inverted (dark on light vs light on dark)
+                    try {
+                        if (ZXing.InvertedLuminanceSource) {
+                            var inv = new ZXing.InvertedLuminanceSource(luminanceSource);
+                            var bin2 = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(inv));
+                            var result2 = scanZXingReader.decode(bin2);
+                            var raw2 = result2 && (result2.getText ? result2.getText() : result2.text);
+                            try { scanZXingReader.reset(); } catch (e3) {}
+                            resolve(raw2 ? String(raw2).trim() : null);
+                            return;
+                        }
+                    } catch (e4) {
+                        try { scanZXingReader.reset(); } catch (e5) {}
+                    }
+                    resolve(null);
+                    return;
+                }
+            }
+            resolve(null);
+        } catch (e) {
+            resolve(null);
         }
-    }).catch(function(e) {});
+    });
+}
+
+function submitManualScan() {
+    var inp = $('scanManualInput');
+    var code = inp ? String(inp.value || '').trim() : '';
+    if (!code) { toast('أدخل الباركود', 'warning'); return; }
+    onBarcodeFound(code);
+    if (inp) inp.value = '';
 }
 
 function onBarcodeFound(code) {
     code = String(code || '').trim();
     if (!code) return;
     var now = Date.now();
-    if (code === lastScanCode && (now - lastScanTime) < 1500) return;
+    if (code === lastScanCode && (now - lastScanTime) < 1800) return;
     lastScanCode = code;
     lastScanTime = now;
 
@@ -881,9 +939,9 @@ function onBarcodeFound(code) {
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.frequency.value = 1200;
-        gain.gain.value = 0.1;
+        gain.gain.value = 0.12;
         osc.start();
-        osc.stop(ctx.currentTime + 0.15);
+        osc.stop(ctx.currentTime + 0.12);
     } catch (e) {}
 
     closeScanner();
@@ -897,18 +955,15 @@ function onBarcodeFound(code) {
         for (var i = 0; i < prods.length; i++) {
             if ((prods[i].code || '') === code) { found = prods[i]; break; }
         }
-        if (found) {
-            setTimeout(function() { editProd(found.id); }, 400);
-        } else {
-            toast('لا يوجد منتج بهذا الباركود', 'warning');
-        }
+        if (found) setTimeout(function() { editProd(found.id); }, 350);
+        else toast('لا يوجد منتج بهذا الباركود', 'warning');
     } else {
         if ($('mProdCode')) $('mProdCode').value = code;
         toast('تم مسح الباركود: ' + code, 'success');
         var prods2 = getA(DB.prods);
         for (var j = 0; j < prods2.length; j++) {
             if ((prods2[j].code || '') === code) {
-                toast('المنتج موجود مسبقاً، تم فتحه للتعديل', 'info');
+                toast('المنتج موجود — تم فتحه', 'info');
                 editProd(prods2[j].id);
                 return;
             }
@@ -2353,17 +2408,4 @@ function closeModal(id) {
 }
 
 // ===== EVENTS =====
-document.addEventListener('click', function(e) {
-    var menu = $('userMenu');
-    var btn = e.target.closest('button[onclick="toggleMenu()"]');
-    if (menu && !menu.classList.contains('hidden') && !btn && !menu.contains(e.target)) {
-        menu.classList.add('hidden');
-    }
-});
-
-// ===== KEYBOARD =====
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        ['modalProd', 'modalCat', 'modalSup', 'modalConfirm', 'modalScanner'].forEach(function(id) {
-            if ($(id) && !$(id).classList.contains('hidden')) {
-   
+document.add
